@@ -54,7 +54,7 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    background: linear-gradient(135deg, #FDE1D3 0%, #E5DEFF 50%, #D3E4FD 100%);
+    background: #E5DEFF;
     background-attachment: fixed;
     background-size: cover;
   }
