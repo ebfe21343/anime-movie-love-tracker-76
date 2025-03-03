@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Plus, Minus, Calendar, X } from 'lucide-react';
 import { Season } from '@/types/movie';
@@ -29,9 +28,7 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
     // Prevent the event from bubbling up to any parent forms
     e.preventDefault();
     
-    if (!newSeason.title.trim()) {
-      return; // Don't add empty seasons
-    }
+    // Remove the title validation check to make it truly optional
     
     // Create new season with unique ID
     const seasonToAdd: Season = {
