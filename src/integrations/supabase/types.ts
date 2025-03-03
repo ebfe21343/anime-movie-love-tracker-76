@@ -31,6 +31,7 @@ export type Database = {
           poster_width: number | null
           primary_title: string
           runtime_minutes: number | null
+          seasons: Json | null
           spoken_languages: Json | null
           start_year: number | null
           type: string | null
@@ -59,6 +60,7 @@ export type Database = {
           poster_width?: number | null
           primary_title: string
           runtime_minutes?: number | null
+          seasons?: Json | null
           spoken_languages?: Json | null
           start_year?: number | null
           type?: string | null
@@ -87,6 +89,7 @@ export type Database = {
           poster_width?: number | null
           primary_title?: string
           runtime_minutes?: number | null
+          seasons?: Json | null
           spoken_languages?: Json | null
           start_year?: number | null
           type?: string | null

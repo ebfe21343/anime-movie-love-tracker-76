@@ -173,7 +173,7 @@ export const getMovieCollection = async (): Promise<Movie[]> => {
       ),
       watch_link: movie.watch_link || '',
       added_at: movie.added_at || new Date().toISOString(),
-      seasons: safeParseJson<Season[]>(movie.seasons, [])
+      seasons: movie.seasons ? safeParseJson<Season[]>(movie.seasons, []) : []
     }));
   } catch (error) {
     console.error('Error fetching movies from Supabase:', error);
@@ -284,7 +284,7 @@ export const addMovieToCollection = async (
       ),
       watch_link: data.watch_link || '',
       added_at: data.added_at || new Date().toISOString(),
-      seasons: safeParseJson<Season[]>(data.seasons, [])
+      seasons: data.seasons ? safeParseJson<Season[]>(data.seasons, []) : []
     };
   } catch (error) {
     console.error('Error adding movie to Supabase:', error);
@@ -390,7 +390,7 @@ export const updateMovieInCollection = async (
       ),
       watch_link: data.watch_link || '',
       added_at: data.added_at || new Date().toISOString(),
-      seasons: safeParseJson<Season[]>(data.seasons, [])
+      seasons: data.seasons ? safeParseJson<Season[]>(data.seasons, []) : []
     };
   } catch (error) {
     console.error('Error updating movie in Supabase:', error);
