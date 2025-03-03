@@ -1,9 +1,8 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Movie } from '@/types/movie';
 import { Star, Clock, Calendar, Globe, Link as LinkIcon, Heart, ArrowLeft, Trash2 } from 'lucide-react';
-import { updateMovieInCollection, removeMovieFromCollection } from '@/lib/api';
+import { updateMovieInCollection } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,9 +36,18 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
   const [lyanComment, setLyanComment] = useState(movie.comments.lyan);
   const [nastyaComment, setNastyaComment] = useState(movie.comments.nastya);
   
-  const handleSaveChanges = () => {
+  // When we receive new props, update our state
+  useEffect(() => {
+    setWatchLink(movie.watch_link);
+    setLyanRating(movie.personal_ratings.lyan);
+    setNastyaRating(movie.personal_ratings.nastya);
+    setLyanComment(movie.comments.lyan);
+    setNastyaComment(movie.comments.nastya);
+  }, [movie]);
+  
+  const handleSaveChanges = async () => {
     try {
-      updateMovieInCollection(movie.id, {
+      await updateMovieInCollection(movie.id, {
         watch_link: watchLink,
         personal_ratings: {
           lyan: lyanRating,
@@ -53,7 +61,9 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
       
       toast.success('Movie details updated!');
       setEditMode(false);
-      onUpdate();
+      // The onUpdate callback is no longer needed since we're using realtime updates
+      // but we'll keep it for compatibility
+      if (onUpdate) onUpdate();
     } catch (error) {
       toast.error('Failed to update movie details');
       console.error(error);

@@ -6,6 +6,7 @@ import { Movie } from '@/types/movie';
 import Header from '@/components/Header';
 import MovieDetail from '@/components/MovieDetail';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const MoviePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,6 +41,43 @@ const MoviePage = () => {
     
     loadMovie();
   }, [id, navigate]);
+  
+  // Set up realtime subscription for movie updates
+  useEffect(() => {
+    if (!id) return;
+    
+    const channel = supabase
+      .channel('movie_updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'movies',
+          filter: `id=eq.${id}`
+        },
+        async (payload) => {
+          console.log('Movie updated:', payload);
+          // Refresh the movie data when an update occurs
+          try {
+            const movieCollection = await getMovieCollection();
+            const updatedMovie = movieCollection.find(m => m.id === id);
+            if (updatedMovie) {
+              setMovie(updatedMovie);
+              toast.success('Movie details updated');
+            }
+          } catch (error) {
+            console.error('Error refreshing movie data:', error);
+          }
+        }
+      )
+      .subscribe();
+    
+    // Clean up subscription when component unmounts
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id]);
   
   const handleMovieUpdate = async () => {
     if (!id) return;

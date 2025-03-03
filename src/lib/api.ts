@@ -340,6 +340,7 @@ export const updateMovieInCollection = async (
       updatesForDb.watch_link = updates.watch_link;
     }
     
+    // Update the movie in Supabase
     const { data, error } = await supabase
       .from('movies')
       .update(updatesForDb)
