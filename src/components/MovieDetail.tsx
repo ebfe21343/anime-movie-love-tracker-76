@@ -520,7 +520,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                                     <Calendar className="h-3 w-3" />
                                     <span>{season.year}</span>
                                     {season.episode_count && (
-                                      <Badge variant="outline" size="sm" className="ml-1 text-xs">
+                                      <Badge variant="outline" className="ml-1 text-xs">
                                         {season.episode_count} episodes
                                       </Badge>
                                     )}
