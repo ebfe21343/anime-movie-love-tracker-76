@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Star, Calendar } from 'lucide-react';
+import { Star, Film, Tv } from 'lucide-react';
 import { Movie } from '@/types/movie';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,10 @@ const MovieCard = ({ movie }: MovieCardProps) => {
   
   // Calculate average personal rating
   const avgPersonalRating = ((movie.personal_ratings.lyan + movie.personal_ratings.nastya) / 2).toFixed(1);
+
+  // Determine if it's a movie or series
+  const isMovie = movie.type === 'movie';
+  const TypeIcon = isMovie ? Film : Tv;
 
   return (
     <Link to={`/movie/${movie.id}`}>
@@ -36,6 +40,14 @@ const MovieCard = ({ movie }: MovieCardProps) => {
             </Badge>
           )}
           
+          {/* Type icon (Movie/Series) */}
+          <div className="absolute top-2 left-2">
+            <Badge className="bg-lavender-500/80 text-white flex items-center gap-1">
+              <TypeIcon className="w-3.5 h-3.5" />
+              <span>{isMovie ? 'Movie' : 'Series'}</span>
+            </Badge>
+          </div>
+          
           {/* Genres */}
           <div className="absolute bottom-0 left-0 right-0 p-3 flex flex-wrap gap-1 bg-gradient-to-t from-black/70 to-transparent">
             {movie.genres.slice(0, 3).map(genre => (
@@ -53,8 +65,7 @@ const MovieCard = ({ movie }: MovieCardProps) => {
         <CardContent className="p-4">
           <div className="flex justify-between items-center mb-1">
             <h3 className="font-bold text-lg line-clamp-1 flex-1">{movie.primary_title}</h3>
-            <div className="text-sm text-muted-foreground flex items-center gap-1">
-              <Calendar className="w-3 h-3" />
+            <div className="text-sm text-muted-foreground">
               <span>{releaseYear}{endYear}</span>
             </div>
           </div>
