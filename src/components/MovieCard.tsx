@@ -29,12 +29,16 @@ const MovieCard = ({ movie }: MovieCardProps) => {
     <Link to={`/movie/${movie.id}`}>
       <Card className="overflow-hidden card-hover h-full border-none glass rounded-2xl">
         <div className="relative aspect-[2/3] overflow-hidden rounded-t-2xl">
-          {/* Poster image */}
+          {/* Poster image with optimization */}
           <img 
             src={poster} 
             alt={movie.primary_title}
-            className="object-cover w-full h-full"
+            className="object-cover w-full h-full transform scale-[1.01]" 
             loading="lazy"
+            style={{
+              imageRendering: 'high-quality',
+              objectPosition: 'center'
+            }}
           />
           
           {/* Adult badge */}
