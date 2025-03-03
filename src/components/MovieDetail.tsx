@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Movie, Season } from '@/types/movie';
@@ -40,7 +39,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
   const [seasons, setSeasons] = useState<Season[]>(movie.seasons || []);
   const isSeries = movie.type === 'tvSeries' || movie.type === 'tvMiniSeries';
   
-  // When we receive new props, update our state
   useEffect(() => {
     setWatchLink(movie.watch_link);
     setLyanRating(movie.personal_ratings.lyan);
@@ -67,8 +65,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
       
       toast.success('Movie details updated!');
       setEditMode(false);
-      // The onUpdate callback is still needed to trigger immediate UI refresh
-      // while we wait for the realtime update to come through
       if (onUpdate) onUpdate();
     } catch (error) {
       toast.error('Failed to update movie details');
@@ -161,7 +157,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
       </div>
       
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Left column - Poster and details */}
         <div className="w-full lg:w-1/3 flex flex-col gap-4">
           <Card className="overflow-hidden border-none glass rounded-2xl">
             <div className="relative aspect-[2/3]">
@@ -277,7 +272,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
             </CardContent>
           </Card>
           
-          {/* Personal ratings card */}
           <Card className="border-none glass rounded-2xl overflow-hidden">
             <CardContent className="p-4">
               <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
@@ -377,7 +371,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
           </Card>
         </div>
         
-        {/* Right column - Movie info and comments */}
         <div className="w-full lg:w-2/3">
           <Card className="border-none glass rounded-2xl overflow-hidden mb-6">
             <CardContent className="p-6">
@@ -393,9 +386,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
               
               <p className="mb-6 leading-relaxed">{movie.plot}</p>
               
-              {/* Credits */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
-                {/* Directors */}
                 {movie.directors && movie.directors.length > 0 && (
                   <div>
                     <h4 className="font-medium mb-2">Directed by</h4>
@@ -420,7 +411,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                   </div>
                 )}
                 
-                {/* Writers */}
                 {movie.writers && movie.writers.length > 0 && (
                   <div>
                     <h4 className="font-medium mb-2">Written by</h4>
@@ -446,7 +436,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                 )}
               </div>
               
-              {/* Cast */}
               {movie.casts && movie.casts.length > 0 && (
                 <div className="mt-6">
                   <h4 className="font-medium mb-3">Cast</h4>
@@ -478,7 +467,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
             </CardContent>
           </Card>
           
-          {/* Seasons section (only for TV series) */}
           {isSeries && (
             <Card className="border-none glass rounded-2xl overflow-hidden mb-6">
               <CardContent className="p-6">
@@ -561,15 +549,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                     ) : (
                       <div className="text-center p-8 bg-muted/30 rounded-lg">
                         <p className="text-muted-foreground">No seasons added yet</p>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="mt-4"
-                          onClick={() => setEditMode(true)}
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Seasons
-                        </Button>
                       </div>
                     )}
                   </div>
@@ -578,7 +557,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
             </Card>
           )}
           
-          {/* Comments */}
           <Card className="border-none glass rounded-2xl overflow-hidden">
             <CardContent className="p-6">
               <h3 className="text-xl font-medium mb-4">Comments</h3>
