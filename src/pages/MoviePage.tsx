@@ -46,8 +46,9 @@ const MoviePage = () => {
   useEffect(() => {
     if (!id) return;
     
+    // Make sure we're subscribed to the specific movie updates
     const channel = supabase
-      .channel('movie_updates')
+      .channel(`movie_updates_${id}`) // Use unique channel name with movie ID
       .on(
         'postgres_changes',
         {
@@ -82,7 +83,7 @@ const MoviePage = () => {
   const handleMovieUpdate = async () => {
     if (!id) return;
     
-    // Refresh movie data
+    // Refresh movie data immediately after update
     try {
       const movieCollection = await getMovieCollection();
       const updatedMovie = movieCollection.find(m => m.id === id);

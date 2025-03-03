@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Movie } from '@/types/movie';
 import { Star, Clock, Calendar, Globe, Link as LinkIcon, Heart, ArrowLeft, Trash2 } from 'lucide-react';
-import { updateMovieInCollection } from '@/lib/api';
+import { updateMovieInCollection, removeMovieFromCollection } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -61,8 +62,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
       
       toast.success('Movie details updated!');
       setEditMode(false);
-      // The onUpdate callback is no longer needed since we're using realtime updates
-      // but we'll keep it for compatibility
+      // The onUpdate callback is still needed to trigger immediate UI refresh
+      // while we wait for the realtime update to come through
       if (onUpdate) onUpdate();
     } catch (error) {
       toast.error('Failed to update movie details');

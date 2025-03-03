@@ -1,4 +1,3 @@
-
 import { Movie, MovieResponse } from '@/types/movie';
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from '@/integrations/supabase/types';
@@ -106,7 +105,6 @@ export async function fetchMovieById(id: string): Promise<Omit<Movie, 'personal_
   }
 }
 
-// Helper function to safely parse JSON data from Supabase
 function safeParseJson<T>(json: Json | null, defaultValue: T): T {
   if (json === null) return defaultValue;
   try {
@@ -118,12 +116,10 @@ function safeParseJson<T>(json: Json | null, defaultValue: T): T {
   }
 }
 
-// Helper function to convert complex types to JSON for Supabase
 function convertToJson<T>(data: T): Json {
   return data as unknown as Json;
 }
 
-// Functions to interact with Supabase
 export const getMovieCollection = async (): Promise<Movie[]> => {
   try {
     const { data, error } = await supabase
@@ -133,7 +129,6 @@ export const getMovieCollection = async (): Promise<Movie[]> => {
     
     if (error) throw error;
     
-    // Transform the data to match our Movie interface with proper type casting
     return data.map(movie => ({
       id: movie.id,
       type: movie.type || '',
@@ -180,7 +175,6 @@ export const getMovieCollection = async (): Promise<Movie[]> => {
     }));
   } catch (error) {
     console.error('Error fetching movies from Supabase:', error);
-    // Fallback to local storage if Supabase fails
     const data = localStorage.getItem('anime_movie_tracker_collection');
     return data ? JSON.parse(data) : [];
   }
@@ -195,7 +189,6 @@ export const addMovieToCollection = async (
   }
 ): Promise<Movie> => {
   try {
-    // Check if movie already exists
     const { data: existingMovie } = await supabase
       .from('movies')
       .select('id')
@@ -206,10 +199,8 @@ export const addMovieToCollection = async (
       throw new Error('Movie already exists in your collection');
     }
 
-    // Fetch movie data from IMDb API
     const movieData = await fetchMovieById(imdbId);
     
-    // Prepare data for Supabase insert - ensuring all complex objects are properly converted to JSON
     const movieForDb = {
       id: movieData.id,
       type: movieData.type,
@@ -238,7 +229,6 @@ export const addMovieToCollection = async (
       watch_link: personalData.watch_link,
     };
     
-    // Insert the movie into Supabase
     const { data, error } = await supabase
       .from('movies')
       .insert(movieForDb)
@@ -247,7 +237,6 @@ export const addMovieToCollection = async (
     
     if (error) throw error;
     
-    // Transform back to our Movie interface
     return {
       id: data.id,
       type: data.type || '',
@@ -309,7 +298,6 @@ export const removeMovieFromCollection = async (id: string): Promise<void> => {
   } catch (error) {
     console.error('Error removing movie from Supabase:', error);
     
-    // Fallback to local storage if Supabase fails
     const movies = JSON.parse(localStorage.getItem('anime_movie_tracker_collection') || '[]');
     const filteredMovies = movies.filter((movie: Movie) => movie.id !== id);
     localStorage.setItem('anime_movie_tracker_collection', JSON.stringify(filteredMovies));
@@ -325,7 +313,6 @@ export const updateMovieInCollection = async (
   }>
 ): Promise<Movie | null> => {
   try {
-    // Convert complex objects to JSON format for Supabase
     const updatesForDb: any = {};
     
     if (updates.personal_ratings) {
@@ -340,7 +327,6 @@ export const updateMovieInCollection = async (
       updatesForDb.watch_link = updates.watch_link;
     }
     
-    // Update the movie in Supabase
     const { data, error } = await supabase
       .from('movies')
       .update(updatesForDb)
@@ -351,7 +337,6 @@ export const updateMovieInCollection = async (
     if (error) throw error;
     if (!data) return null;
     
-    // Transform to our Movie interface
     return {
       id: data.id,
       type: data.type || '',
@@ -399,7 +384,6 @@ export const updateMovieInCollection = async (
   } catch (error) {
     console.error('Error updating movie in Supabase:', error);
     
-    // Fallback to local storage if Supabase fails
     const movies = JSON.parse(localStorage.getItem('anime_movie_tracker_collection') || '[]');
     const movieIndex = movies.findIndex((movie: Movie) => movie.id === id);
     
