@@ -34,9 +34,11 @@ const Header = () => {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo on the left */}
-        <div className="w-10 h-10 rounded-full bg-sakura-400 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-          <Film className="text-white h-5 w-5" />
-        </div>
+        <Link to="/" className="cursor-pointer">
+          <div className="w-10 h-10 rounded-full bg-sakura-400 flex items-center justify-center shadow-md hover:scale-110 transition-transform duration-300">
+            <Film className="text-white h-5 w-5" />
+          </div>
+        </Link>
         
         {/* Title in the center */}
         <Link 
