@@ -9,13 +9,144 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      movies: {
+        Row: {
+          added_at: string | null
+          aggregate_rating: number | null
+          casts: Json | null
+          certificates: Json | null
+          comments: Json
+          critic_review: Json | null
+          directors: Json | null
+          end_year: number | null
+          genres: string[] | null
+          id: string
+          is_adult: boolean | null
+          origin_countries: Json | null
+          original_title: string | null
+          personal_ratings: Json
+          plot: string | null
+          poster_height: number | null
+          poster_url: string | null
+          poster_width: number | null
+          primary_title: string
+          runtime_minutes: number | null
+          spoken_languages: Json | null
+          start_year: number | null
+          type: string | null
+          votes_count: number | null
+          watch_link: string | null
+          writers: Json | null
+        }
+        Insert: {
+          added_at?: string | null
+          aggregate_rating?: number | null
+          casts?: Json | null
+          certificates?: Json | null
+          comments?: Json
+          critic_review?: Json | null
+          directors?: Json | null
+          end_year?: number | null
+          genres?: string[] | null
+          id: string
+          is_adult?: boolean | null
+          origin_countries?: Json | null
+          original_title?: string | null
+          personal_ratings?: Json
+          plot?: string | null
+          poster_height?: number | null
+          poster_url?: string | null
+          poster_width?: number | null
+          primary_title: string
+          runtime_minutes?: number | null
+          spoken_languages?: Json | null
+          start_year?: number | null
+          type?: string | null
+          votes_count?: number | null
+          watch_link?: string | null
+          writers?: Json | null
+        }
+        Update: {
+          added_at?: string | null
+          aggregate_rating?: number | null
+          casts?: Json | null
+          certificates?: Json | null
+          comments?: Json
+          critic_review?: Json | null
+          directors?: Json | null
+          end_year?: number | null
+          genres?: string[] | null
+          id?: string
+          is_adult?: boolean | null
+          origin_countries?: Json | null
+          original_title?: string | null
+          personal_ratings?: Json
+          plot?: string | null
+          poster_height?: number | null
+          poster_url?: string | null
+          poster_width?: number | null
+          primary_title?: string
+          runtime_minutes?: number | null
+          spoken_languages?: Json | null
+          start_year?: number | null
+          type?: string | null
+          votes_count?: number | null
+          watch_link?: string | null
+          writers?: Json | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      gtrgm_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gtrgm_decompress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gtrgm_in: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gtrgm_options: {
+        Args: {
+          "": unknown
+        }
+        Returns: undefined
+      }
+      gtrgm_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      set_limit: {
+        Args: {
+          "": number
+        }
+        Returns: number
+      }
+      show_limit: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      show_trgm: {
+        Args: {
+          "": string
+        }
+        Returns: string[]
+      }
     }
     Enums: {
       [_ in never]: never

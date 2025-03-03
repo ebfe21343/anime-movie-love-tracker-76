@@ -41,8 +41,8 @@ const Header = () => {
             <Film className="text-white h-5 w-5" />
           </div>
           <h1 className="text-2xl font-bold text-sakura-700">
-            <span className="text-lavender-700">Anime</span>Movie
-            <span className="text-sakura-500">Track</span>
+            <span className="text-lavender-700">Movie</span>
+            <span className="text-sakura-500">Tracker</span>
           </h1>
           <div className="hidden md:flex">
             <Heart className="w-4 h-4 text-sakura-500 animate-pulse-gentle" />
