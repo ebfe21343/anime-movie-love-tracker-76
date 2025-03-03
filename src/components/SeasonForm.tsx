@@ -25,7 +25,10 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
     comments: { lyan: '', nastya: '' }
   });
   
-  const addSeason = () => {
+  const addSeason = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent the event from bubbling up to any parent forms
+    e.preventDefault();
+    
     if (!newSeason.title.trim()) {
       return; // Don't add empty seasons
     }
@@ -71,6 +74,12 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
     setNewSeason({ ...newSeason, [field]: value });
   };
   
+  const toggleAddSeason = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent the event from bubbling up to any parent forms
+    e.preventDefault();
+    setIsAddingNewSeason(!isAddingNewSeason);
+  };
+  
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -78,8 +87,9 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => setIsAddingNewSeason(!isAddingNewSeason)}
+          onClick={toggleAddSeason}
           className="flex items-center gap-1"
+          type="button" // Explicitly set type to button to prevent form submission
         >
           {isAddingNewSeason ? (
             <>
@@ -153,6 +163,7 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
               variant="default" 
               className="w-full bg-sakura-500 hover:bg-sakura-600"
               onClick={addSeason}
+              type="button" // Explicitly set type to button to prevent form submission
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Season
@@ -190,6 +201,7 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
                     size="icon" 
                     className="text-destructive hover:bg-destructive/10"
                     onClick={() => removeSeason(index)}
+                    type="button" // Explicitly set type to button to prevent form submission
                   >
                     <Minus className="h-4 w-4" />
                   </Button>

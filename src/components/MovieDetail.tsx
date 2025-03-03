@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Movie } from '@/types/movie';
-import { Star, Clock, Calendar, Globe, Link as LinkIcon, Heart, ArrowLeft, Trash2 } from 'lucide-react';
+import { Movie, Season } from '@/types/movie';
+import { Star, Clock, Calendar, Globe, Link as LinkIcon, Heart, ArrowLeft, Trash2, Tv, Plus } from 'lucide-react';
 import { updateMovieInCollection, removeMovieFromCollection } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import SeasonForm from '@/components/SeasonForm';
 import {
   Dialog,
   DialogContent,
@@ -36,6 +37,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
   const [nastyaRating, setNastyaRating] = useState(movie.personal_ratings.nastya);
   const [lyanComment, setLyanComment] = useState(movie.comments.lyan);
   const [nastyaComment, setNastyaComment] = useState(movie.comments.nastya);
+  const [seasons, setSeasons] = useState<Season[]>(movie.seasons || []);
+  const isSeries = movie.type === 'tvSeries' || movie.type === 'tvMiniSeries';
   
   // When we receive new props, update our state
   useEffect(() => {
@@ -44,6 +47,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
     setNastyaRating(movie.personal_ratings.nastya);
     setLyanComment(movie.comments.lyan);
     setNastyaComment(movie.comments.nastya);
+    setSeasons(movie.seasons || []);
   }, [movie]);
   
   const handleSaveChanges = async () => {
@@ -58,6 +62,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
           lyan: lyanComment,
           nastya: nastyaComment,
         },
+        seasons: isSeries ? seasons : undefined,
       });
       
       toast.success('Movie details updated!');
@@ -169,6 +174,16 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
               {movie.is_adult && (
                 <Badge variant="destructive" className="absolute top-3 right-3">
                   18+
+                </Badge>
+              )}
+              
+              {isSeries && (
+                <Badge 
+                  variant="secondary" 
+                  className="absolute top-3 left-3 bg-lavender-500 text-white"
+                >
+                  <Tv className="h-3.5 w-3.5 mr-1" />
+                  Series
                 </Badge>
               )}
             </div>
@@ -462,6 +477,106 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
               )}
             </CardContent>
           </Card>
+          
+          {/* Seasons section (only for TV series) */}
+          {isSeries && (
+            <Card className="border-none glass rounded-2xl overflow-hidden mb-6">
+              <CardContent className="p-6">
+                {editMode ? (
+                  <SeasonForm
+                    seasons={seasons}
+                    onSeasonsChange={setSeasons}
+                  />
+                ) : (
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl font-medium flex items-center gap-2">
+                        <Tv className="h-5 w-5 text-lavender-500" />
+                        Seasons
+                      </h3>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-lavender-500/10 border-lavender-200 text-lavender-900"
+                        onClick={() => setEditMode(true)}
+                      >
+                        <Plus className="h-3.5 w-3.5 mr-1" />
+                        Manage Seasons
+                      </Button>
+                    </div>
+                    
+                    {seasons && seasons.length > 0 ? (
+                      <div className="space-y-4">
+                        {seasons.map((season) => (
+                          <Card key={season.id} className="bg-white/40 overflow-hidden">
+                            <CardContent className="p-4">
+                              <div className="flex justify-between mb-3">
+                                <div>
+                                  <h4 className="font-medium">Season {season.season_number}</h4>
+                                  {season.title && (
+                                    <p className="text-sm text-muted-foreground">"{season.title}"</p>
+                                  )}
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                                    <Calendar className="h-3 w-3" />
+                                    <span>{season.year}</span>
+                                    {season.episode_count && (
+                                      <Badge variant="outline" size="sm" className="ml-1 text-xs">
+                                        {season.episode_count} episodes
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="flex items-center">
+                                  <Badge className={cn(
+                                    "mr-2 font-bold",
+                                    getRatingBadgeColor((season.personal_ratings.lyan + season.personal_ratings.nastya) / 2)
+                                  )}>
+                                    {((season.personal_ratings.lyan + season.personal_ratings.nastya) / 2).toFixed(1)}/10
+                                  </Badge>
+                                </div>
+                              </div>
+                              
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <p className="font-medium mb-1">Lyan's Rating: {season.personal_ratings.lyan}/10</p>
+                                  {season.comments.lyan ? (
+                                    <p className="text-sm italic">{season.comments.lyan}</p>
+                                  ) : (
+                                    <p className="text-xs text-muted-foreground italic">No comment</p>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="font-medium mb-1">Nastya's Rating: {season.personal_ratings.nastya}/10</p>
+                                  {season.comments.nastya ? (
+                                    <p className="text-sm italic">{season.comments.nastya}</p>
+                                  ) : (
+                                    <p className="text-xs text-muted-foreground italic">No comment</p>
+                                  )}
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center p-8 bg-muted/30 rounded-lg">
+                        <p className="text-muted-foreground">No seasons added yet</p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="mt-4"
+                          onClick={() => setEditMode(true)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Seasons
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
           
           {/* Comments */}
           <Card className="border-none glass rounded-2xl overflow-hidden">

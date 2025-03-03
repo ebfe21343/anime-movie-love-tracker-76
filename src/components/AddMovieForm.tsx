@@ -65,10 +65,11 @@ const AddMovieForm = () => {
       setValue('id', id.value);
       
       // Detect if it's a series
-      setIsSeries(movieData.type === 'tvSeries' || movieData.type === 'tvMiniSeries');
+      const isTvSeries = movieData.type === 'tvSeries' || movieData.type === 'tvMiniSeries';
+      setIsSeries(isTvSeries);
       
       // If it's a series and end_year is null, it might be ongoing
-      if (isSeries && movieData.end_year === null) {
+      if (isTvSeries && movieData.end_year === null) {
         setSeasons([]); // Reset seasons when fetching a new show
       }
     } catch (error) {
@@ -229,16 +230,6 @@ const AddMovieForm = () => {
                 </div>
               </div>
               
-              {/* Season form (only visible if it's a series) */}
-              {preview && isSeries && (
-                <div className="pt-2 pb-2 border-t border-lavender-200">
-                  <SeasonForm 
-                    seasons={seasons} 
-                    onSeasonsChange={setSeasons} 
-                  />
-                </div>
-              )}
-              
               <div className="pt-2">
                 <Button 
                   type="submit" 
@@ -367,6 +358,16 @@ const AddMovieForm = () => {
                   </CardContent>
                 </div>
               </Card>
+              
+              {/* Season form (only visible if it's a series) */}
+              {preview && isSeries && (
+                <div className="pt-4 pb-2">
+                  <SeasonForm 
+                    seasons={seasons} 
+                    onSeasonsChange={setSeasons} 
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <div className="h-full flex flex-col items-center justify-center py-10 px-4 text-center bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
