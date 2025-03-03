@@ -36,7 +36,7 @@ const MovieCard = ({ movie }: MovieCardProps) => {
             className="object-cover w-full h-full transform scale-[1.01]" 
             loading="lazy"
             style={{
-              imageRendering: 'high-quality',
+              imageRendering: 'auto',
               objectPosition: 'center'
             }}
           />
