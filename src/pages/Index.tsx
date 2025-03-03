@@ -4,20 +4,22 @@ import { getMovieCollection } from '@/lib/api';
 import { Movie } from '@/types/movie';
 import Header from '@/components/Header';
 import MovieGrid from '@/components/MovieGrid';
+import { toast } from 'sonner';
 
 const Index = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Load movies from local storage
-    const loadMovies = () => {
+    // Load movies from Supabase
+    const loadMovies = async () => {
       setLoading(true);
       try {
-        const movieCollection = getMovieCollection();
+        const movieCollection = await getMovieCollection();
         setMovies(movieCollection);
       } catch (error) {
         console.error('Error loading movies:', error);
+        toast.error('Failed to load your movie collection');
       } finally {
         setLoading(false);
       }

@@ -1,10 +1,11 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getMovieCollection } from '@/lib/api';
+import { getMovieCollection, removeMovieFromCollection } from '@/lib/api';
 import { Movie } from '@/types/movie';
 import Header from '@/components/Header';
 import MovieDetail from '@/components/MovieDetail';
+import { toast } from 'sonner';
 
 const MoviePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,42 +14,61 @@ const MoviePage = () => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    const loadMovie = () => {
+    const loadMovie = async () => {
+      if (!id) return;
+      
       setLoading(true);
       try {
-        const movieCollection = getMovieCollection();
+        const movieCollection = await getMovieCollection();
         const foundMovie = movieCollection.find(m => m.id === id);
         
         if (foundMovie) {
           setMovie(foundMovie);
         } else {
           // Movie not found, redirect to home
+          toast.error('Movie not found');
           navigate('/', { replace: true });
         }
       } catch (error) {
         console.error('Error loading movie:', error);
+        toast.error('Failed to load movie details');
         navigate('/', { replace: true });
       } finally {
         setLoading(false);
       }
     };
     
-    if (id) {
-      loadMovie();
-    }
+    loadMovie();
   }, [id, navigate]);
   
-  const handleMovieUpdate = () => {
+  const handleMovieUpdate = async () => {
+    if (!id) return;
+    
     // Refresh movie data
-    const movieCollection = getMovieCollection();
-    const updatedMovie = movieCollection.find(m => m.id === id);
-    if (updatedMovie) {
-      setMovie(updatedMovie);
+    try {
+      const movieCollection = await getMovieCollection();
+      const updatedMovie = movieCollection.find(m => m.id === id);
+      if (updatedMovie) {
+        setMovie(updatedMovie);
+        toast.success('Movie details updated');
+      }
+    } catch (error) {
+      console.error('Error refreshing movie data:', error);
+      toast.error('Failed to refresh movie data');
     }
   };
   
-  const handleMovieDelete = () => {
-    navigate('/', { replace: true });
+  const handleMovieDelete = async () => {
+    if (!id) return;
+    
+    try {
+      await removeMovieFromCollection(id);
+      toast.success('Movie removed from collection');
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.error('Error deleting movie:', error);
+      toast.error('Failed to delete movie');
+    }
   };
 
   return (

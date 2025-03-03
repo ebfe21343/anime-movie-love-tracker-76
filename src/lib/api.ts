@@ -1,5 +1,6 @@
 
 import { Movie, MovieResponse } from '@/types/movie';
+import { supabase } from "@/integrations/supabase/client";
 
 const IMDB_API_ENDPOINT = 'https://graph.imdbapi.dev/v1';
 
@@ -104,16 +105,55 @@ export async function fetchMovieById(id: string): Promise<Omit<Movie, 'personal_
   }
 }
 
-// Local storage functions for our movie collection
-const STORAGE_KEY = 'anime_movie_tracker_collection';
-
-export const saveMovieCollection = (movies: Movie[]): void => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(movies));
-};
-
-export const getMovieCollection = (): Movie[] => {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
+// Functions to interact with Supabase
+export const getMovieCollection = async (): Promise<Movie[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('movies')
+      .select('*')
+      .order('added_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    // Transform the data to match our Movie interface
+    return data.map(movie => ({
+      id: movie.id,
+      type: movie.type,
+      is_adult: movie.is_adult,
+      primary_title: movie.primary_title,
+      original_title: movie.original_title,
+      start_year: movie.start_year,
+      end_year: movie.end_year,
+      runtime_minutes: movie.runtime_minutes,
+      plot: movie.plot,
+      rating: {
+        aggregate_rating: movie.aggregate_rating,
+        votes_count: movie.votes_count
+      },
+      genres: movie.genres || [],
+      posters: movie.poster_url ? [{ 
+        url: movie.poster_url, 
+        width: movie.poster_width || 0, 
+        height: movie.poster_height || 0 
+      }] : [],
+      certificates: movie.certificates || [],
+      spoken_languages: movie.spoken_languages || [],
+      origin_countries: movie.origin_countries || [],
+      critic_review: movie.critic_review,
+      directors: movie.directors || [],
+      writers: movie.writers || [],
+      casts: movie.casts || [],
+      personal_ratings: movie.personal_ratings,
+      comments: movie.comments,
+      watch_link: movie.watch_link || '',
+      added_at: movie.added_at
+    }));
+  } catch (error) {
+    console.error('Error fetching movies from Supabase:', error);
+    // Fallback to local storage if Supabase fails
+    const data = localStorage.getItem('anime_movie_tracker_collection');
+    return data ? JSON.parse(data) : [];
+  }
 };
 
 export const addMovieToCollection = async (
@@ -125,58 +165,186 @@ export const addMovieToCollection = async (
   }
 ): Promise<Movie> => {
   try {
-    const movieData = await fetchMovieById(imdbId);
-    const existingMovies = getMovieCollection();
-    
     // Check if movie already exists
-    if (existingMovies.some(movie => movie.id === imdbId)) {
+    const { data: existingMovie } = await supabase
+      .from('movies')
+      .select('id')
+      .eq('id', imdbId)
+      .single();
+    
+    if (existingMovie) {
       throw new Error('Movie already exists in your collection');
     }
+
+    // Fetch movie data from IMDb API
+    const movieData = await fetchMovieById(imdbId);
     
-    const newMovie: Movie = {
-      ...movieData,
+    // Prepare data for Supabase insert
+    const movieForDb = {
+      id: movieData.id,
+      type: movieData.type,
+      is_adult: movieData.is_adult,
+      primary_title: movieData.primary_title,
+      original_title: movieData.original_title,
+      start_year: movieData.start_year,
+      end_year: movieData.end_year,
+      runtime_minutes: movieData.runtime_minutes,
+      plot: movieData.plot,
+      aggregate_rating: movieData.rating.aggregate_rating,
+      votes_count: movieData.rating.votes_count,
+      genres: movieData.genres,
+      poster_url: movieData.posters && movieData.posters[0] ? movieData.posters[0].url : null,
+      poster_width: movieData.posters && movieData.posters[0] ? movieData.posters[0].width : null,
+      poster_height: movieData.posters && movieData.posters[0] ? movieData.posters[0].height : null,
+      certificates: movieData.certificates,
+      spoken_languages: movieData.spoken_languages,
+      origin_countries: movieData.origin_countries,
+      critic_review: movieData.critic_review,
+      directors: movieData.directors,
+      writers: movieData.writers,
+      casts: movieData.casts,
       personal_ratings: personalData.personal_ratings,
       comments: personalData.comments,
       watch_link: personalData.watch_link,
-      added_at: new Date().toISOString(),
     };
     
-    const updatedCollection = [...existingMovies, newMovie];
-    saveMovieCollection(updatedCollection);
+    // Insert the movie into Supabase
+    const { data, error } = await supabase
+      .from('movies')
+      .insert(movieForDb)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    // Transform back to our Movie interface
+    const newMovie: Movie = {
+      id: data.id,
+      type: data.type,
+      is_adult: data.is_adult,
+      primary_title: data.primary_title,
+      original_title: data.original_title,
+      start_year: data.start_year,
+      end_year: data.end_year,
+      runtime_minutes: data.runtime_minutes,
+      plot: data.plot,
+      rating: {
+        aggregate_rating: data.aggregate_rating,
+        votes_count: data.votes_count
+      },
+      genres: data.genres || [],
+      posters: data.poster_url ? [{ 
+        url: data.poster_url, 
+        width: data.poster_width || 0, 
+        height: data.poster_height || 0 
+      }] : [],
+      certificates: data.certificates || [],
+      spoken_languages: data.spoken_languages || [],
+      origin_countries: data.origin_countries || [],
+      critic_review: data.critic_review,
+      directors: data.directors || [],
+      writers: data.writers || [],
+      casts: data.casts || [],
+      personal_ratings: data.personal_ratings,
+      comments: data.comments,
+      watch_link: data.watch_link || '',
+      added_at: data.added_at
+    };
     
     return newMovie;
   } catch (error) {
-    console.error('Error adding movie:', error);
+    console.error('Error adding movie to Supabase:', error);
     throw error;
   }
 };
 
-export const removeMovieFromCollection = (id: string): void => {
-  const movies = getMovieCollection();
-  const filteredMovies = movies.filter(movie => movie.id !== id);
-  saveMovieCollection(filteredMovies);
+export const removeMovieFromCollection = async (id: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('movies')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error removing movie from Supabase:', error);
+    
+    // Fallback to local storage if Supabase fails
+    const movies = JSON.parse(localStorage.getItem('anime_movie_tracker_collection') || '[]');
+    const filteredMovies = movies.filter((movie: Movie) => movie.id !== id);
+    localStorage.setItem('anime_movie_tracker_collection', JSON.stringify(filteredMovies));
+  }
 };
 
-export const updateMovieInCollection = (
+export const updateMovieInCollection = async (
   id: string,
   updates: Partial<{
     personal_ratings: { lyan: number; nastya: number; },
     comments: { lyan: string; nastya: string; },
     watch_link: string
   }>
-): Movie | null => {
-  const movies = getMovieCollection();
-  const movieIndex = movies.findIndex(movie => movie.id === id);
-  
-  if (movieIndex === -1) return null;
-  
-  const updatedMovie = {
-    ...movies[movieIndex],
-    ...updates,
-  };
-  
-  movies[movieIndex] = updatedMovie;
-  saveMovieCollection(movies);
-  
-  return updatedMovie;
+): Promise<Movie | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('movies')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    if (!data) return null;
+    
+    // Transform to our Movie interface
+    return {
+      id: data.id,
+      type: data.type,
+      is_adult: data.is_adult,
+      primary_title: data.primary_title,
+      original_title: data.original_title,
+      start_year: data.start_year,
+      end_year: data.end_year,
+      runtime_minutes: data.runtime_minutes,
+      plot: data.plot,
+      rating: {
+        aggregate_rating: data.aggregate_rating,
+        votes_count: data.votes_count
+      },
+      genres: data.genres || [],
+      posters: data.poster_url ? [{ 
+        url: data.poster_url, 
+        width: data.poster_width || 0, 
+        height: data.poster_height || 0 
+      }] : [],
+      certificates: data.certificates || [],
+      spoken_languages: data.spoken_languages || [],
+      origin_countries: data.origin_countries || [],
+      critic_review: data.critic_review,
+      directors: data.directors || [],
+      writers: data.writers || [],
+      casts: data.casts || [],
+      personal_ratings: data.personal_ratings,
+      comments: data.comments,
+      watch_link: data.watch_link || '',
+      added_at: data.added_at
+    };
+  } catch (error) {
+    console.error('Error updating movie in Supabase:', error);
+    
+    // Fallback to local storage if Supabase fails
+    const movies = JSON.parse(localStorage.getItem('anime_movie_tracker_collection') || '[]');
+    const movieIndex = movies.findIndex((movie: Movie) => movie.id === id);
+    
+    if (movieIndex === -1) return null;
+    
+    const updatedMovie = {
+      ...movies[movieIndex],
+      ...updates,
+    };
+    
+    movies[movieIndex] = updatedMovie;
+    localStorage.setItem('anime_movie_tracker_collection', JSON.stringify(movies));
+    
+    return updatedMovie;
+  }
 };
