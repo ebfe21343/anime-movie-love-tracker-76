@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -54,7 +53,7 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    background: #D9C8FF;
+    background: #F0ECFF;
     background-attachment: fixed;
     background-size: cover;
   }
