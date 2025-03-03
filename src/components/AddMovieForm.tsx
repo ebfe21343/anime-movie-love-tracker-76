@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -18,6 +18,9 @@ const AddMovieForm = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState<any>(null);
+  const [lyanRating, setLyanRating] = useState(5);
+  const [nastyaRating, setNastyaRating] = useState(5);
+
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<MovieFormData>({
     defaultValues: {
       id: '',
@@ -32,6 +35,12 @@ const AddMovieForm = () => {
       watch_link: ''
     }
   });
+
+  // Update form values when ratings change
+  useEffect(() => {
+    setValue('personal_ratings.lyan', lyanRating);
+    setValue('personal_ratings.nastya', nastyaRating);
+  }, [lyanRating, nastyaRating, setValue]);
 
   const handleFetchPreview = async () => {
     const id = document.getElementById('imdbId') as HTMLInputElement;
@@ -65,6 +74,8 @@ const AddMovieForm = () => {
       toast.success('Movie added to your collection!');
       reset();
       setPreview(null);
+      setLyanRating(5);
+      setNastyaRating(5);
       navigate('/');
     } catch (error: any) {
       console.error('Error adding movie:', error);
@@ -119,7 +130,7 @@ const AddMovieForm = () => {
                   <div className="flex justify-between items-center mb-2">
                     <Label htmlFor="lyan-rating">Lyan's Rating</Label>
                     <Badge variant="outline" className="font-bold">
-                      {preview?.personal_ratings?.lyan || 5}/10
+                      {lyanRating}/10
                     </Badge>
                   </div>
                   <Slider
@@ -127,7 +138,8 @@ const AddMovieForm = () => {
                     defaultValue={[5]}
                     max={10}
                     step={1}
-                    onValueChange={(values) => setValue('personal_ratings.lyan', values[0])}
+                    value={[lyanRating]}
+                    onValueChange={(values) => setLyanRating(values[0])}
                     className="py-2"
                   />
                 </div>
@@ -136,7 +148,7 @@ const AddMovieForm = () => {
                   <div className="flex justify-between items-center mb-2">
                     <Label htmlFor="nastya-rating">Nastya's Rating</Label>
                     <Badge variant="outline" className="font-bold">
-                      {preview?.personal_ratings?.nastya || 5}/10
+                      {nastyaRating}/10
                     </Badge>
                   </div>
                   <Slider
@@ -144,7 +156,8 @@ const AddMovieForm = () => {
                     defaultValue={[5]}
                     max={10}
                     step={1}
-                    onValueChange={(values) => setValue('personal_ratings.nastya', values[0])}
+                    value={[nastyaRating]}
+                    onValueChange={(values) => setNastyaRating(values[0])}
                     className="py-2"
                   />
                 </div>

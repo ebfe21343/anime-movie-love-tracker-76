@@ -33,12 +33,8 @@ const MovieCard = ({ movie }: MovieCardProps) => {
           <img 
             src={poster} 
             alt={movie.primary_title}
-            className="object-cover w-full h-full transform scale-[1.01]" 
+            className="object-cover w-full h-full" 
             loading="lazy"
-            style={{
-              imageRendering: 'auto',
-              objectPosition: 'center'
-            }}
           />
           
           {/* Adult badge */}
