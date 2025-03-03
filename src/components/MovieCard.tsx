@@ -70,13 +70,21 @@ const MovieCard = ({ movie }: MovieCardProps) => {
             </div>
           </div>
           
-          <div className="flex items-center">
+          <div className="flex items-center justify-between">
             {/* Average personal rating */}
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 fill-lavender-500 text-lavender-500" />
               <span className="font-medium">{avgPersonalRating}</span>
               <span className="text-xs text-muted-foreground">Rating</span>
             </div>
+            
+            {/* IMDb rating */}
+            {movie.rating && (
+              <div className="flex items-center gap-1">
+                <span className="text-xs font-semibold bg-yellow-400 text-black px-1.5 py-0.5 rounded">IMDb</span>
+                <span className="font-medium">{movie.rating.aggregate_rating.toFixed(1)}</span>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
