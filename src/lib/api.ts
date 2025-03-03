@@ -118,6 +118,11 @@ function safeParseJson<T>(json: Json | null, defaultValue: T): T {
   }
 }
 
+// Helper function to convert complex types to JSON for Supabase
+function convertToJson<T>(data: T): Json {
+  return data as unknown as Json;
+}
+
 // Functions to interact with Supabase
 export const getMovieCollection = async (): Promise<Movie[]> => {
   try {
@@ -204,7 +209,7 @@ export const addMovieToCollection = async (
     // Fetch movie data from IMDb API
     const movieData = await fetchMovieById(imdbId);
     
-    // Prepare data for Supabase insert
+    // Prepare data for Supabase insert - ensuring all complex objects are properly converted to JSON
     const movieForDb = {
       id: movieData.id,
       type: movieData.type,
@@ -221,15 +226,15 @@ export const addMovieToCollection = async (
       poster_url: movieData.posters && movieData.posters[0] ? movieData.posters[0].url : null,
       poster_width: movieData.posters && movieData.posters[0] ? movieData.posters[0].width : null,
       poster_height: movieData.posters && movieData.posters[0] ? movieData.posters[0].height : null,
-      certificates: movieData.certificates || [],
-      spoken_languages: movieData.spoken_languages || [],
-      origin_countries: movieData.origin_countries || [],
-      critic_review: movieData.critic_review,
-      directors: movieData.directors || [],
-      writers: movieData.writers || [],
-      casts: movieData.casts || [],
-      personal_ratings: personalData.personal_ratings,
-      comments: personalData.comments,
+      certificates: convertToJson(movieData.certificates || []),
+      spoken_languages: convertToJson(movieData.spoken_languages || []),
+      origin_countries: convertToJson(movieData.origin_countries || []),
+      critic_review: convertToJson(movieData.critic_review),
+      directors: convertToJson(movieData.directors || []),
+      writers: convertToJson(movieData.writers || []),
+      casts: convertToJson(movieData.casts || []),
+      personal_ratings: convertToJson(personalData.personal_ratings),
+      comments: convertToJson(personalData.comments),
       watch_link: personalData.watch_link,
     };
     
@@ -320,9 +325,24 @@ export const updateMovieInCollection = async (
   }>
 ): Promise<Movie | null> => {
   try {
+    // Convert complex objects to JSON format for Supabase
+    const updatesForDb: any = {};
+    
+    if (updates.personal_ratings) {
+      updatesForDb.personal_ratings = convertToJson(updates.personal_ratings);
+    }
+    
+    if (updates.comments) {
+      updatesForDb.comments = convertToJson(updates.comments);
+    }
+    
+    if (updates.watch_link !== undefined) {
+      updatesForDb.watch_link = updates.watch_link;
+    }
+    
     const { data, error } = await supabase
       .from('movies')
-      .update(updates)
+      .update(updatesForDb)
       .eq('id', id)
       .select()
       .single();
