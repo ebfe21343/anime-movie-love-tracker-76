@@ -33,13 +33,16 @@ const Header = () => {
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* Logo on the left */}
+        <div className="w-10 h-10 rounded-full bg-sakura-400 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+          <Film className="text-white h-5 w-5" />
+        </div>
+        
+        {/* Title in the center */}
         <Link 
           to="/" 
-          className="flex items-center gap-2 group"
+          className="flex items-center gap-2 group absolute left-1/2 transform -translate-x-1/2"
         >
-          <div className="w-10 h-10 rounded-full bg-sakura-400 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-            <Film className="text-white h-5 w-5" />
-          </div>
           <h1 className="text-2xl font-bold text-sakura-700">
             <span className="text-lavender-700">Lyan & Nastya </span>
             <span className="text-sakura-500">MovieTracker</span>
@@ -49,18 +52,8 @@ const Header = () => {
           </div>
         </Link>
         
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-full"
-            asChild
-          >
-            <Link to="/">
-              <Film className="h-5 w-5" />
-            </Link>
-          </Button>
-          
+        {/* Add Movie button on the right */}
+        <div className="flex gap-2">          
           <Button 
             variant="default" 
             size="sm" 
