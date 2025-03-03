@@ -1,6 +1,7 @@
 
 import { Movie, MovieResponse } from '@/types/movie';
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from '@/integrations/supabase/types';
 
 const IMDB_API_ENDPOINT = 'https://graph.imdbapi.dev/v1';
 
@@ -105,6 +106,18 @@ export async function fetchMovieById(id: string): Promise<Omit<Movie, 'personal_
   }
 }
 
+// Helper function to safely parse JSON data from Supabase
+function safeParseJson<T>(json: Json | null, defaultValue: T): T {
+  if (json === null) return defaultValue;
+  try {
+    if (typeof json === 'object') return json as unknown as T;
+    return JSON.parse(json as string) as T;
+  } catch (e) {
+    console.error('Error parsing JSON:', e);
+    return defaultValue;
+  }
+}
+
 // Functions to interact with Supabase
 export const getMovieCollection = async (): Promise<Movie[]> => {
   try {
@@ -115,20 +128,20 @@ export const getMovieCollection = async (): Promise<Movie[]> => {
     
     if (error) throw error;
     
-    // Transform the data to match our Movie interface
+    // Transform the data to match our Movie interface with proper type casting
     return data.map(movie => ({
       id: movie.id,
-      type: movie.type,
-      is_adult: movie.is_adult,
+      type: movie.type || '',
+      is_adult: movie.is_adult || false,
       primary_title: movie.primary_title,
-      original_title: movie.original_title,
-      start_year: movie.start_year,
-      end_year: movie.end_year,
-      runtime_minutes: movie.runtime_minutes,
-      plot: movie.plot,
+      original_title: movie.original_title || null,
+      start_year: movie.start_year || 0,
+      end_year: movie.end_year || null,
+      runtime_minutes: movie.runtime_minutes || 0,
+      plot: movie.plot || '',
       rating: {
-        aggregate_rating: movie.aggregate_rating,
-        votes_count: movie.votes_count
+        aggregate_rating: movie.aggregate_rating || 0,
+        votes_count: movie.votes_count || 0
       },
       genres: movie.genres || [],
       posters: movie.poster_url ? [{ 
@@ -136,17 +149,29 @@ export const getMovieCollection = async (): Promise<Movie[]> => {
         width: movie.poster_width || 0, 
         height: movie.poster_height || 0 
       }] : [],
-      certificates: movie.certificates || [],
-      spoken_languages: movie.spoken_languages || [],
-      origin_countries: movie.origin_countries || [],
-      critic_review: movie.critic_review,
-      directors: movie.directors || [],
-      writers: movie.writers || [],
-      casts: movie.casts || [],
-      personal_ratings: movie.personal_ratings,
-      comments: movie.comments,
+      certificates: safeParseJson<{ country: { code: string; name: string; }; rating: string; }[]>(
+        movie.certificates, []
+      ),
+      spoken_languages: safeParseJson<{ code: string; name: string; }[]>(
+        movie.spoken_languages, []
+      ),
+      origin_countries: safeParseJson<{ code: string; name: string; }[]>(
+        movie.origin_countries, []
+      ),
+      critic_review: movie.critic_review ? 
+        safeParseJson<{ score: number; review_count: number; }>(movie.critic_review, null) : 
+        null,
+      directors: safeParseJson<Movie['directors']>(movie.directors, []),
+      writers: safeParseJson<Movie['writers']>(movie.writers, []),
+      casts: safeParseJson<Movie['casts']>(movie.casts, []),
+      personal_ratings: safeParseJson<{ lyan: number; nastya: number; }>(
+        movie.personal_ratings, { lyan: 5, nastya: 5 }
+      ),
+      comments: safeParseJson<{ lyan: string; nastya: string; }>(
+        movie.comments, { lyan: '', nastya: '' }
+      ),
       watch_link: movie.watch_link || '',
-      added_at: movie.added_at
+      added_at: movie.added_at || new Date().toISOString()
     }));
   } catch (error) {
     console.error('Error fetching movies from Supabase:', error);
@@ -196,13 +221,13 @@ export const addMovieToCollection = async (
       poster_url: movieData.posters && movieData.posters[0] ? movieData.posters[0].url : null,
       poster_width: movieData.posters && movieData.posters[0] ? movieData.posters[0].width : null,
       poster_height: movieData.posters && movieData.posters[0] ? movieData.posters[0].height : null,
-      certificates: movieData.certificates,
-      spoken_languages: movieData.spoken_languages,
-      origin_countries: movieData.origin_countries,
+      certificates: movieData.certificates || [],
+      spoken_languages: movieData.spoken_languages || [],
+      origin_countries: movieData.origin_countries || [],
       critic_review: movieData.critic_review,
-      directors: movieData.directors,
-      writers: movieData.writers,
-      casts: movieData.casts,
+      directors: movieData.directors || [],
+      writers: movieData.writers || [],
+      casts: movieData.casts || [],
       personal_ratings: personalData.personal_ratings,
       comments: personalData.comments,
       watch_link: personalData.watch_link,
@@ -218,19 +243,19 @@ export const addMovieToCollection = async (
     if (error) throw error;
     
     // Transform back to our Movie interface
-    const newMovie: Movie = {
+    return {
       id: data.id,
-      type: data.type,
-      is_adult: data.is_adult,
+      type: data.type || '',
+      is_adult: data.is_adult || false,
       primary_title: data.primary_title,
-      original_title: data.original_title,
-      start_year: data.start_year,
-      end_year: data.end_year,
-      runtime_minutes: data.runtime_minutes,
-      plot: data.plot,
+      original_title: data.original_title || null,
+      start_year: data.start_year || 0,
+      end_year: data.end_year || null,
+      runtime_minutes: data.runtime_minutes || 0,
+      plot: data.plot || '',
       rating: {
-        aggregate_rating: data.aggregate_rating,
-        votes_count: data.votes_count
+        aggregate_rating: data.aggregate_rating || 0,
+        votes_count: data.votes_count || 0
       },
       genres: data.genres || [],
       posters: data.poster_url ? [{ 
@@ -238,20 +263,30 @@ export const addMovieToCollection = async (
         width: data.poster_width || 0, 
         height: data.poster_height || 0 
       }] : [],
-      certificates: data.certificates || [],
-      spoken_languages: data.spoken_languages || [],
-      origin_countries: data.origin_countries || [],
-      critic_review: data.critic_review,
-      directors: data.directors || [],
-      writers: data.writers || [],
-      casts: data.casts || [],
-      personal_ratings: data.personal_ratings,
-      comments: data.comments,
+      certificates: safeParseJson<{ country: { code: string; name: string; }; rating: string; }[]>(
+        data.certificates, []
+      ),
+      spoken_languages: safeParseJson<{ code: string; name: string; }[]>(
+        data.spoken_languages, []
+      ),
+      origin_countries: safeParseJson<{ code: string; name: string; }[]>(
+        data.origin_countries, []
+      ),
+      critic_review: data.critic_review ? 
+        safeParseJson<{ score: number; review_count: number; }>(data.critic_review, null) : 
+        null,
+      directors: safeParseJson<Movie['directors']>(data.directors, []),
+      writers: safeParseJson<Movie['writers']>(data.writers, []),
+      casts: safeParseJson<Movie['casts']>(data.casts, []),
+      personal_ratings: safeParseJson<{ lyan: number; nastya: number; }>(
+        data.personal_ratings, { lyan: 5, nastya: 5 }
+      ),
+      comments: safeParseJson<{ lyan: string; nastya: string; }>(
+        data.comments, { lyan: '', nastya: '' }
+      ),
       watch_link: data.watch_link || '',
-      added_at: data.added_at
+      added_at: data.added_at || new Date().toISOString()
     };
-    
-    return newMovie;
   } catch (error) {
     console.error('Error adding movie to Supabase:', error);
     throw error;
@@ -298,17 +333,17 @@ export const updateMovieInCollection = async (
     // Transform to our Movie interface
     return {
       id: data.id,
-      type: data.type,
-      is_adult: data.is_adult,
+      type: data.type || '',
+      is_adult: data.is_adult || false,
       primary_title: data.primary_title,
-      original_title: data.original_title,
-      start_year: data.start_year,
-      end_year: data.end_year,
-      runtime_minutes: data.runtime_minutes,
-      plot: data.plot,
+      original_title: data.original_title || null,
+      start_year: data.start_year || 0,
+      end_year: data.end_year || null,
+      runtime_minutes: data.runtime_minutes || 0,
+      plot: data.plot || '',
       rating: {
-        aggregate_rating: data.aggregate_rating,
-        votes_count: data.votes_count
+        aggregate_rating: data.aggregate_rating || 0,
+        votes_count: data.votes_count || 0
       },
       genres: data.genres || [],
       posters: data.poster_url ? [{ 
@@ -316,17 +351,29 @@ export const updateMovieInCollection = async (
         width: data.poster_width || 0, 
         height: data.poster_height || 0 
       }] : [],
-      certificates: data.certificates || [],
-      spoken_languages: data.spoken_languages || [],
-      origin_countries: data.origin_countries || [],
-      critic_review: data.critic_review,
-      directors: data.directors || [],
-      writers: data.writers || [],
-      casts: data.casts || [],
-      personal_ratings: data.personal_ratings,
-      comments: data.comments,
+      certificates: safeParseJson<{ country: { code: string; name: string; }; rating: string; }[]>(
+        data.certificates, []
+      ),
+      spoken_languages: safeParseJson<{ code: string; name: string; }[]>(
+        data.spoken_languages, []
+      ),
+      origin_countries: safeParseJson<{ code: string; name: string; }[]>(
+        data.origin_countries, []
+      ),
+      critic_review: data.critic_review ? 
+        safeParseJson<{ score: number; review_count: number; }>(data.critic_review, null) : 
+        null,
+      directors: safeParseJson<Movie['directors']>(data.directors, []),
+      writers: safeParseJson<Movie['writers']>(data.writers, []),
+      casts: safeParseJson<Movie['casts']>(data.casts, []),
+      personal_ratings: safeParseJson<{ lyan: number; nastya: number; }>(
+        data.personal_ratings, { lyan: 5, nastya: 5 }
+      ),
+      comments: safeParseJson<{ lyan: string; nastya: string; }>(
+        data.comments, { lyan: '', nastya: '' }
+      ),
       watch_link: data.watch_link || '',
-      added_at: data.added_at
+      added_at: data.added_at || new Date().toISOString()
     };
   } catch (error) {
     console.error('Error updating movie in Supabase:', error);
