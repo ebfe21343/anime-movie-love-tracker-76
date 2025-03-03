@@ -1,10 +1,11 @@
-import { Movie, MovieResponse } from '@/types/movie';
+
+import { Movie, MovieResponse, Season } from '@/types/movie';
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from '@/integrations/supabase/types';
 
 const IMDB_API_ENDPOINT = 'https://graph.imdbapi.dev/v1';
 
-export async function fetchMovieById(id: string): Promise<Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at'>> {
+export async function fetchMovieById(id: string): Promise<Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'seasons'>> {
   const query = `
     query titleById {
       title(id: "${id}") {
@@ -171,7 +172,8 @@ export const getMovieCollection = async (): Promise<Movie[]> => {
         movie.comments, { lyan: '', nastya: '' }
       ),
       watch_link: movie.watch_link || '',
-      added_at: movie.added_at || new Date().toISOString()
+      added_at: movie.added_at || new Date().toISOString(),
+      seasons: safeParseJson<Season[]>(movie.seasons, [])
     }));
   } catch (error) {
     console.error('Error fetching movies from Supabase:', error);
@@ -185,7 +187,8 @@ export const addMovieToCollection = async (
   personalData: { 
     personal_ratings: { lyan: number; nastya: number; },
     comments: { lyan: string; nastya: string; },
-    watch_link: string 
+    watch_link: string,
+    seasons?: Season[]
   }
 ): Promise<Movie> => {
   try {
@@ -227,6 +230,7 @@ export const addMovieToCollection = async (
       personal_ratings: convertToJson(personalData.personal_ratings),
       comments: convertToJson(personalData.comments),
       watch_link: personalData.watch_link,
+      seasons: personalData.seasons ? convertToJson(personalData.seasons) : null
     };
     
     const { data, error } = await supabase
@@ -279,7 +283,8 @@ export const addMovieToCollection = async (
         data.comments, { lyan: '', nastya: '' }
       ),
       watch_link: data.watch_link || '',
-      added_at: data.added_at || new Date().toISOString()
+      added_at: data.added_at || new Date().toISOString(),
+      seasons: safeParseJson<Season[]>(data.seasons, [])
     };
   } catch (error) {
     console.error('Error adding movie to Supabase:', error);
@@ -309,7 +314,8 @@ export const updateMovieInCollection = async (
   updates: Partial<{
     personal_ratings: { lyan: number; nastya: number; },
     comments: { lyan: string; nastya: string; },
-    watch_link: string
+    watch_link: string,
+    seasons: Season[]
   }>
 ): Promise<Movie | null> => {
   try {
@@ -325,6 +331,10 @@ export const updateMovieInCollection = async (
     
     if (updates.watch_link !== undefined) {
       updatesForDb.watch_link = updates.watch_link;
+    }
+    
+    if (updates.seasons !== undefined) {
+      updatesForDb.seasons = convertToJson(updates.seasons);
     }
     
     const { data, error } = await supabase
@@ -379,7 +389,8 @@ export const updateMovieInCollection = async (
         data.comments, { lyan: '', nastya: '' }
       ),
       watch_link: data.watch_link || '',
-      added_at: data.added_at || new Date().toISOString()
+      added_at: data.added_at || new Date().toISOString(),
+      seasons: safeParseJson<Season[]>(data.seasons, [])
     };
   } catch (error) {
     console.error('Error updating movie in Supabase:', error);

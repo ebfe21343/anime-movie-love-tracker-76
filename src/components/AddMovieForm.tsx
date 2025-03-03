@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { Search, Film, Star, Link as LinkIcon } from 'lucide-react';
-import { MovieFormData } from '@/types/movie';
+import { Search, Film, Star, Link as LinkIcon, Tv } from 'lucide-react';
+import { MovieFormData, Season } from '@/types/movie';
 import { addMovieToCollection, fetchMovieById } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import SeasonForm from '@/components/SeasonForm';
 
 const AddMovieForm = () => {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ const AddMovieForm = () => {
   const [preview, setPreview] = useState<any>(null);
   const [lyanRating, setLyanRating] = useState(5);
   const [nastyaRating, setNastyaRating] = useState(5);
+  const [seasons, setSeasons] = useState<Season[]>([]);
+  const [isSeries, setIsSeries] = useState(false);
 
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<MovieFormData>({
     defaultValues: {
@@ -32,7 +35,8 @@ const AddMovieForm = () => {
         lyan: '',
         nastya: ''
       },
-      watch_link: ''
+      watch_link: '',
+      seasons: []
     }
   });
 
@@ -41,6 +45,11 @@ const AddMovieForm = () => {
     setValue('personal_ratings.lyan', lyanRating);
     setValue('personal_ratings.nastya', nastyaRating);
   }, [lyanRating, nastyaRating, setValue]);
+
+  // Update seasons in form
+  useEffect(() => {
+    setValue('seasons', seasons);
+  }, [seasons, setValue]);
 
   const handleFetchPreview = async () => {
     const id = document.getElementById('imdbId') as HTMLInputElement;
@@ -54,6 +63,14 @@ const AddMovieForm = () => {
       const movieData = await fetchMovieById(id.value);
       setPreview(movieData);
       setValue('id', id.value);
+      
+      // Detect if it's a series
+      setIsSeries(movieData.type === 'tvSeries' || movieData.type === 'tvMiniSeries');
+      
+      // If it's a series and end_year is null, it might be ongoing
+      if (isSeries && movieData.end_year === null) {
+        setSeasons([]); // Reset seasons when fetching a new show
+      }
     } catch (error) {
       console.error('Error fetching movie preview:', error);
       toast.error('Could not find movie with that ID. Please try again.');
@@ -65,10 +82,17 @@ const AddMovieForm = () => {
   const onSubmit = async (data: MovieFormData) => {
     setIsLoading(true);
     try {
+      // Only include seasons if it's a series
+      const dataToSubmit = {
+        ...data,
+        seasons: isSeries ? seasons : undefined
+      };
+      
       await addMovieToCollection(data.id, {
         personal_ratings: data.personal_ratings,
         comments: data.comments,
-        watch_link: data.watch_link
+        watch_link: data.watch_link,
+        seasons: dataToSubmit.seasons
       });
       
       toast.success('Movie added to your collection!');
@@ -76,6 +100,7 @@ const AddMovieForm = () => {
       setPreview(null);
       setLyanRating(5);
       setNastyaRating(5);
+      setSeasons([]);
       navigate('/');
     } catch (error: any) {
       console.error('Error adding movie:', error);
@@ -204,14 +229,28 @@ const AddMovieForm = () => {
                 </div>
               </div>
               
+              {/* Season form (only visible if it's a series) */}
+              {preview && isSeries && (
+                <div className="pt-2 pb-2 border-t border-lavender-200">
+                  <SeasonForm 
+                    seasons={seasons} 
+                    onSeasonsChange={setSeasons} 
+                  />
+                </div>
+              )}
+              
               <div className="pt-2">
                 <Button 
                   type="submit" 
                   className="w-full bg-sakura-500 hover:bg-sakura-600 btn-anime"
                   disabled={isLoading || !preview}
                 >
-                  <Film className="h-4 w-4 mr-2" />
-                  Add Movie to Collection
+                  {isSeries ? (
+                    <Tv className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Film className="h-4 w-4 mr-2" />
+                  )}
+                  Add {isSeries ? 'Series' : 'Movie'} to Collection
                 </Button>
               </div>
             </div>
@@ -221,7 +260,9 @@ const AddMovieForm = () => {
         <div className="w-full md:w-3/5">
           {preview ? (
             <div className="animate-scale-in">
-              <h3 className="text-lg font-medium mb-4">Movie Preview</h3>
+              <h3 className="text-lg font-medium mb-4">
+                {isSeries ? 'Series' : 'Movie'} Preview
+              </h3>
               <Card className="overflow-hidden border-none glass">
                 <div className="flex flex-col lg:flex-row">
                   {preview.posters && preview.posters[0] && (
@@ -250,27 +291,37 @@ const AddMovieForm = () => {
                       )}
                     </div>
                     
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {preview.genres?.map((genre: string) => (
-                        <Badge key={genre} variant="outline" className="text-xs">
-                          {genre}
-                        </Badge>
-                      ))}
-                    </div>
-                    
-                    <div className="flex gap-x-4 gap-y-1 flex-wrap text-sm mb-3">
+                    <div className="flex items-center gap-2 mb-3 text-sm text-muted-foreground">
+                      <Badge 
+                        className={isSeries ? 'bg-lavender-500' : 'bg-sakura-500'} 
+                        variant="default"
+                      >
+                        {isSeries ? (
+                          <div className="flex items-center">
+                            <Tv className="h-3.5 w-3.5 mr-1" />
+                            Series
+                          </div>
+                        ) : (
+                          <div className="flex items-center">
+                            <Film className="h-3.5 w-3.5 mr-1" />
+                            Movie
+                          </div>
+                        )}
+                      </Badge>
                       <span>{preview.start_year}{preview.end_year ? ` - ${preview.end_year}` : ''}</span>
                       {preview.runtime_minutes && (
                         <span>
                           {Math.floor(preview.runtime_minutes / 60)}h {preview.runtime_minutes % 60}m
                         </span>
                       )}
-                      {preview.certificates && preview.certificates[0] && (
-                        <span>{preview.certificates[0].rating}</span>
-                      )}
-                      {preview.is_adult && (
-                        <Badge variant="destructive" className="text-xs">18+</Badge>
-                      )}
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {preview.genres?.map((genre: string) => (
+                        <Badge key={genre} variant="outline" className="text-xs">
+                          {genre}
+                        </Badge>
+                      ))}
                     </div>
                     
                     <p className="text-sm mb-4 line-clamp-3">{preview.plot}</p>

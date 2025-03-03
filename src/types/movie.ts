@@ -52,6 +52,7 @@ export interface Movie {
   };
   watch_link: string;
   added_at: string;
+  seasons?: Season[];
 }
 
 interface Credit {
@@ -70,9 +71,25 @@ interface CastCredit extends Credit {
   characters: string[];
 }
 
+export interface Season {
+  id: string;
+  season_number: number;
+  title: string;
+  year: number;
+  episode_count?: number;
+  personal_ratings: {
+    lyan: number;
+    nastya: number;
+  };
+  comments: {
+    lyan: string;
+    nastya: string;
+  };
+}
+
 export interface MovieResponse {
   data: {
-    title: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at'>;
+    title: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'seasons'>;
   };
 }
 
@@ -87,4 +104,5 @@ export interface MovieFormData {
     nastya: string;
   };
   watch_link: string;
+  seasons?: Season[];
 }
