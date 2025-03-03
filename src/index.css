@@ -54,7 +54,7 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    background: #E5DEFF;
+    background: #D9C8FF;
     background-attachment: fixed;
     background-size: cover;
   }
