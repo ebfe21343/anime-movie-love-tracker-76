@@ -52,8 +52,11 @@
   }
 
   body {
-    @apply bg-background text-foreground bg-[url('/src/assets/background-pattern.svg')] bg-fixed;
+    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background: linear-gradient(135deg, #fff5f7 0%, #f9f0ff 50%, #f0f7ff 100%);
+    background-attachment: fixed;
+    background-size: cover;
   }
   
   /* Custom scrollbar */
