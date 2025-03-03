@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { Movie } from '@/types/movie';
 import MovieCard from './MovieCard';
@@ -25,11 +24,13 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
   const [sortBy, setSortBy] = useState<SortOption>('recently_added');
   
   const filteredAndSortedMovies = useMemo(() => {
-    // Filter movies by search query
+    // Filter movies by search query (title, genre, or comments)
     const filtered = searchQuery 
       ? movies.filter(movie => 
           movie.primary_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          movie.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase()))
+          movie.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          movie.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          movie.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase())
         )
       : movies;
     
@@ -66,7 +67,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search movies by title or genre..."
+            placeholder="Search movies by title, genre, or comments..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 bg-white/50 backdrop-blur-sm border-sakura-200 focus-visible:ring-sakura-400"
