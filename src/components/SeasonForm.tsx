@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Plus, Minus, Calendar, X } from 'lucide-react';
 import { Season } from '@/types/movie';
@@ -8,6 +9,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface SeasonFormProps {
   seasons: Season[];
@@ -23,6 +32,10 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
     personal_ratings: { lyan: 5, nastya: 5 },
     comments: { lyan: '', nastya: '' }
   });
+  
+  // Add state for confirmation dialog
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [seasonToDelete, setSeasonToDelete] = useState<number | null>(null);
   
   const addSeason = (e: React.MouseEvent<HTMLButtonElement>) => {
     // Prevent the event from bubbling up to any parent forms
@@ -49,10 +62,21 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
     });
   };
   
-  const removeSeason = (index: number) => {
-    const updatedSeasons = [...seasons];
-    updatedSeasons.splice(index, 1);
-    onSeasonsChange(updatedSeasons);
+  // Modified to open confirmation dialog instead of immediately deleting
+  const confirmRemoveSeason = (index: number) => {
+    setSeasonToDelete(index);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  // Actual removal function called after confirmation
+  const removeSeason = () => {
+    if (seasonToDelete !== null) {
+      const updatedSeasons = [...seasons];
+      updatedSeasons.splice(seasonToDelete, 1);
+      onSeasonsChange(updatedSeasons);
+      setIsDeleteDialogOpen(false);
+      setSeasonToDelete(null);
+    }
   };
   
   const updateSeasonRating = (index: number, person: 'lyan' | 'nastya', value: number) => {
@@ -197,7 +221,7 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
                     variant="ghost" 
                     size="icon" 
                     className="text-destructive hover:bg-destructive/10"
-                    onClick={() => removeSeason(index)}
+                    onClick={() => confirmRemoveSeason(index)}
                     type="button" // Explicitly set type to button to prevent form submission
                   >
                     <Minus className="h-4 w-4" />
@@ -274,6 +298,34 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
           <p className="text-muted-foreground">No seasons added yet</p>
         </div>
       )}
+      
+      {/* Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Remove Season</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to remove this season? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-between">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button" 
+              variant="destructive" 
+              onClick={removeSeason}
+            >
+              Remove Season
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
