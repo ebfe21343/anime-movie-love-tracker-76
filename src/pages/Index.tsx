@@ -35,11 +35,8 @@ const Index = () => {
       <main className="max-w-7xl mx-auto px-4 pt-28">
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-sakura-700 mb-2">
-            Movie Collection
+            Our Movie Collection
           </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Track your favorite movies, rate them, and add personal comments.
-          </p>
         </div>
         
         {loading ? (

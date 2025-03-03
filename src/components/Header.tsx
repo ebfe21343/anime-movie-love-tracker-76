@@ -41,22 +41,13 @@ const Header = () => {
             <Film className="text-white h-5 w-5" />
           </div>
           <h1 className="text-2xl font-bold text-sakura-700">
-            <span className="text-lavender-700">Movie</span>
-            <span className="text-sakura-500">Tracker</span>
+            <span className="text-lavender-700">Lyan & Nastya </span>
+            <span className="text-sakura-500">MovieTracker</span>
           </h1>
           <div className="hidden md:flex">
             <Heart className="w-4 h-4 text-sakura-500 animate-pulse-gentle" />
           </div>
         </Link>
-        
-        <nav className="hidden md:flex items-center gap-6">
-          <NavLink to="/" active={location.pathname === '/'}>
-            Home
-          </NavLink>
-          <NavLink to="/add" active={location.pathname === '/add'}>
-            Add Movie
-          </NavLink>
-        </nav>
         
         <div className="flex gap-2">
           <Button
@@ -95,31 +86,6 @@ const Header = () => {
         </div>
       </div>
     </header>
-  );
-};
-
-const NavLink = ({ 
-  children, 
-  to, 
-  active 
-}: { 
-  children: React.ReactNode; 
-  to: string; 
-  active: boolean;
-}) => {
-  return (
-    <Link
-      to={to}
-      className={cn(
-        "relative px-2 py-1 font-medium text-sm transition-colors duration-200",
-        "after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-sakura-500 after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100",
-        active 
-          ? "text-sakura-700 after:origin-bottom-left after:scale-x-100" 
-          : "text-foreground hover:text-sakura-700"
-      )}
-    >
-      {children}
-    </Link>
   );
 };
 
