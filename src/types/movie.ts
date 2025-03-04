@@ -52,6 +52,7 @@ export interface Movie {
   };
   watch_link: string;
   added_at: string;
+  cancelled: boolean;
   seasons?: Season[];
 }
 
@@ -85,11 +86,12 @@ export interface Season {
     lyan: string;
     nastya: string;
   };
+  cancelled: boolean;
 }
 
 export interface MovieResponse {
   data: {
-    title: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'seasons'>;
+    title: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'cancelled' | 'seasons'>;
   };
 }
 
@@ -104,5 +106,6 @@ export interface MovieFormData {
     nastya: string;
   };
   watch_link: string;
+  cancelled?: boolean;
   seasons?: Season[];
 }

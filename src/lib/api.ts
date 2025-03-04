@@ -1,4 +1,3 @@
-
 import { Movie, MovieResponse, Season } from '@/types/movie';
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from '@/integrations/supabase/types';
@@ -173,6 +172,7 @@ export const getMovieCollection = async (): Promise<Movie[]> => {
       ),
       watch_link: movie.watch_link || '',
       added_at: movie.added_at || new Date().toISOString(),
+      cancelled: movie.cancelled || false,
       seasons: movie.seasons ? safeParseJson<Season[]>(movie.seasons, []) : []
     }));
   } catch (error) {
@@ -188,6 +188,7 @@ export const addMovieToCollection = async (
     personal_ratings: { lyan: number; nastya: number; },
     comments: { lyan: string; nastya: string; },
     watch_link: string,
+    cancelled?: boolean,
     seasons?: Season[]
   }
 ): Promise<Movie> => {
@@ -230,6 +231,7 @@ export const addMovieToCollection = async (
       personal_ratings: convertToJson(personalData.personal_ratings),
       comments: convertToJson(personalData.comments),
       watch_link: personalData.watch_link,
+      cancelled: personalData.cancelled || false,
       seasons: personalData.seasons ? convertToJson(personalData.seasons) : null
     };
     
@@ -284,6 +286,7 @@ export const addMovieToCollection = async (
       ),
       watch_link: data.watch_link || '',
       added_at: data.added_at || new Date().toISOString(),
+      cancelled: data.cancelled || false,
       seasons: data.seasons ? safeParseJson<Season[]>(data.seasons, []) : []
     };
   } catch (error) {
@@ -315,6 +318,7 @@ export const updateMovieInCollection = async (
     personal_ratings: { lyan: number; nastya: number; },
     comments: { lyan: string; nastya: string; },
     watch_link: string,
+    cancelled: boolean,
     seasons: Season[]
   }>
 ): Promise<Movie | null> => {
@@ -331,6 +335,10 @@ export const updateMovieInCollection = async (
     
     if (updates.watch_link !== undefined) {
       updatesForDb.watch_link = updates.watch_link;
+    }
+    
+    if (updates.cancelled !== undefined) {
+      updatesForDb.cancelled = updates.cancelled;
     }
     
     if (updates.seasons !== undefined) {
@@ -390,6 +398,7 @@ export const updateMovieInCollection = async (
       ),
       watch_link: data.watch_link || '',
       added_at: data.added_at || new Date().toISOString(),
+      cancelled: data.cancelled || false,
       seasons: data.seasons ? safeParseJson<Season[]>(data.seasons, []) : []
     };
   } catch (error) {

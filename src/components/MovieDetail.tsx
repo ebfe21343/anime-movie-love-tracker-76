@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Movie, Season } from '@/types/movie';
-import { Star, Clock, Calendar, Globe, Link as LinkIcon, Heart, ArrowLeft, Trash2, Tv, Plus } from 'lucide-react';
+import { Star, Clock, Calendar, Globe, Link as LinkIcon, Heart, ArrowLeft, Trash2, Tv, Plus, X } from 'lucide-react';
 import { updateMovieInCollection, removeMovieFromCollection } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -37,6 +37,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
   const [lyanComment, setLyanComment] = useState(movie.comments.lyan);
   const [nastyaComment, setNastyaComment] = useState(movie.comments.nastya);
   const [seasons, setSeasons] = useState<Season[]>(movie.seasons || []);
+  const [cancelled, setCancelled] = useState(movie.cancelled || false);
   const isSeries = movie.type === 'tvSeries' || movie.type === 'tvMiniSeries';
   
   useEffect(() => {
@@ -46,6 +47,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
     setLyanComment(movie.comments.lyan);
     setNastyaComment(movie.comments.nastya);
     setSeasons(movie.seasons || []);
+    setCancelled(movie.cancelled || false);
   }, [movie]);
   
   const handleSaveChanges = async () => {
@@ -60,6 +62,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
           lyan: lyanComment,
           nastya: nastyaComment,
         },
+        cancelled: cancelled,
         seasons: isSeries ? seasons : undefined,
       });
       
@@ -172,15 +175,26 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                 </Badge>
               )}
               
-              {isSeries && (
-                <Badge 
-                  variant="secondary" 
-                  className="absolute top-3 left-3 bg-lavender-500 text-white"
-                >
-                  <Tv className="h-3.5 w-3.5 mr-1" />
-                  Series
-                </Badge>
-              )}
+              <div className="absolute top-3 left-3 flex flex-col gap-2">
+                {isSeries && (
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-lavender-500 text-white"
+                  >
+                    <Tv className="h-3.5 w-3.5 mr-1" />
+                    Series
+                  </Badge>
+                )}
+                
+                {movie.cancelled && (
+                  <Badge 
+                    className="bg-red-500 text-white border-red-400 flex items-center gap-1"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                    Cancelled
+                  </Badge>
+                )}
+              </div>
             </div>
             
             <CardContent className="p-4">

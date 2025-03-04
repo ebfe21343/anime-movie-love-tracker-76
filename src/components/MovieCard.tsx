@@ -1,9 +1,10 @@
 
 import { Link } from 'react-router-dom';
-import { Star, Film, Tv } from 'lucide-react';
+import { Star, Film, Tv, X } from 'lucide-react';
 import { Movie } from '@/types/movie';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface MovieCardProps {
   movie: Movie;
@@ -41,11 +42,22 @@ const MovieCard = ({ movie }: MovieCardProps) => {
           )}
           
           {/* Type icon (Movie/Series) */}
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-2 left-2 flex flex-col gap-2">
             <Badge className="bg-lavender-500/80 text-white flex items-center gap-1">
               <TypeIcon className="w-3.5 h-3.5" />
               <span>{isMovie ? 'Movie' : 'Series'}</span>
             </Badge>
+            
+            {/* Cancelled badge */}
+            {movie.cancelled && (
+              <Badge 
+                variant="outline" 
+                className="bg-red-500/90 text-white border-red-400 flex items-center gap-1"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>Cancelled</span>
+              </Badge>
+            )}
           </div>
           
           {/* Genres */}
