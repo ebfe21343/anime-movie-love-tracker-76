@@ -133,20 +133,6 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
             </div>
             
             <div>
-              <Label htmlFor="season_year">Year</Label>
-              <Input
-                id="season_year"
-                type="number"
-                value={newSeason.year}
-                onChange={(e) => setNewSeason({
-                  ...newSeason,
-                  year: parseInt(e.target.value) || new Date().getFullYear()
-                })}
-                className="mt-1"
-              />
-            </div>
-            
-            <div>
               <Label htmlFor="episode_count">Episode Count (optional)</Label>
               <Input
                 id="episode_count"
@@ -262,7 +248,7 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
                     size="icon" 
                     className="text-destructive hover:bg-destructive/10"
                     onClick={() => confirmRemoveSeason(index)}
-                    type="button" // Explicitly set type to button to prevent form submission
+                    type="button"
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
