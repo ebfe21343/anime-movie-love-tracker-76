@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import { openDatabase, getCachedImageFromDB, storeImageInDB, clearOldImages, getCacheSize } from './db';
+import { openDatabase, getCachedImageFromDB, storeImageInDB, clearOldImages, getCacheSize, clearAllImages } from './db';
 import { optimizeImage } from './optimizer';
 
 /**
@@ -67,4 +67,4 @@ export async function getCachedImageUrl(
 }
 
 // Re-export utility functions for cache management
-export { clearOldImages as clearOldCachedImages, getCacheSize };
+export { clearOldImages as clearOldCachedImages, getCacheSize, clearAllImages as clearImageCache };

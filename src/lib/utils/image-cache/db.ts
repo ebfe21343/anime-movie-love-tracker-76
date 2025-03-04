@@ -1,3 +1,4 @@
+
 /**
  * Database utilities for image caching using IndexedDB
  */
@@ -114,6 +115,35 @@ export function clearOldImages(maxAge: number = 7 * 24 * 60 * 60 * 1000): Promis
       };
     } catch (error) {
       console.error('Error clearing cache:', error);
+      reject(error);
+    }
+  });
+}
+
+/**
+ * Clear all cached images from the database
+ */
+export function clearAllImages(): Promise<void> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await openDatabase();
+      const transaction = db.transaction(STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      
+      // Clear all entries in the store
+      const request = store.clear();
+      
+      request.onsuccess = () => {
+        console.log('Image cache cleared successfully');
+        resolve();
+      };
+      
+      request.onerror = () => {
+        console.error('Failed to clear image cache:', request.error);
+        reject(request.error);
+      };
+    } catch (error) {
+      console.error('Error clearing image cache:', error);
       reject(error);
     }
   });
