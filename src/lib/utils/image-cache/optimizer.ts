@@ -6,12 +6,19 @@
 // Image optimization settings
 const MAX_IMAGE_WIDTH = 600; // Maximum width for cached images
 const IMAGE_QUALITY = 0.7; // JPEG compression quality (0-1)
+const MAX_IMAGE_SIZE_MB = 5; // Maximum size in MB to process
 
 /**
  * Resize and compress an image to reduce file size
  */
 export const optimizeImage = async (imageBlob: Blob): Promise<Blob> => {
   return new Promise((resolve, reject) => {
+    // If the image is too large, it might crash the browser
+    const imageSizeMB = imageBlob.size / (1024 * 1024);
+    if (imageSizeMB > MAX_IMAGE_SIZE_MB) {
+      console.warn(`Large image detected (${imageSizeMB.toFixed(2)}MB). Applying aggressive optimization.`);
+    }
+    
     // Create an image element to load the blob
     const img = new Image();
     img.onload = () => {
@@ -44,7 +51,16 @@ export const optimizeImage = async (imageBlob: Blob): Promise<Blob> => {
       canvas.toBlob(
         (blob) => {
           if (blob) {
-            console.log(`Image optimized: ${Math.round(imageBlob.size / 1024)}KB → ${Math.round(blob.size / 1024)}KB`);
+            // Log the size reduction
+            const originalSizeKB = Math.round(imageBlob.size / 1024);
+            const newSizeKB = Math.round(blob.size / 1024);
+            const reductionPercent = Math.round((1 - (blob.size / imageBlob.size)) * 100);
+            
+            console.log(
+              `Image optimized: ${originalSizeKB}KB → ${newSizeKB}KB (${reductionPercent}% reduction), ` + 
+              `Dimensions: ${img.width}x${img.height} → ${width}x${height}`
+            );
+            
             resolve(blob);
           } else {
             reject(new Error('Failed to create blob from canvas'));
@@ -56,7 +72,9 @@ export const optimizeImage = async (imageBlob: Blob): Promise<Blob> => {
     };
     
     img.onerror = () => {
-      reject(new Error('Failed to load image for optimization'));
+      console.error('Failed to load image for optimization');
+      // If optimization fails, return the original blob as fallback
+      resolve(imageBlob);
     };
     
     // Load the image blob

@@ -40,6 +40,13 @@ export const MovieInfo = ({ movie, poster, contentType, cancelled }: MovieInfoPr
     };
     
     loadCachedImage();
+    
+    // Clean up object URLs when component unmounts or poster changes
+    return () => {
+      if (cachedPosterUrl && cachedPosterUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(cachedPosterUrl);
+      }
+    };
   }, [poster, movie.id]);
   
   const handleImageError = () => {

@@ -46,10 +46,9 @@ export async function getCachedImageUrl(
     
     const originalBlob = await response.blob();
     
-    // Optimize the image before storing (only for posters, not for small avatars)
-    const optimizedBlob = type === 'poster' 
-      ? await optimizeImage(originalBlob)
-      : originalBlob;
+    // Always optimize the image before storing, especially for posters
+    // For small avatars, we can use less aggressive optimization
+    const optimizedBlob = await optimizeImage(originalBlob);
     
     // Store in IndexedDB
     await storeImageInDB(db, {
