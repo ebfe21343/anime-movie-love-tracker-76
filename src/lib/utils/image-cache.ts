@@ -1,5 +1,6 @@
+
 /**
- * Utility functions for caching movie poster images
+ * Utility functions for locally caching movie poster images using IndexedDB
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -7,15 +8,44 @@ import { supabase } from '@/integrations/supabase/client';
 // Cache object to keep track of already processed images
 interface CachedImage {
   originalUrl: string;
-  cachedUrl: string;
+  cachedBlob: Blob;
   timestamp: number;
 }
 
-// In-memory cache for the current session
-const imageCache: Record<string, CachedImage> = {};
+// Define the database name and store
+const DB_NAME = 'movie-cache-db';
+const STORE_NAME = 'images';
+const DB_VERSION = 1;
 
 /**
- * Gets an image URL, either from cache or downloads it to Supabase Storage
+ * Open the IndexedDB database
+ */
+const openDatabase = (): Promise<IDBDatabase> => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    
+    request.onerror = (event) => {
+      console.error('IndexedDB error:', request.error);
+      reject(request.error);
+    };
+    
+    request.onsuccess = (event) => {
+      resolve(request.result);
+    };
+    
+    request.onupgradeneeded = (event) => {
+      const db = request.result;
+      // Create object store for images if it doesn't exist
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        const store = db.createObjectStore(STORE_NAME, { keyPath: 'originalUrl' });
+        store.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+    };
+  });
+};
+
+/**
+ * Gets an image URL, either from cache or downloads it and stores in IndexedDB
  */
 export async function getCachedImageUrl(
   imageUrl: string, 
@@ -25,100 +55,149 @@ export async function getCachedImageUrl(
   // Return original URL if null/empty
   if (!imageUrl) return '';
   
-  // Check if already in memory cache
-  if (imageCache[imageUrl]) {
-    return imageCache[imageUrl].cachedUrl;
-  }
-  
   try {
-    // Check if image is already in Supabase Storage
-    const bucketName = 'movie-images';
-    const filePath = `${type}/${movieId}_${Date.now()}.jpg`;
+    // Try to get the image from IndexedDB first
+    const db = await openDatabase();
+    const cachedImage = await getCachedImageFromDB(db, imageUrl);
     
-    // First try to find an existing cached version
-    const { data: files } = await supabase
-      .storage
-      .from(bucketName)
-      .list(`${type}`, {
-        search: movieId
-      });
-    
-    // If we found an existing file for this movie, use it
-    if (files && files.length > 0) {
-      const existingFile = files[0];
-      const { data } = supabase
-        .storage
-        .from(bucketName)
-        .getPublicUrl(`${type}/${existingFile.name}`);
-      
-      if (data && data.publicUrl) {
-        // Store in memory cache
-        imageCache[imageUrl] = {
-          originalUrl: imageUrl,
-          cachedUrl: data.publicUrl,
-          timestamp: Date.now()
-        };
-        
-        return data.publicUrl;
-      }
+    if (cachedImage) {
+      console.log('Found cached image:', imageUrl);
+      // Create a URL from the cached blob
+      return URL.createObjectURL(cachedImage.cachedBlob);
     }
     
-    // If no cached image found, download and store it
-    try {
-      // Fetch the image
-      const response = await fetch(imageUrl);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${response.statusText}`);
-      }
-      
-      const blob = await response.blob();
-      
-      // Upload to Supabase Storage
-      const { data, error } = await supabase
-        .storage
-        .from(bucketName)
-        .upload(filePath, blob, {
-          contentType: 'image/jpeg',
-          upsert: true
-        });
-      
-      if (error) {
-        console.error('Error uploading to Supabase Storage:', error);
-        return imageUrl; // Fall back to original URL
-      }
-      
-      // Get the public URL
-      const { data: urlData } = supabase
-        .storage
-        .from(bucketName)
-        .getPublicUrl(filePath);
-      
-      if (urlData && urlData.publicUrl) {
-        // Store in memory cache
-        imageCache[imageUrl] = {
-          originalUrl: imageUrl,
-          cachedUrl: urlData.publicUrl,
-          timestamp: Date.now()
-        };
-        
-        return urlData.publicUrl;
-      }
-    } catch (error) {
-      console.error('Error processing image:', error);
+    // If not in cache, download and store it
+    console.log('Downloading image:', imageUrl);
+    const response = await fetch(imageUrl);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
     }
+    
+    const blob = await response.blob();
+    
+    // Store in IndexedDB
+    await storeImageInDB(db, {
+      originalUrl: imageUrl,
+      cachedBlob: blob,
+      timestamp: Date.now()
+    });
+    
+    // Return as object URL
+    return URL.createObjectURL(blob);
   } catch (error) {
-    console.error('Storage operation failed:', error);
+    console.error('Error caching image:', error);
+    // Return original URL as fallback
+    return imageUrl;
   }
-  
-  // Return original URL as fallback
-  return imageUrl;
 }
 
 /**
- * Clear old cached images (not implemented yet, could be added in future)
+ * Get a cached image from IndexedDB
  */
-export function clearOldCachedImages() {
-  // Implementation to remove old cached images
-  // Could be based on timestamp or other criteria
+const getCachedImageFromDB = (db: IDBDatabase, imageUrl: string): Promise<CachedImage | null> => {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, 'readonly');
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.get(imageUrl);
+    
+    request.onerror = () => {
+      reject(request.error);
+    };
+    
+    request.onsuccess = () => {
+      resolve(request.result || null);
+    };
+  });
+};
+
+/**
+ * Store an image in IndexedDB
+ */
+const storeImageInDB = (db: IDBDatabase, cachedImage: CachedImage): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.put(cachedImage);
+    
+    request.onerror = () => {
+      reject(request.error);
+    };
+    
+    request.onsuccess = () => {
+      resolve();
+    };
+  });
+};
+
+/**
+ * Clear old cached images older than maxAge (in milliseconds)
+ */
+export function clearOldCachedImages(maxAge: number = 7 * 24 * 60 * 60 * 1000): Promise<void> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await openDatabase();
+      const transaction = db.transaction(STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const index = store.index('timestamp');
+      
+      // Find entries older than maxAge
+      const cutoffTime = Date.now() - maxAge;
+      const request = index.openCursor(IDBKeyRange.upperBound(cutoffTime));
+      
+      request.onsuccess = (event) => {
+        const cursor = request.result;
+        if (cursor) {
+          // Delete this entry
+          cursor.delete();
+          // Move to next entry
+          cursor.continue();
+        }
+      };
+      
+      transaction.oncomplete = () => {
+        console.log('Cleared old cached images');
+        resolve();
+      };
+      
+      transaction.onerror = () => {
+        reject(transaction.error);
+      };
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+      reject(error);
+    }
+  });
+}
+
+/**
+ * Get the total size of the image cache
+ */
+export function getCacheSize(): Promise<number> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await openDatabase();
+      const transaction = db.transaction(STORE_NAME, 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.getAll();
+      
+      request.onsuccess = () => {
+        const cachedImages = request.result as CachedImage[];
+        let totalSize = 0;
+        
+        cachedImages.forEach(image => {
+          totalSize += image.cachedBlob.size;
+        });
+        
+        resolve(totalSize);
+      };
+      
+      request.onerror = () => {
+        reject(request.error);
+      };
+    } catch (error) {
+      console.error('Error getting cache size:', error);
+      reject(error);
+    }
+  });
 }
