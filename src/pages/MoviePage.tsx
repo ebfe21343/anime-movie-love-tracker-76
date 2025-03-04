@@ -7,16 +7,12 @@ import Header from '@/components/Header';
 import MovieDetail from '@/components/MovieDetail';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { clearImageCache, getCacheSize } from '@/lib/utils/image-cache';
-import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
 
 const MoviePage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
-  const [cacheSize, setCacheSize] = useState<string>('');
   
   useEffect(() => {
     const loadMovie = async () => {
@@ -44,32 +40,7 @@ const MoviePage = () => {
     };
     
     loadMovie();
-    updateCacheSize();
   }, [id, navigate]);
-  
-  const updateCacheSize = async () => {
-    try {
-      const size = await getCacheSize();
-      const sizeMB = (size / (1024 * 1024)).toFixed(2);
-      setCacheSize(`${sizeMB} MB`);
-    } catch (error) {
-      console.error('Error getting cache size:', error);
-    }
-  };
-  
-  const handleClearCache = async () => {
-    try {
-      await clearImageCache();
-      toast.success('Image cache cleared successfully');
-      // Update the displayed cache size
-      updateCacheSize();
-      // Reload the current page to refresh images
-      window.location.reload();
-    } catch (error) {
-      console.error('Error clearing cache:', error);
-      toast.error('Failed to clear image cache');
-    }
-  };
   
   // Set up realtime subscription for movie updates
   useEffect(() => {
@@ -144,19 +115,6 @@ const MoviePage = () => {
       <Header />
       
       <main className="max-w-7xl mx-auto px-4 pt-28">
-        {/* Cache management button */}
-        <div className="mb-4 flex justify-end">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex items-center gap-2 text-xs"
-            onClick={handleClearCache}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            Clear image cache {cacheSize && `(${cacheSize})`}
-          </Button>
-        </div>
-        
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="relative w-16 h-16">
