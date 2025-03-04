@@ -1,4 +1,3 @@
-
 export interface Movie {
   id: string;
   type: string;
@@ -54,6 +53,7 @@ export interface Movie {
   added_at: string;
   cancelled: boolean;
   seasons?: Season[];
+  content_type?: string; // Added for storing the user-selected content type
 }
 
 interface Credit {
@@ -77,7 +77,6 @@ export interface Season {
   season_number: number;
   title: string;
   year: number;
-  episode_count?: number;
   personal_ratings: {
     lyan: number;
     nastya: number;
@@ -106,7 +105,7 @@ export interface MovieFormData {
     nastya: string;
   };
   watch_link: string;
-  type?: string;
+  content_type?: string; // Added to match our Movie interface
   cancelled?: boolean;
   seasons?: Season[];
 }

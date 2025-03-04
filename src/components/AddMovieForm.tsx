@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -41,13 +40,11 @@ const AddMovieForm = () => {
     }
   });
 
-  // Update form values when ratings change
   useEffect(() => {
     setValue('personal_ratings.lyan', lyanRating);
     setValue('personal_ratings.nastya', nastyaRating);
   }, [lyanRating, nastyaRating, setValue]);
 
-  // Update seasons in form
   useEffect(() => {
     setValue('seasons', seasons);
   }, [seasons, setValue]);
@@ -65,14 +62,13 @@ const AddMovieForm = () => {
       setPreview(movieData);
       setValue('id', id.value);
       
-      // Detect if it's a series
       const isTvSeries = movieData.type === 'tvSeries' || movieData.type === 'tvMiniSeries';
       setIsSeries(isTvSeries);
-      setContentType(isTvSeries ? 'series' : 'movie');
+      const detectedType = isTvSeries ? 'series' : 'movie';
+      setContentType(detectedType);
       
-      // If it's a series and end_year is null, it might be ongoing
       if (isTvSeries && movieData.end_year === null) {
-        setSeasons([]); // Reset seasons when fetching a new show
+        setSeasons([]);
       }
     } catch (error) {
       console.error('Error fetching movie preview:', error);
@@ -90,10 +86,9 @@ const AddMovieForm = () => {
   const onSubmit = async (data: MovieFormData) => {
     setIsLoading(true);
     try {
-      // Only include seasons if it's a series or anime
       const dataToSubmit = {
         ...data,
-        type: contentType,  // Include the custom type
+        content_type: contentType,
         seasons: isSeries ? seasons : undefined
       };
       
@@ -101,7 +96,7 @@ const AddMovieForm = () => {
         personal_ratings: data.personal_ratings,
         comments: data.comments,
         watch_link: data.watch_link,
-        type: contentType,  // Include the custom type
+        content_type: contentType,
         seasons: dataToSubmit.seasons
       });
       
@@ -158,7 +153,6 @@ const AddMovieForm = () => {
           
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-6">
-              {/* Personal ratings */}
               <div>
                 <h3 className="text-lg font-medium mb-4">Your Ratings</h3>
                 
@@ -199,7 +193,6 @@ const AddMovieForm = () => {
                 </div>
               </div>
               
-              {/* Watch Link */}
               <div>
                 <Label htmlFor="watchLink" className="flex items-center gap-1">
                   <LinkIcon className="h-3.5 w-3.5" />
@@ -213,7 +206,6 @@ const AddMovieForm = () => {
                 />
               </div>
               
-              {/* Comments */}
               <div>
                 <h3 className="text-lg font-medium mb-4">Your Comments</h3>
                 
@@ -369,17 +361,14 @@ const AddMovieForm = () => {
                 </div>
               </Card>
               
-              {/* Season form (only visible if it's a series) */}
-              {preview && (
-                <div className="pt-4 pb-2">
-                  <SeasonForm 
-                    seasons={seasons} 
-                    onSeasonsChange={setSeasons} 
-                    contentType={contentType}
-                    onContentTypeChange={handleContentTypeChange}
-                  />
-                </div>
-              )}
+              <div className="pt-4 pb-2">
+                <SeasonForm 
+                  seasons={seasons} 
+                  onSeasonsChange={setSeasons} 
+                  contentType={contentType}
+                  onContentTypeChange={handleContentTypeChange}
+                />
+              </div>
             </div>
           ) : (
             <div className="h-full flex flex-col items-center justify-center py-10 px-4 text-center bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">

@@ -40,7 +40,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
   const [nastyaComment, setNastyaComment] = useState(movie.comments.nastya);
   const [seasons, setSeasons] = useState<Season[]>(movie.seasons || []);
   const [cancelled, setCancelled] = useState(movie.cancelled || false);
-  const isSeries = movie.type === 'tvSeries' || movie.type === 'tvMiniSeries';
+  const [contentType, setContentType] = useState(movie.content_type || movie.type || 'movie');
+  const isSeries = contentType === 'series' || contentType === 'anime';
   
   useEffect(() => {
     setWatchLink(movie.watch_link);
@@ -50,7 +51,12 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
     setNastyaComment(movie.comments.nastya);
     setSeasons(movie.seasons || []);
     setCancelled(movie.cancelled || false);
+    setContentType(movie.content_type || movie.type || 'movie');
   }, [movie]);
+  
+  const handleContentTypeChange = (type: string) => {
+    setContentType(type);
+  };
   
   const handleSaveChanges = async () => {
     try {
@@ -65,6 +71,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
           nastya: nastyaComment,
         },
         cancelled: cancelled,
+        content_type: contentType,
         seasons: isSeries ? seasons : undefined,
       });
       
@@ -184,7 +191,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                     className="bg-lavender-500 text-white"
                   >
                     <Tv className="h-3.5 w-3.5 mr-1" />
-                    Series
+                    {contentType.charAt(0).toUpperCase() + contentType.slice(1)}
                   </Badge>
                 )}
                 
@@ -503,6 +510,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                   <SeasonForm
                     seasons={seasons}
                     onSeasonsChange={setSeasons}
+                    contentType={contentType}
+                    onContentTypeChange={handleContentTypeChange}
                   />
                 ) : (
                   <div>

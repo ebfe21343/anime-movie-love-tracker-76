@@ -27,11 +27,16 @@ import {
 interface SeasonFormProps {
   seasons: Season[];
   onSeasonsChange: (seasons: Season[]) => void;
-  contentType: string;
-  onContentTypeChange: (type: string) => void;
+  contentType?: string;
+  onContentTypeChange?: (type: string) => void;
 }
 
-const SeasonForm = ({ seasons, onSeasonsChange, contentType, onContentTypeChange }: SeasonFormProps) => {
+const SeasonForm = ({ 
+  seasons, 
+  onSeasonsChange, 
+  contentType = 'movie',
+  onContentTypeChange 
+}: SeasonFormProps) => {
   const [newSeason, setNewSeason] = useState<Omit<Season, 'id'>>({
     season_number: (seasons.length > 0 ? Math.max(...seasons.map(s => s.season_number)) : 0) + 1,
     title: '',
@@ -111,20 +116,25 @@ const SeasonForm = ({ seasons, onSeasonsChange, contentType, onContentTypeChange
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-medium mb-4">Manage Seasons</h3>
         
-        <div className="w-48">
-          <Label htmlFor="content-type" className="text-sm mb-1 block">Content Type</Label>
-          <Select value={contentType} onValueChange={onContentTypeChange}>
-            <SelectTrigger id="content-type">
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="movie">Movie</SelectItem>
-              <SelectItem value="series">Series</SelectItem>
-              <SelectItem value="cartoon">Cartoon</SelectItem>
-              <SelectItem value="anime">Anime</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {onContentTypeChange && (
+          <div className="w-48">
+            <Label htmlFor="content-type" className="text-sm mb-1 block">Content Type</Label>
+            <Select 
+              value={contentType} 
+              onValueChange={(value) => onContentTypeChange(value)}
+            >
+              <SelectTrigger id="content-type">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="movie">Movie</SelectItem>
+                <SelectItem value="series">Series</SelectItem>
+                <SelectItem value="cartoon">Cartoon</SelectItem>
+                <SelectItem value="anime">Anime</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
       
       <Card className="bg-white/40">
@@ -295,24 +305,6 @@ const SeasonForm = ({ seasons, onSeasonsChange, contentType, onContentTypeChange
                         updatedSeasons[index] = {
                           ...updatedSeasons[index],
                           title: e.target.value
-                        };
-                        onSeasonsChange(updatedSeasons);
-                      }}
-                      className="mt-1"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor={`season_year_${index}`}>Year</Label>
-                    <Input
-                      id={`season_year_${index}`}
-                      type="number"
-                      value={season.year}
-                      onChange={(e) => {
-                        const updatedSeasons = [...seasons];
-                        updatedSeasons[index] = {
-                          ...updatedSeasons[index],
-                          year: parseInt(e.target.value) || new Date().getFullYear()
                         };
                         onSeasonsChange(updatedSeasons);
                       }}
