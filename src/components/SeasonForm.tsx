@@ -30,22 +30,9 @@ const SeasonForm = ({
   
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [seasonToDelete, setSeasonToDelete] = useState<number | null>(null);
-  
+
   // Always render the SeasonHeader with content type selector
-  if (contentType === 'movie') {
-    return (
-      <div className="space-y-6">
-        <SeasonHeader 
-          title="Content Type" 
-          contentType={contentType} 
-          onContentTypeChange={onContentTypeChange} 
-        />
-        <p className="text-center text-muted-foreground py-4">
-          Season management is only available for series, cartoons, and anime.
-        </p>
-      </div>
-    );
-  }
+  // No more early return for movie content type
   
   const addSeason = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -124,26 +111,34 @@ const SeasonForm = ({
         onContentTypeChange={onContentTypeChange} 
       />
       
-      <NewSeasonForm 
-        newSeason={newSeason}
-        setNewSeason={setNewSeason}
-        addSeason={addSeason}
-      />
-      
-      <SeasonList 
-        seasons={seasons}
-        updateSeason={updateSeason}
-        updateSeasonRating={updateSeasonRating}
-        updateSeasonComment={updateSeasonComment}
-        updateSeasonCancelled={updateSeasonCancelled}
-        confirmRemoveSeason={confirmRemoveSeason}
-      />
-      
-      <DeleteSeasonDialog
-        isOpen={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        onConfirm={removeSeason}
-      />
+      {contentType !== 'movie' ? (
+        <>
+          <NewSeasonForm 
+            newSeason={newSeason}
+            setNewSeason={setNewSeason}
+            addSeason={addSeason}
+          />
+          
+          <SeasonList 
+            seasons={seasons}
+            updateSeason={updateSeason}
+            updateSeasonRating={updateSeasonRating}
+            updateSeasonComment={updateSeasonComment}
+            updateSeasonCancelled={updateSeasonCancelled}
+            confirmRemoveSeason={confirmRemoveSeason}
+          />
+          
+          <DeleteSeasonDialog
+            isOpen={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+            onConfirm={removeSeason}
+          />
+        </>
+      ) : (
+        <p className="text-center text-muted-foreground py-4">
+          Season management is only available for series, cartoons, and anime.
+        </p>
+      )}
     </div>
   );
 };
