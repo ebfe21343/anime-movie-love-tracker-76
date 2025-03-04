@@ -15,7 +15,8 @@ interface MovieCardProps {
 const MovieCard = ({ movie }: MovieCardProps) => {
   const poster = movie.posters[0]?.url || '';
   const [cachedPosterUrl, setCachedPosterUrl] = useState(poster);
-  const hasValidPoster = poster && poster !== '/placeholder.svg';
+  const [imageLoadError, setImageLoadError] = useState(false);
+  const hasValidPoster = poster && poster !== '/placeholder.svg' && !imageLoadError;
   const releaseYear = movie.start_year;
   const endYear = movie.end_year ? ` - ${movie.end_year}` : '';
   
@@ -35,9 +36,12 @@ const MovieCard = ({ movie }: MovieCardProps) => {
   }
   
   useEffect(() => {
+    // Reset error state when poster changes
+    setImageLoadError(false);
+    
     // Try to get cached version of the poster
     const loadCachedImage = async () => {
-      if (hasValidPoster) {
+      if (poster && poster !== '/placeholder.svg') {
         try {
           const cachedUrl = await getCachedImageUrl(poster, movie.id, 'poster');
           if (cachedUrl) {
@@ -52,7 +56,12 @@ const MovieCard = ({ movie }: MovieCardProps) => {
     };
     
     loadCachedImage();
-  }, [poster, movie.id, hasValidPoster]);
+  }, [poster, movie.id]);
+
+  const handleImageError = () => {
+    console.error('Image failed to load:', poster);
+    setImageLoadError(true);
+  };
 
   return (
     <Link to={`/movie/${movie.id}`}>
@@ -65,6 +74,7 @@ const MovieCard = ({ movie }: MovieCardProps) => {
               alt={movie.primary_title}
               className="object-cover w-full h-full" 
               loading="lazy"
+              onError={handleImageError}
             />
           ) : (
             /* Default styled card when no poster is available */

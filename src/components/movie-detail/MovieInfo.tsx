@@ -16,12 +16,16 @@ interface MovieInfoProps {
 export const MovieInfo = ({ movie, poster, contentType, cancelled }: MovieInfoProps) => {
   const isSeries = contentType === 'series' || contentType === 'anime' || contentType === 'cartoon';
   const [cachedPosterUrl, setCachedPosterUrl] = useState(poster);
-  const hasValidPoster = poster && poster !== '/placeholder.svg';
+  const [imageLoadError, setImageLoadError] = useState(false);
+  const hasValidPoster = poster && poster !== '/placeholder.svg' && !imageLoadError;
   
   useEffect(() => {
+    // Reset error state when poster changes
+    setImageLoadError(false);
+    
     // Try to get cached version of the poster
     const loadCachedImage = async () => {
-      if (hasValidPoster) {
+      if (poster && poster !== '/placeholder.svg') {
         try {
           const cachedUrl = await getCachedImageUrl(poster, movie.id, 'poster');
           if (cachedUrl) {
@@ -36,7 +40,12 @@ export const MovieInfo = ({ movie, poster, contentType, cancelled }: MovieInfoPr
     };
     
     loadCachedImage();
-  }, [poster, movie.id, hasValidPoster]);
+  }, [poster, movie.id]);
+  
+  const handleImageError = () => {
+    console.error('Image failed to load:', poster);
+    setImageLoadError(true);
+  };
   
   return (
     <div className="relative aspect-[2/3]">
@@ -45,6 +54,7 @@ export const MovieInfo = ({ movie, poster, contentType, cancelled }: MovieInfoPr
           src={cachedPosterUrl} 
           alt={movie.primary_title}
           className="object-cover w-full h-full"
+          onError={handleImageError}
         />
       ) : (
         /* Default styled placeholder when no poster is available */
