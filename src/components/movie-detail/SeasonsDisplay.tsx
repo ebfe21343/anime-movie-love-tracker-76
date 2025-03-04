@@ -6,6 +6,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import SeasonForm from '@/components/SeasonForm';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface SeasonsDisplayProps {
   seasons: Season[];
@@ -60,15 +68,36 @@ export const SeasonsDisplay = ({
                   </>
                 )}
               </h3>
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-lavender-500/10 border-lavender-200 text-lavender-900"
-                onClick={() => setEditMode(true)}
-              >
-                <Plus className="h-3.5 w-3.5 mr-1" />
-                Manage Seasons
-              </Button>
+              
+              <div className="flex items-center gap-3">
+                {/* Always show content type selector */}
+                <div className="w-40">
+                  <Select 
+                    value={contentType} 
+                    onValueChange={onContentTypeChange}
+                  >
+                    <SelectTrigger id="content-type" className="h-9">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="movie">Movie</SelectItem>
+                      <SelectItem value="series">Series</SelectItem>
+                      <SelectItem value="cartoon">Cartoon</SelectItem>
+                      <SelectItem value="anime">Anime</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-lavender-500/10 border-lavender-200 text-lavender-900"
+                  onClick={() => setEditMode(true)}
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Manage Seasons
+                </Button>
+              </div>
             </div>
             
             {/* Only show season content when contentType isn't 'movie' */}

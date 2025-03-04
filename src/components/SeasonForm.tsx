@@ -113,7 +113,7 @@ const SeasonForm = ({
       />
       
       {/* Only render season management UI when contentType isn't 'movie' */}
-      {contentType !== 'movie' ? (
+      {contentType !== 'movie' && (
         <>
           <NewSeasonForm 
             newSeason={newSeason}
@@ -130,18 +130,20 @@ const SeasonForm = ({
             confirmRemoveSeason={confirmRemoveSeason}
             contentType={contentType}
           />
-          
-          <DeleteSeasonDialog
-            isOpen={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
-            onConfirm={removeSeason}
-          />
         </>
-      ) : (
+      )}
+      
+      {contentType === 'movie' && (
         <p className="text-center text-muted-foreground py-4">
           Season management is only available for series, cartoons, and anime.
         </p>
       )}
+      
+      <DeleteSeasonDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={removeSeason}
+      />
     </div>
   );
 };
