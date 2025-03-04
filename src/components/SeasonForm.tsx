@@ -16,13 +16,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface SeasonFormProps {
   seasons: Season[];
   onSeasonsChange: (seasons: Season[]) => void;
+  contentType: string;
+  onContentTypeChange: (type: string) => void;
 }
 
-const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
+const SeasonForm = ({ seasons, onSeasonsChange, contentType, onContentTypeChange }: SeasonFormProps) => {
   const [newSeason, setNewSeason] = useState<Omit<Season, 'id'>>({
     season_number: (seasons.length > 0 ? Math.max(...seasons.map(s => s.season_number)) : 0) + 1,
     title: '',
@@ -99,7 +108,24 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
   
   return (
     <div className="space-y-6">
-      <h3 className="text-xl font-medium mb-4">Manage Seasons</h3>
+      <div className="flex justify-between items-center">
+        <h3 className="text-xl font-medium mb-4">Manage Seasons</h3>
+        
+        <div className="w-48">
+          <Label htmlFor="content-type" className="text-sm mb-1 block">Content Type</Label>
+          <Select value={contentType} onValueChange={onContentTypeChange}>
+            <SelectTrigger id="content-type">
+              <SelectValue placeholder="Select type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="movie">Movie</SelectItem>
+              <SelectItem value="series">Series</SelectItem>
+              <SelectItem value="cartoon">Cartoon</SelectItem>
+              <SelectItem value="anime">Anime</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       
       <Card className="bg-white/40">
         <CardContent className="p-4">
@@ -127,20 +153,6 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
                 onChange={(e) => setNewSeason({
                   ...newSeason,
                   title: e.target.value
-                })}
-                className="mt-1"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="episode_count">Episode Count (optional)</Label>
-              <Input
-                id="episode_count"
-                type="number"
-                value={newSeason.episode_count || ''}
-                onChange={(e) => setNewSeason({
-                  ...newSeason,
-                  episode_count: e.target.value ? parseInt(e.target.value) : undefined
                 })}
                 className="mt-1"
               />
@@ -301,24 +313,6 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
                         updatedSeasons[index] = {
                           ...updatedSeasons[index],
                           year: parseInt(e.target.value) || new Date().getFullYear()
-                        };
-                        onSeasonsChange(updatedSeasons);
-                      }}
-                      className="mt-1"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor={`episode_count_${index}`}>Episode Count (optional)</Label>
-                    <Input
-                      id={`episode_count_${index}`}
-                      type="number"
-                      value={season.episode_count || ''}
-                      onChange={(e) => {
-                        const updatedSeasons = [...seasons];
-                        updatedSeasons[index] = {
-                          ...updatedSeasons[index],
-                          episode_count: e.target.value ? parseInt(e.target.value) : undefined
                         };
                         onSeasonsChange(updatedSeasons);
                       }}

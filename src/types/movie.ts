@@ -106,6 +106,7 @@ export interface MovieFormData {
     nastya: string;
   };
   watch_link: string;
+  type?: string;
   cancelled?: boolean;
   seasons?: Season[];
 }

@@ -23,6 +23,7 @@ const AddMovieForm = () => {
   const [nastyaRating, setNastyaRating] = useState(5);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [isSeries, setIsSeries] = useState(false);
+  const [contentType, setContentType] = useState('movie');
 
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<MovieFormData>({
     defaultValues: {
@@ -67,6 +68,7 @@ const AddMovieForm = () => {
       // Detect if it's a series
       const isTvSeries = movieData.type === 'tvSeries' || movieData.type === 'tvMiniSeries';
       setIsSeries(isTvSeries);
+      setContentType(isTvSeries ? 'series' : 'movie');
       
       // If it's a series and end_year is null, it might be ongoing
       if (isTvSeries && movieData.end_year === null) {
@@ -80,12 +82,18 @@ const AddMovieForm = () => {
     }
   };
 
+  const handleContentTypeChange = (type: string) => {
+    setContentType(type);
+    setIsSeries(type === 'series' || type === 'anime');
+  };
+
   const onSubmit = async (data: MovieFormData) => {
     setIsLoading(true);
     try {
-      // Only include seasons if it's a series
+      // Only include seasons if it's a series or anime
       const dataToSubmit = {
         ...data,
+        type: contentType,  // Include the custom type
         seasons: isSeries ? seasons : undefined
       };
       
@@ -93,6 +101,7 @@ const AddMovieForm = () => {
         personal_ratings: data.personal_ratings,
         comments: data.comments,
         watch_link: data.watch_link,
+        type: contentType,  // Include the custom type
         seasons: dataToSubmit.seasons
       });
       
@@ -102,6 +111,7 @@ const AddMovieForm = () => {
       setLyanRating(5);
       setNastyaRating(5);
       setSeasons([]);
+      setContentType('movie');
       navigate('/');
     } catch (error: any) {
       console.error('Error adding movie:', error);
@@ -241,7 +251,7 @@ const AddMovieForm = () => {
                   ) : (
                     <Film className="h-4 w-4 mr-2" />
                   )}
-                  Add {isSeries ? 'Series' : 'Movie'} to Collection
+                  Add {contentType.charAt(0).toUpperCase() + contentType.slice(1)} to Collection
                 </Button>
               </div>
             </div>
@@ -252,7 +262,7 @@ const AddMovieForm = () => {
           {preview ? (
             <div className="animate-scale-in">
               <h3 className="text-lg font-medium mb-4">
-                {isSeries ? 'Series' : 'Movie'} Preview
+                {contentType.charAt(0).toUpperCase() + contentType.slice(1)} Preview
               </h3>
               <Card className="overflow-hidden border-none glass">
                 <div className="flex flex-col lg:flex-row">
@@ -290,12 +300,12 @@ const AddMovieForm = () => {
                         {isSeries ? (
                           <div className="flex items-center">
                             <Tv className="h-3.5 w-3.5 mr-1" />
-                            Series
+                            {contentType.charAt(0).toUpperCase() + contentType.slice(1)}
                           </div>
                         ) : (
                           <div className="flex items-center">
                             <Film className="h-3.5 w-3.5 mr-1" />
-                            Movie
+                            {contentType.charAt(0).toUpperCase() + contentType.slice(1)}
                           </div>
                         )}
                       </Badge>
@@ -360,11 +370,13 @@ const AddMovieForm = () => {
               </Card>
               
               {/* Season form (only visible if it's a series) */}
-              {preview && isSeries && (
+              {preview && (
                 <div className="pt-4 pb-2">
                   <SeasonForm 
                     seasons={seasons} 
                     onSeasonsChange={setSeasons} 
+                    contentType={contentType}
+                    onContentTypeChange={handleContentTypeChange}
                   />
                 </div>
               )}
