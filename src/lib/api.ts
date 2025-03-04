@@ -102,7 +102,8 @@ export async function fetchMovieById(id: string): Promise<Omit<Movie, 'personal_
     
     return {
       ...movieData,
-      cancelled: false // Default value when fetching from IMDb
+      cancelled: false, // Default value when fetching from IMDb
+      content_type: movieData.type || 'movie' // Add content_type based on the movie type
     };
   } catch (error) {
     console.error('Error fetching movie:', error);
@@ -214,7 +215,7 @@ export const addMovieToCollection = async (
     
     const movieForDb = {
       id: movieData.id,
-      type: movieData.type,
+      type: personalData.content_type || movieData.type,
       is_adult: movieData.is_adult,
       primary_title: movieData.primary_title,
       original_title: movieData.original_title,
@@ -239,7 +240,6 @@ export const addMovieToCollection = async (
       comments: convertToJson(personalData.comments),
       watch_link: personalData.watch_link,
       cancelled: personalData.cancelled || false,
-      type: personalData.content_type || movieData.type,
       seasons: personalData.seasons ? convertToJson(personalData.seasons) : null
     };
     
