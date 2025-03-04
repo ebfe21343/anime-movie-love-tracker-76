@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -156,25 +157,8 @@ const AddMovieForm = () => {
               <div>
                 <h3 className="text-lg font-medium mb-4">Your Ratings</h3>
                 
+                {/* Swapped Nastya's rating to be first */}
                 <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <Label htmlFor="lyan-rating">Lyan's Rating</Label>
-                    <Badge variant="outline" className="font-bold">
-                      {lyanRating}/10
-                    </Badge>
-                  </div>
-                  <Slider
-                    id="lyan-rating"
-                    defaultValue={[5]}
-                    max={10}
-                    step={1}
-                    value={[lyanRating]}
-                    onValueChange={(values) => setLyanRating(values[0])}
-                    className="py-2"
-                  />
-                </div>
-                
-                <div>
                   <div className="flex justify-between items-center mb-2">
                     <Label htmlFor="nastya-rating">Nastya's Rating</Label>
                     <Badge variant="outline" className="font-bold">
@@ -188,6 +172,24 @@ const AddMovieForm = () => {
                     step={1}
                     value={[nastyaRating]}
                     onValueChange={(values) => setNastyaRating(values[0])}
+                    className="py-2"
+                  />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <Label htmlFor="lyan-rating">Lyan's Rating</Label>
+                    <Badge variant="outline" className="font-bold">
+                      {lyanRating}/10
+                    </Badge>
+                  </div>
+                  <Slider
+                    id="lyan-rating"
+                    defaultValue={[5]}
+                    max={10}
+                    step={1}
+                    value={[lyanRating]}
+                    onValueChange={(values) => setLyanRating(values[0])}
                     className="py-2"
                   />
                 </div>
@@ -209,18 +211,8 @@ const AddMovieForm = () => {
               <div>
                 <h3 className="text-lg font-medium mb-4">Your Comments</h3>
                 
+                {/* Swapped Nastya's comment to be first */}
                 <div className="mb-4">
-                  <Label htmlFor="lyan-comment">Lyan's Comment</Label>
-                  <Textarea
-                    id="lyan-comment"
-                    placeholder="What did you think of this movie?"
-                    className="mt-1.5 resize-none"
-                    rows={3}
-                    {...register('comments.lyan')}
-                  />
-                </div>
-                
-                <div>
                   <Label htmlFor="nastya-comment">Nastya's Comment</Label>
                   <Textarea
                     id="nastya-comment"
@@ -228,6 +220,17 @@ const AddMovieForm = () => {
                     className="mt-1.5 resize-none"
                     rows={3}
                     {...register('comments.nastya')}
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="lyan-comment">Lyan's Comment</Label>
+                  <Textarea
+                    id="lyan-comment"
+                    placeholder="What did you think of this movie?"
+                    className="mt-1.5 resize-none"
+                    rows={3}
+                    {...register('comments.lyan')}
                   />
                 </div>
               </div>
