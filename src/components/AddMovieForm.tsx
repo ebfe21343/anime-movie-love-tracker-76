@@ -17,7 +17,6 @@ const AddMovieForm = () => {
   const [lyanRating, setLyanRating] = useState(5);
   const [nastyaRating, setNastyaRating] = useState(5);
   const [seasons, setSeasons] = useState<Season[]>([]);
-  const [isSeries, setIsSeries] = useState(false);
   const [contentType, setContentType] = useState('movie');
 
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<MovieFormData>({
@@ -47,7 +46,6 @@ const AddMovieForm = () => {
 
   const handleContentTypeChange = (type: string) => {
     setContentType(type);
-    setIsSeries(type === 'series' || type === 'anime');
   };
 
   const onSubmit = async (data: MovieFormData) => {
@@ -56,7 +54,7 @@ const AddMovieForm = () => {
       const dataToSubmit = {
         ...data,
         content_type: contentType,
-        seasons: isSeries ? seasons : undefined
+        seasons: contentType !== 'movie' ? seasons : undefined
       };
       
       await addMovieToCollection(data.id, {
@@ -93,7 +91,6 @@ const AddMovieForm = () => {
             isLoading={isLoading}
             setIsLoading={setIsLoading}
             setPreview={setPreview}
-            setIsSeries={setIsSeries}
             setContentType={setContentType}
             setValue={setValue}
             setSeasons={setSeasons}
@@ -111,7 +108,6 @@ const AddMovieForm = () => {
             setNastyaRating={setNastyaRating}
             isLoading={isLoading}
             preview={preview}
-            isSeries={isSeries}
             contentType={contentType}
           />
         </div>
@@ -119,11 +115,10 @@ const AddMovieForm = () => {
         <div className="w-full md:w-3/5">
           <MoviePreview 
             preview={preview} 
-            isSeries={isSeries} 
             contentType={contentType} 
           />
           
-          {preview && contentType !== 'movie' && (
+          {preview && (
             <div className="pt-4 pb-2">
               <SeasonForm 
                 seasons={seasons} 
