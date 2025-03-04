@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Film, Tv, X, Palette } from 'lucide-react';
+import { Star, Film, Tv, X, Palette, ImageOff } from 'lucide-react';
 import { Movie } from '@/types/movie';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,8 +13,9 @@ interface MovieCardProps {
 }
 
 const MovieCard = ({ movie }: MovieCardProps) => {
-  const poster = movie.posters[0]?.url || '/placeholder.svg';
+  const poster = movie.posters[0]?.url || '';
   const [cachedPosterUrl, setCachedPosterUrl] = useState(poster);
+  const hasValidPoster = poster && poster !== '/placeholder.svg';
   const releaseYear = movie.start_year;
   const endYear = movie.end_year ? ` - ${movie.end_year}` : '';
   
@@ -36,7 +37,7 @@ const MovieCard = ({ movie }: MovieCardProps) => {
   useEffect(() => {
     // Try to get cached version of the poster
     const loadCachedImage = async () => {
-      if (poster && poster !== '/placeholder.svg') {
+      if (hasValidPoster) {
         try {
           const cachedUrl = await getCachedImageUrl(poster, movie.id, 'poster');
           if (cachedUrl) {
@@ -51,19 +52,32 @@ const MovieCard = ({ movie }: MovieCardProps) => {
     };
     
     loadCachedImage();
-  }, [poster, movie.id]);
+  }, [poster, movie.id, hasValidPoster]);
 
   return (
     <Link to={`/movie/${movie.id}`}>
       <Card className="overflow-hidden card-hover h-full border-none glass rounded-2xl">
         <div className="relative aspect-[2/3] overflow-hidden rounded-t-2xl">
-          {/* Poster image with caching */}
-          <img 
-            src={cachedPosterUrl} 
-            alt={movie.primary_title}
-            className="object-cover w-full h-full" 
-            loading="lazy"
-          />
+          {hasValidPoster ? (
+            /* Poster image with caching */
+            <img 
+              src={cachedPosterUrl} 
+              alt={movie.primary_title}
+              className="object-cover w-full h-full" 
+              loading="lazy"
+            />
+          ) : (
+            /* Default styled card when no poster is available */
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-lavender-100 to-lavender-200 text-lavender-800">
+              <div className="mb-4 p-3 rounded-full bg-white/30">
+                <ImageOff className="w-12 h-12 text-lavender-600" />
+              </div>
+              <div className="text-center px-4">
+                <p className="text-sm font-medium">No poster available</p>
+                <h4 className="mt-2 text-lg font-bold line-clamp-3 px-2">{movie.primary_title}</h4>
+              </div>
+            </div>
+          )}
           
           {/* Adult badge */}
           {movie.is_adult && (
@@ -85,7 +99,7 @@ const MovieCard = ({ movie }: MovieCardProps) => {
                 variant="outline" 
                 className="bg-red-500/90 text-white border-red-400 flex items-center gap-1"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3.5 w-3.5 mr-1" />
                 <span>Cancelled</span>
               </Badge>
             )}

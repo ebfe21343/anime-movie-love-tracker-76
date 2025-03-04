@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { Film, Palette, Tv, X } from 'lucide-react';
+import { Film, Palette, Tv, X, ImageOff } from 'lucide-react';
 import { Movie } from '@/types/movie';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -16,11 +16,12 @@ interface MovieInfoProps {
 export const MovieInfo = ({ movie, poster, contentType, cancelled }: MovieInfoProps) => {
   const isSeries = contentType === 'series' || contentType === 'anime' || contentType === 'cartoon';
   const [cachedPosterUrl, setCachedPosterUrl] = useState(poster);
+  const hasValidPoster = poster && poster !== '/placeholder.svg';
   
   useEffect(() => {
     // Try to get cached version of the poster
     const loadCachedImage = async () => {
-      if (poster) {
+      if (hasValidPoster) {
         try {
           const cachedUrl = await getCachedImageUrl(poster, movie.id, 'poster');
           if (cachedUrl) {
@@ -35,15 +36,28 @@ export const MovieInfo = ({ movie, poster, contentType, cancelled }: MovieInfoPr
     };
     
     loadCachedImage();
-  }, [poster, movie.id]);
+  }, [poster, movie.id, hasValidPoster]);
   
   return (
     <div className="relative aspect-[2/3]">
-      <img 
-        src={cachedPosterUrl} 
-        alt={movie.primary_title}
-        className="object-cover w-full h-full"
-      />
+      {hasValidPoster ? (
+        <img 
+          src={cachedPosterUrl} 
+          alt={movie.primary_title}
+          className="object-cover w-full h-full"
+        />
+      ) : (
+        /* Default styled placeholder when no poster is available */
+        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-lavender-100 to-lavender-200 text-lavender-800">
+          <div className="mb-4 p-3 rounded-full bg-white/30">
+            <ImageOff className="w-16 h-16 text-lavender-600" />
+          </div>
+          <div className="text-center px-4">
+            <p className="text-md font-medium">No poster available</p>
+            <h3 className="mt-2 text-xl font-bold">{movie.primary_title}</h3>
+          </div>
+        </div>
+      )}
       
       {movie.is_adult && (
         <Badge variant="destructive" className="absolute top-3 right-3">
