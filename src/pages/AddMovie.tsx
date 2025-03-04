@@ -13,7 +13,7 @@ const AddMovie = () => {
             Add New Movie
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Enter an IMDb ID to add a new movie to your collection
+            Enter an IMDb ID to fetch movie details and add it to your collection
           </p>
         </div>
         

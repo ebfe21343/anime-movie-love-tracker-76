@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -85,10 +84,7 @@ const AddMovieForm = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-white/50 animate-fade-in">
-      <h2 className="text-2xl font-bold mb-1 text-center">Add Movie to Collection</h2>
-      <p className="text-center text-muted-foreground mb-6">
-        Enter an IMDb ID to fetch movie details and add it to your collection
-      </p>
+      <h2 className="text-2xl font-bold mb-6 text-center">Movie Details</h2>
       
       <div className="flex flex-col md:flex-row gap-6 mb-6">
         <div className="w-full md:w-2/5">
