@@ -1,3 +1,4 @@
+
 import { useTheme } from "next-themes"
 import { Toaster as Sonner } from "sonner"
 
@@ -10,7 +11,14 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      // Limit to one toast and position it at the bottom right
+      position="bottom-right"
+      closeButton
+      richColors
+      expand={false}
+      // Only show one toast at a time
       toastOptions={{
+        duration: 5000, // Match the 5 second duration used in our custom hook
         classNames: {
           toast:
             "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
