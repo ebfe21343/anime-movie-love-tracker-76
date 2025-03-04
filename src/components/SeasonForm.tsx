@@ -239,22 +239,6 @@ const SeasonForm = ({ seasons, onSeasonsChange }: SeasonFormProps) => {
             </div>
           </div>
           
-          <div className="flex items-center mb-4">
-            <Label htmlFor="cancelled" className="flex items-center cursor-pointer">
-              <input
-                id="cancelled"
-                type="checkbox"
-                checked={newSeason.cancelled}
-                onChange={(e) => setNewSeason({
-                  ...newSeason,
-                  cancelled: e.target.checked
-                })}
-                className="h-4 w-4 rounded border-gray-300 text-red-500 focus:ring-red-500 mr-2"
-              />
-              <span className="text-sm">Mark as Cancelled</span>
-            </Label>
-          </div>
-          
           <Button 
             type="button"
             onClick={addSeason}
