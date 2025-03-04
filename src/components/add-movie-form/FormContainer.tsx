@@ -14,7 +14,6 @@ interface FormContainerProps {
   setNastyaRating: (rating: number) => void;
   isLoading: boolean;
   preview: any;
-  isSeries: boolean;
   contentType: string;
 }
 
@@ -28,7 +27,6 @@ const FormContainer = ({
   setNastyaRating,
   isLoading,
   preview,
-  isSeries,
   contentType
 }: FormContainerProps) => {
   return (
@@ -48,7 +46,6 @@ const FormContainer = ({
         <SubmitButtonSection
           isLoading={isLoading}
           preview={preview}
-          isSeries={isSeries}
           contentType={contentType}
         />
       </div>

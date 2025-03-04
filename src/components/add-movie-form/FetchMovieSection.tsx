@@ -10,7 +10,6 @@ interface FetchMovieSectionProps {
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
   setPreview: (preview: any) => void;
-  setIsSeries: (isSeries: boolean) => void;
   setContentType: (contentType: string) => void;
   setValue: (field: string, value: any) => void;
   setSeasons: (seasons: any[]) => void;
@@ -22,7 +21,6 @@ const FetchMovieSection = ({
   isLoading,
   setIsLoading,
   setPreview,
-  setIsSeries,
   setContentType,
   setValue,
   setSeasons,
@@ -43,7 +41,6 @@ const FetchMovieSection = ({
       setValue('id', id.value);
       
       const isTvSeries = movieData.type === 'tvSeries' || movieData.type === 'tvMiniSeries';
-      setIsSeries(isTvSeries);
       const detectedType = isTvSeries ? 'series' : 'movie';
       setContentType(detectedType);
       

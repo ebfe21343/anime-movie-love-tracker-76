@@ -1,33 +1,31 @@
 
-import { Film, Tv } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 interface SubmitButtonSectionProps {
   isLoading: boolean;
   preview: any;
-  isSeries: boolean;
   contentType: string;
 }
 
-const SubmitButtonSection = ({
-  isLoading,
-  preview,
-  isSeries,
-  contentType
-}: SubmitButtonSectionProps) => {
+const SubmitButtonSection = ({ isLoading, preview, contentType }: SubmitButtonSectionProps) => {
+  const isSeries = contentType !== 'movie';
+  
   return (
-    <div className="pt-2">
-      <Button 
-        type="submit" 
-        className="w-full bg-sakura-500 hover:bg-sakura-600 btn-anime"
+    <div className="flex justify-end">
+      <Button
+        type="submit"
         disabled={isLoading || !preview}
+        className="bg-sakura-500 hover:bg-sakura-600 text-white"
       >
-        {isSeries ? (
-          <Tv className="h-4 w-4 mr-2" />
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Adding {isSeries ? contentType : 'movie'}...
+          </>
         ) : (
-          <Film className="h-4 w-4 mr-2" />
+          <>Add to Collection</>
         )}
-        Add {contentType.charAt(0).toUpperCase() + contentType.slice(1)} to Collection
       </Button>
     </div>
   );

@@ -5,11 +5,10 @@ import { Card, CardContent } from '@/components/ui/card';
 
 interface MoviePreviewProps {
   preview: any;
-  isSeries: boolean;
   contentType: string;
 }
 
-const MoviePreview = ({ preview, isSeries, contentType }: MoviePreviewProps) => {
+const MoviePreview = ({ preview, contentType }: MoviePreviewProps) => {
   if (!preview) {
     return (
       <div className="h-full flex flex-col items-center justify-center py-10 px-4 text-center bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
@@ -23,6 +22,8 @@ const MoviePreview = ({ preview, isSeries, contentType }: MoviePreviewProps) => 
       </div>
     );
   }
+
+  const isSeries = contentType !== 'movie';
 
   return (
     <div className="animate-scale-in">
