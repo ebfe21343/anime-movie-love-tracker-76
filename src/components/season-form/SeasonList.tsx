@@ -10,6 +10,7 @@ interface SeasonListProps {
   updateSeasonComment: (index: number, person: 'lyan' | 'nastya', value: string) => void;
   updateSeasonCancelled: (index: number, cancelled: boolean) => void;
   confirmRemoveSeason: (index: number) => void;
+  contentType: string;
 }
 
 export function SeasonList({
@@ -18,28 +19,38 @@ export function SeasonList({
   updateSeasonRating,
   updateSeasonComment,
   updateSeasonCancelled,
-  confirmRemoveSeason
+  confirmRemoveSeason,
+  contentType
 }: SeasonListProps) {
+  // Only render season content if it's not a movie
+  const showSeasonContent = contentType !== 'movie';
+  
   return (
     <>
       <h4 className="font-medium">Existing Seasons</h4>
-      {seasons.length > 0 ? (
-        <div className="space-y-4">
-          {seasons.map((season, index) => (
-            <ExistingSeasonItem
-              key={season.id}
-              season={season}
-              index={index}
-              updateSeason={updateSeason}
-              updateSeasonRating={updateSeasonRating}
-              updateSeasonComment={updateSeasonComment}
-              updateSeasonCancelled={updateSeasonCancelled}
-              confirmRemoveSeason={confirmRemoveSeason}
-            />
-          ))}
-        </div>
+      {showSeasonContent ? (
+        seasons.length > 0 ? (
+          <div className="space-y-4">
+            {seasons.map((season, index) => (
+              <ExistingSeasonItem
+                key={season.id}
+                season={season}
+                index={index}
+                updateSeason={updateSeason}
+                updateSeasonRating={updateSeasonRating}
+                updateSeasonComment={updateSeasonComment}
+                updateSeasonCancelled={updateSeasonCancelled}
+                confirmRemoveSeason={confirmRemoveSeason}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptySeasonsList />
+        )
       ) : (
-        <EmptySeasonsList />
+        <p className="text-center text-muted-foreground py-4">
+          Season management is only available for series, cartoons, and anime.
+        </p>
       )}
     </>
   );

@@ -24,10 +24,8 @@ export const SeasonsDisplay = ({
   onContentTypeChange,
   setEditMode,
 }: SeasonsDisplayProps) => {
-  // If it's a movie, don't render anything
-  if (contentType === 'movie') {
-    return null;
-  }
+  // Remove the early return - always render the component regardless of contentType
+  // We'll conditionally render the UI based on contentType inside
   
   function getRatingBadgeColor(rating: number) {
     if (rating >= 8) return "bg-mint-500 text-white";
@@ -73,58 +71,65 @@ export const SeasonsDisplay = ({
               </Button>
             </div>
             
-            {seasons && seasons.length > 0 ? (
-              <div className="space-y-4">
-                {seasons.map((season) => (
-                  <Card key={season.id} className="bg-white/40 overflow-hidden">
-                    <CardContent className="p-4">
-                      <div className="flex justify-between mb-3">
-                        <div>
-                          <h4 className="font-medium">Season {season.season_number}</h4>
-                          {season.title && (
-                            <p className="text-sm text-muted-foreground">"{season.title}"</p>
-                          )}
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>{season.year}</span>
+            {/* Only show season content when contentType isn't 'movie' */}
+            {contentType !== 'movie' ? (
+              seasons && seasons.length > 0 ? (
+                <div className="space-y-4">
+                  {seasons.map((season) => (
+                    <Card key={season.id} className="bg-white/40 overflow-hidden">
+                      <CardContent className="p-4">
+                        <div className="flex justify-between mb-3">
+                          <div>
+                            <h4 className="font-medium">Season {season.season_number}</h4>
+                            {season.title && (
+                              <p className="text-sm text-muted-foreground">"{season.title}"</p>
+                            )}
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                              <Calendar className="h-3 w-3" />
+                              <span>{season.year}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center">
+                            <Badge className={cn(
+                              "mr-2 font-bold",
+                              getRatingBadgeColor((season.personal_ratings.lyan + season.personal_ratings.nastya) / 2)
+                            )}>
+                              {((season.personal_ratings.lyan + season.personal_ratings.nastya) / 2).toFixed(1)}/10
+                            </Badge>
                           </div>
                         </div>
-                        <div className="flex items-center">
-                          <Badge className={cn(
-                            "mr-2 font-bold",
-                            getRatingBadgeColor((season.personal_ratings.lyan + season.personal_ratings.nastya) / 2)
-                          )}>
-                            {((season.personal_ratings.lyan + season.personal_ratings.nastya) / 2).toFixed(1)}/10
-                          </Badge>
+                        
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="font-medium mb-1">Lyan's Rating: {season.personal_ratings.lyan}/10</p>
+                            {season.comments.lyan ? (
+                              <p className="text-sm italic">{season.comments.lyan}</p>
+                            ) : (
+                              <p className="text-xs text-muted-foreground italic">No comment</p>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium mb-1">Nastya's Rating: {season.personal_ratings.nastya}/10</p>
+                            {season.comments.nastya ? (
+                              <p className="text-sm italic">{season.comments.nastya}</p>
+                            ) : (
+                              <p className="text-xs text-muted-foreground italic">No comment</p>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <p className="font-medium mb-1">Lyan's Rating: {season.personal_ratings.lyan}/10</p>
-                          {season.comments.lyan ? (
-                            <p className="text-sm italic">{season.comments.lyan}</p>
-                          ) : (
-                            <p className="text-xs text-muted-foreground italic">No comment</p>
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium mb-1">Nastya's Rating: {season.personal_ratings.nastya}/10</p>
-                          {season.comments.nastya ? (
-                            <p className="text-sm italic">{season.comments.nastya}</p>
-                          ) : (
-                            <p className="text-xs text-muted-foreground italic">No comment</p>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center p-8 bg-muted/30 rounded-lg">
+                  <p className="text-muted-foreground">No seasons added yet</p>
+                </div>
+              )
             ) : (
-              <div className="text-center p-8 bg-muted/30 rounded-lg">
-                <p className="text-muted-foreground">No seasons added yet</p>
-              </div>
+              <p className="text-center text-muted-foreground py-4">
+                Season management is only available for series, cartoons, and anime.
+              </p>
             )}
           </div>
         )}
