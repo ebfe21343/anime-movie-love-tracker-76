@@ -47,7 +47,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
   const [seasons, setSeasons] = useState<Season[]>(movie.seasons || []);
   const [cancelled, setCancelled] = useState(movie.cancelled || false);
   const [contentType, setContentType] = useState(movie.content_type || movie.type || 'movie');
-  const isSeries = contentType === 'series' || contentType === 'anime';
+  
+  const isSeries = contentType === 'series' || contentType === 'anime' || contentType === 'cartoon';
   
   useEffect(() => {
     setWatchLink(movie.watch_link);
@@ -196,8 +197,32 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                     variant="secondary" 
                     className="bg-lavender-500 text-white"
                   >
-                    <Tv className="h-3.5 w-3.5 mr-1" />
-                    {contentType.charAt(0).toUpperCase() + contentType.slice(1)}
+                    {contentType === 'cartoon' ? (
+                      <>
+                        <Palette className="h-3.5 w-3.5 mr-1" />
+                        Cartoon
+                      </>
+                    ) : contentType === 'anime' ? (
+                      <>
+                        <Tv className="h-3.5 w-3.5 mr-1" />
+                        Anime
+                      </>
+                    ) : (
+                      <>
+                        <Tv className="h-3.5 w-3.5 mr-1" />
+                        Series
+                      </>
+                    )}
+                  </Badge>
+                )}
+                
+                {!isSeries && (
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-lavender-500 text-white"
+                  >
+                    <Film className="h-3.5 w-3.5 mr-1" />
+                    Movie
                   </Badge>
                 )}
                 
@@ -541,8 +566,17 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                   <div>
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-xl font-medium flex items-center gap-2">
-                        <Tv className="h-5 w-5 text-lavender-500" />
-                        Seasons
+                        {contentType === 'cartoon' ? (
+                          <>
+                            <Palette className="h-5 w-5 text-lavender-500" />
+                            Seasons
+                          </>
+                        ) : (
+                          <>
+                            <Tv className="h-5 w-5 text-lavender-500" />
+                            Seasons
+                          </>
+                        )}
                       </h3>
                       <Button
                         variant="outline"
