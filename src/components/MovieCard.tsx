@@ -103,13 +103,13 @@ const MovieCard = ({ movie }: MovieCardProps) => {
               <span>{typeName}</span>
             </Badge>
             
-            {/* Cancelled badge */}
+            {/* Cancelled badge - Adjusted size to match genre badges */}
             {movie.cancelled && (
               <Badge 
                 variant="outline" 
-                className="bg-red-500/90 text-white border-red-400 flex items-center gap-1"
+                className="bg-red-500/90 text-white border-red-400 flex items-center gap-1 text-xs"
               >
-                <X className="w-3.5 w-3.5 mr-1" />
+                <X className="w-3.5 h-3.5" />
                 <span>Cancelled</span>
               </Badge>
             )}
