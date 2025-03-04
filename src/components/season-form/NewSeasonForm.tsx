@@ -53,26 +53,6 @@ export function NewSeasonForm({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
           <RatingCommentSection
-            person="lyan"
-            rating={newSeason.personal_ratings.lyan}
-            comment={newSeason.comments.lyan}
-            onRatingChange={(value) => setNewSeason({
-              ...newSeason,
-              personal_ratings: {
-                ...newSeason.personal_ratings,
-                lyan: value
-              }
-            })}
-            onCommentChange={(value) => setNewSeason({
-              ...newSeason,
-              comments: {
-                ...newSeason.comments,
-                lyan: value
-              }
-            })}
-          />
-          
-          <RatingCommentSection
             person="nastya"
             rating={newSeason.personal_ratings.nastya}
             comment={newSeason.comments.nastya}
@@ -88,6 +68,26 @@ export function NewSeasonForm({
               comments: {
                 ...newSeason.comments,
                 nastya: value
+              }
+            })}
+          />
+          
+          <RatingCommentSection
+            person="lyan"
+            rating={newSeason.personal_ratings.lyan}
+            comment={newSeason.comments.lyan}
+            onRatingChange={(value) => setNewSeason({
+              ...newSeason,
+              personal_ratings: {
+                ...newSeason.personal_ratings,
+                lyan: value
+              }
+            })}
+            onCommentChange={(value) => setNewSeason({
+              ...newSeason,
+              comments: {
+                ...newSeason.comments,
+                lyan: value
               }
             })}
           />

@@ -87,20 +87,20 @@ export function ExistingSeasonItem({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <RatingCommentSection
-            person="lyan"
-            rating={season.personal_ratings.lyan}
-            comment={season.comments.lyan}
-            onRatingChange={(value) => updateSeasonRating(index, 'lyan', value)}
-            onCommentChange={(value) => updateSeasonComment(index, 'lyan', value)}
-            id={index.toString()}
-          />
-          
-          <RatingCommentSection
             person="nastya"
             rating={season.personal_ratings.nastya}
             comment={season.comments.nastya}
             onRatingChange={(value) => updateSeasonRating(index, 'nastya', value)}
             onCommentChange={(value) => updateSeasonComment(index, 'nastya', value)}
+            id={index.toString()}
+          />
+          
+          <RatingCommentSection
+            person="lyan"
+            rating={season.personal_ratings.lyan}
+            comment={season.comments.lyan}
+            onRatingChange={(value) => updateSeasonRating(index, 'lyan', value)}
+            onCommentChange={(value) => updateSeasonComment(index, 'lyan', value)}
             id={index.toString()}
           />
         </div>

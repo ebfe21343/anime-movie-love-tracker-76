@@ -1,11 +1,9 @@
-
 import { useState } from 'react';
 import { Season } from '@/types/movie';
 import { SeasonHeader } from './season-form/SeasonHeader';
 import { NewSeasonForm } from './season-form/NewSeasonForm';
-import { ExistingSeasonItem } from './season-form/ExistingSeasonItem';
+import { SeasonList } from './season-form/SeasonList';
 import { DeleteSeasonDialog } from './season-form/DeleteSeasonDialog';
-import { EmptySeasonsList } from './season-form/EmptySeasonsList';
 
 interface SeasonFormProps {
   seasons: Season[];
@@ -115,25 +113,14 @@ const SeasonForm = ({
         addSeason={addSeason}
       />
       
-      <h4 className="font-medium">Existing Seasons</h4>
-      {seasons.length > 0 ? (
-        <div className="space-y-4">
-          {seasons.map((season, index) => (
-            <ExistingSeasonItem
-              key={season.id}
-              season={season}
-              index={index}
-              updateSeason={updateSeason}
-              updateSeasonRating={updateSeasonRating}
-              updateSeasonComment={updateSeasonComment}
-              updateSeasonCancelled={updateSeasonCancelled}
-              confirmRemoveSeason={confirmRemoveSeason}
-            />
-          ))}
-        </div>
-      ) : (
-        <EmptySeasonsList />
-      )}
+      <SeasonList 
+        seasons={seasons}
+        updateSeason={updateSeason}
+        updateSeasonRating={updateSeasonRating}
+        updateSeasonComment={updateSeasonComment}
+        updateSeasonCancelled={updateSeasonCancelled}
+        confirmRemoveSeason={confirmRemoveSeason}
+      />
       
       <DeleteSeasonDialog
         isOpen={isDeleteDialogOpen}
