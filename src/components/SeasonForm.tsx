@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Plus, Minus, Calendar, X } from 'lucide-react';
 import { Season } from '@/types/movie';
@@ -114,6 +115,7 @@ const SeasonForm = ({
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-medium mb-4">Manage Seasons</h3>
         
+        {/* Only show content type selector if onContentTypeChange is explicitly provided */}
         {onContentTypeChange && (
           <div className="w-48">
             <Label htmlFor="content-type" className="text-sm mb-1 block">Content Type</Label>

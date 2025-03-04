@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Movie, Season } from '@/types/movie';
-import { Star, Clock, Calendar, Globe, Link as LinkIcon, Heart, ArrowLeft, Trash2, Tv, Plus, X } from 'lucide-react';
+import { Star, Clock, Calendar, Globe, Link as LinkIcon, Heart, ArrowLeft, Trash2, Tv, Plus, X, Film, Palette } from 'lucide-react';
 import { updateMovieInCollection, removeMovieFromCollection } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,6 +23,13 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface MovieDetailProps {
   movie: Movie;
@@ -264,15 +271,46 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                 </div>
                 
                 {editMode && (
-                  <div className="flex items-center space-x-2 pt-2">
-                    <Checkbox 
-                      id="cancelled" 
-                      checked={cancelled} 
-                      onCheckedChange={(checked) => setCancelled(!!checked)}
-                    />
-                    <Label htmlFor="cancelled" className="text-sm font-medium text-red-500">
-                      Mark as Cancelled
-                    </Label>
+                  <div className="space-y-3 pt-2">
+                    <div>
+                      <Label htmlFor="content-type" className="text-xs mb-1 block">Content Type</Label>
+                      <Select 
+                        value={contentType} 
+                        onValueChange={handleContentTypeChange}
+                      >
+                        <SelectTrigger id="content-type">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="movie">Movie</SelectItem>
+                          <SelectItem value="series">Series</SelectItem>
+                          <SelectItem value="cartoon">Cartoon</SelectItem>
+                          <SelectItem value="anime">Anime</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="cancelled" 
+                        checked={cancelled} 
+                        onCheckedChange={(checked) => setCancelled(!!checked)}
+                      />
+                      <Label htmlFor="cancelled" className="text-sm font-medium text-red-500">
+                        Mark as Cancelled
+                      </Label>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="watchLink" className="text-xs">Streaming Link</Label>
+                      <Input
+                        id="watchLink"
+                        value={watchLink}
+                        onChange={(e) => setWatchLink(e.target.value)}
+                        placeholder="https://..."
+                        className="mt-1"
+                      />
+                    </div>
                   </div>
                 )}
                 
@@ -288,19 +326,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                         Watch Now
                       </a>
                     </Button>
-                  </div>
-                )}
-                
-                {editMode && (
-                  <div className="pt-2">
-                    <Label htmlFor="watchLink" className="text-xs">Streaming Link</Label>
-                    <Input
-                      id="watchLink"
-                      value={watchLink}
-                      onChange={(e) => setWatchLink(e.target.value)}
-                      placeholder="https://..."
-                      className="mt-1"
-                    />
                   </div>
                 )}
               </div>
