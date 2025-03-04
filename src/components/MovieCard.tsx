@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Star, Film, Tv, X } from 'lucide-react';
+import { Star, Film, Tv, X, Palette } from 'lucide-react';
 import { Movie } from '@/types/movie';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,9 +18,17 @@ const MovieCard = ({ movie }: MovieCardProps) => {
   // Calculate average personal rating
   const avgPersonalRating = ((movie.personal_ratings.lyan + movie.personal_ratings.nastya) / 2).toFixed(1);
 
-  // Determine if it's a movie or series
-  const isMovie = movie.type === 'movie';
-  const TypeIcon = isMovie ? Film : Tv;
+  // Get the correct content type icon and name
+  let TypeIcon = Film;
+  let typeName = 'Movie';
+  
+  if (movie.content_type === 'series') {
+    TypeIcon = Tv;
+    typeName = 'Series';
+  } else if (movie.content_type === 'cartoon') {
+    TypeIcon = Palette;
+    typeName = 'Cartoon';
+  }
 
   return (
     <Link to={`/movie/${movie.id}`}>
@@ -41,11 +49,11 @@ const MovieCard = ({ movie }: MovieCardProps) => {
             </Badge>
           )}
           
-          {/* Type icon (Movie/Series) and Cancelled badge */}
+          {/* Type icon (Movie/Series/Cartoon) and Cancelled badge */}
           <div className="absolute top-2 left-2 flex flex-col gap-2">
             <Badge className="bg-lavender-500/80 text-white flex items-center gap-1">
               <TypeIcon className="w-3.5 h-3.5" />
-              <span>{isMovie ? 'Movie' : 'Series'}</span>
+              <span>{typeName}</span>
             </Badge>
             
             {/* Cancelled badge */}
