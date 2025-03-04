@@ -1,8 +1,10 @@
 
+import { useEffect, useState } from 'react';
 import { Film, Palette, Tv, X } from 'lucide-react';
 import { Movie } from '@/types/movie';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { getCachedImageUrl } from '@/lib/utils/image-cache';
 
 interface MovieInfoProps {
   movie: Movie;
@@ -13,11 +15,32 @@ interface MovieInfoProps {
 
 export const MovieInfo = ({ movie, poster, contentType, cancelled }: MovieInfoProps) => {
   const isSeries = contentType === 'series' || contentType === 'anime' || contentType === 'cartoon';
+  const [cachedPosterUrl, setCachedPosterUrl] = useState(poster);
+  
+  useEffect(() => {
+    // Try to get cached version of the poster
+    const loadCachedImage = async () => {
+      if (poster) {
+        try {
+          const cachedUrl = await getCachedImageUrl(poster, movie.id, 'poster');
+          if (cachedUrl) {
+            setCachedPosterUrl(cachedUrl);
+          }
+        } catch (error) {
+          console.error('Failed to load cached image:', error);
+          // Fallback to original URL
+          setCachedPosterUrl(poster);
+        }
+      }
+    };
+    
+    loadCachedImage();
+  }, [poster, movie.id]);
   
   return (
     <div className="relative aspect-[2/3]">
       <img 
-        src={poster} 
+        src={cachedPosterUrl} 
         alt={movie.primary_title}
         className="object-cover w-full h-full"
       />

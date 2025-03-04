@@ -1,10 +1,12 @@
 
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Film, Tv, X, Palette } from 'lucide-react';
 import { Movie } from '@/types/movie';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { getCachedImageUrl } from '@/lib/utils/image-cache';
 
 interface MovieCardProps {
   movie: Movie;
@@ -12,6 +14,7 @@ interface MovieCardProps {
 
 const MovieCard = ({ movie }: MovieCardProps) => {
   const poster = movie.posters[0]?.url || '/placeholder.svg';
+  const [cachedPosterUrl, setCachedPosterUrl] = useState(poster);
   const releaseYear = movie.start_year;
   const endYear = movie.end_year ? ` - ${movie.end_year}` : '';
   
@@ -29,14 +32,34 @@ const MovieCard = ({ movie }: MovieCardProps) => {
     TypeIcon = Palette;
     typeName = 'Cartoon';
   }
+  
+  useEffect(() => {
+    // Try to get cached version of the poster
+    const loadCachedImage = async () => {
+      if (poster && poster !== '/placeholder.svg') {
+        try {
+          const cachedUrl = await getCachedImageUrl(poster, movie.id, 'poster');
+          if (cachedUrl) {
+            setCachedPosterUrl(cachedUrl);
+          }
+        } catch (error) {
+          console.error('Failed to load cached image:', error);
+          // Fallback to original URL
+          setCachedPosterUrl(poster);
+        }
+      }
+    };
+    
+    loadCachedImage();
+  }, [poster, movie.id]);
 
   return (
     <Link to={`/movie/${movie.id}`}>
       <Card className="overflow-hidden card-hover h-full border-none glass rounded-2xl">
         <div className="relative aspect-[2/3] overflow-hidden rounded-t-2xl">
-          {/* Poster image with optimization */}
+          {/* Poster image with caching */}
           <img 
-            src={poster} 
+            src={cachedPosterUrl} 
             alt={movie.primary_title}
             className="object-cover w-full h-full" 
             loading="lazy"
