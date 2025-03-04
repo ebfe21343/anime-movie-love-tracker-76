@@ -31,7 +31,14 @@ export async function getCachedImageUrl(
     
     // If not in cache, download and store it
     console.log('Downloading image:', imageUrl);
-    const response = await fetch(imageUrl);
+    
+    // Handle both absolute URLs and relative URLs
+    const fetchUrl = imageUrl.startsWith('http') ? imageUrl : `${window.location.origin}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+    
+    const response = await fetch(fetchUrl, {
+      // Avoid caching at the network level to ensure we always get fresh content when needed
+      cache: 'no-store'
+    });
     
     if (!response.ok) {
       throw new Error(`Failed to fetch image: ${response.statusText}`);
