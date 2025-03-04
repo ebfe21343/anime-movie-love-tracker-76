@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { Movie } from '@/types/movie';
 import MovieCard from './MovieCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowUpDown, Search, Star, Calendar } from 'lucide-react';
+import { ArrowUpDown, Search, ChevronDown } from 'lucide-react';
 
 interface MovieGridProps {
   movies: Movie[];
@@ -19,9 +20,13 @@ type SortOption =
   | 'personal_high'
   | 'personal_low';
 
+const MOVIES_PER_PAGE = 8;
+
 const MovieGrid = ({ movies }: MovieGridProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('recently_added');
+  const [visibleMoviesCount, setVisibleMoviesCount] = useState(MOVIES_PER_PAGE);
+  const observerTarget = useRef<HTMLDivElement>(null);
   
   const filteredAndSortedMovies = useMemo(() => {
     // Filter movies by search query (title, genre, or comments)
@@ -64,6 +69,45 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
       }
     });
   }, [movies, searchQuery, sortBy]);
+
+  // Reset visible movies count when the search or sort changes
+  useEffect(() => {
+    setVisibleMoviesCount(MOVIES_PER_PAGE);
+  }, [searchQuery, sortBy]);
+
+  // Implementation of infinite scrolling using Intersection Observer
+  const loadMoreMovies = useCallback(() => {
+    if (visibleMoviesCount < filteredAndSortedMovies.length) {
+      setVisibleMoviesCount(prev => prev + MOVIES_PER_PAGE);
+    }
+  }, [visibleMoviesCount, filteredAndSortedMovies.length]);
+
+  // Set up intersection observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMoreMovies();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentObserver = observerTarget.current;
+    if (currentObserver) {
+      observer.observe(currentObserver);
+    }
+
+    return () => {
+      if (currentObserver) {
+        observer.unobserve(currentObserver);
+      }
+    };
+  }, [loadMoreMovies]);
+
+  // Get current visible movies
+  const currentMovies = filteredAndSortedMovies.slice(0, visibleMoviesCount);
+  const hasMoreMovies = visibleMoviesCount < filteredAndSortedMovies.length;
 
   return (
     <div className="w-full animate-fade-in">
@@ -124,13 +168,41 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredAndSortedMovies.map((movie) => (
-            <div key={movie.id} className="animate-enter" style={{ animationDelay: '0ms' }}>
-              <MovieCard movie={movie} />
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {currentMovies.map((movie) => (
+              <div key={movie.id} className="animate-enter" style={{ animationDelay: '0ms' }}>
+                <MovieCard movie={movie} />
+              </div>
+            ))}
+          </div>
+          
+          {/* Loading indicator and observer target */}
+          {hasMoreMovies && (
+            <div 
+              ref={observerTarget} 
+              className="flex justify-center items-center py-8 mt-4"
+            >
+              <div className="relative w-10 h-10">
+                <div className="absolute top-0 left-0 w-full h-full rounded-full border-4 border-sakura-200 opacity-25"></div>
+                <div className="absolute top-0 left-0 w-full h-full rounded-full border-4 border-sakura-500 border-t-transparent animate-spin"></div>
+              </div>
             </div>
-          ))}
-        </div>
+          )}
+
+          {/* Manual load more button as fallback */}
+          {hasMoreMovies && (
+            <div className="flex justify-center mt-4">
+              <Button 
+                variant="outline" 
+                onClick={loadMoreMovies}
+                className="flex items-center gap-2"
+              >
+                Load More <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
