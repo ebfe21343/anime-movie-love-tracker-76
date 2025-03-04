@@ -41,7 +41,7 @@ const MovieCard = ({ movie }: MovieCardProps) => {
             </Badge>
           )}
           
-          {/* Type icon (Movie/Series) */}
+          {/* Type icon (Movie/Series) and Cancelled badge */}
           <div className="absolute top-2 left-2 flex flex-col gap-2">
             <Badge className="bg-lavender-500/80 text-white flex items-center gap-1">
               <TypeIcon className="w-3.5 h-3.5" />

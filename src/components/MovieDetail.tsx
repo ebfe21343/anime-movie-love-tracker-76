@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Movie, Season } from '@/types/movie';
@@ -10,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import SeasonForm from '@/components/SeasonForm';
@@ -254,6 +256,19 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                     </span>
                   </span>
                 </div>
+                
+                {editMode && (
+                  <div className="flex items-center space-x-2 pt-2">
+                    <Checkbox 
+                      id="cancelled" 
+                      checked={cancelled} 
+                      onCheckedChange={(checked) => setCancelled(!!checked)}
+                    />
+                    <Label htmlFor="cancelled" className="text-sm font-medium text-red-500">
+                      Mark as Cancelled
+                    </Label>
+                  </div>
+                )}
                 
                 {!editMode && movie.watch_link && (
                   <div className="pt-2">
