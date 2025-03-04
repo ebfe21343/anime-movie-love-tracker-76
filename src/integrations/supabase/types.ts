@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           added_at: string | null
           aggregate_rating: number | null
+          cancelled: boolean
           casts: Json | null
           certificates: Json | null
           comments: Json
@@ -42,6 +43,7 @@ export type Database = {
         Insert: {
           added_at?: string | null
           aggregate_rating?: number | null
+          cancelled?: boolean
           casts?: Json | null
           certificates?: Json | null
           comments?: Json
@@ -71,6 +73,7 @@ export type Database = {
         Update: {
           added_at?: string | null
           aggregate_rating?: number | null
+          cancelled?: boolean
           casts?: Json | null
           certificates?: Json | null
           comments?: Json

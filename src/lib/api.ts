@@ -98,7 +98,12 @@ export async function fetchMovieById(id: string): Promise<Omit<Movie, 'personal_
     }
 
     const responseData: MovieResponse = await response.json();
-    return responseData.data.title;
+    const movieData = responseData.data.title;
+    
+    return {
+      ...movieData,
+      cancelled: false // Default value when fetching from IMDb
+    };
   } catch (error) {
     console.error('Error fetching movie:', error);
     throw error;
