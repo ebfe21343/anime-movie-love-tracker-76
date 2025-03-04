@@ -178,7 +178,7 @@ export const getMovieCollection = async (): Promise<Movie[]> => {
       watch_link: movie.watch_link || '',
       added_at: movie.added_at || new Date().toISOString(),
       cancelled: movie.cancelled || false,
-      content_type: movie.content_type || movie.type || 'movie',
+      content_type: movie.type || 'movie',
       seasons: movie.seasons ? safeParseJson<Season[]>(movie.seasons, []) : []
     }));
   } catch (error) {
@@ -239,7 +239,7 @@ export const addMovieToCollection = async (
       comments: convertToJson(personalData.comments),
       watch_link: personalData.watch_link,
       cancelled: personalData.cancelled || false,
-      content_type: personalData.content_type || movieData.type,
+      type: personalData.content_type || movieData.type,
       seasons: personalData.seasons ? convertToJson(personalData.seasons) : null
     };
     
@@ -295,7 +295,7 @@ export const addMovieToCollection = async (
       watch_link: data.watch_link || '',
       added_at: data.added_at || new Date().toISOString(),
       cancelled: data.cancelled || false,
-      content_type: data.content_type || data.type || 'movie',
+      content_type: data.type || 'movie',
       seasons: data.seasons ? safeParseJson<Season[]>(data.seasons, []) : []
     };
   } catch (error) {
@@ -352,7 +352,7 @@ export const updateMovieInCollection = async (
     }
     
     if (updates.content_type !== undefined) {
-      updatesForDb.content_type = updates.content_type;
+      updatesForDb.type = updates.content_type;
     }
     
     if (updates.seasons !== undefined) {
@@ -413,7 +413,7 @@ export const updateMovieInCollection = async (
       watch_link: data.watch_link || '',
       added_at: data.added_at || new Date().toISOString(),
       cancelled: data.cancelled || false,
-      content_type: data.content_type || data.type || 'movie',
+      content_type: data.type || 'movie',
       seasons: data.seasons ? safeParseJson<Season[]>(data.seasons, []) : []
     };
   } catch (error) {

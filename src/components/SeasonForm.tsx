@@ -41,7 +41,6 @@ const SeasonForm = ({
     season_number: (seasons.length > 0 ? Math.max(...seasons.map(s => s.season_number)) : 0) + 1,
     title: '',
     year: new Date().getFullYear(),
-    episode_count: undefined,
     personal_ratings: { lyan: 5, nastya: 5 },
     comments: { lyan: '', nastya: '' },
     cancelled: false
@@ -68,7 +67,6 @@ const SeasonForm = ({
       season_number: newSeason.season_number + 1,
       title: '',
       year: new Date().getFullYear(),
-      episode_count: undefined,
       personal_ratings: { lyan: 5, nastya: 5 },
       comments: { lyan: '', nastya: '' },
       cancelled: false

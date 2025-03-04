@@ -1,3 +1,4 @@
+
 export interface Movie {
   id: string;
   type: string;
@@ -53,7 +54,7 @@ export interface Movie {
   added_at: string;
   cancelled: boolean;
   seasons?: Season[];
-  content_type?: string; // Added for storing the user-selected content type
+  content_type: string; // Changed from optional to required
 }
 
 interface Credit {
@@ -90,7 +91,7 @@ export interface Season {
 
 export interface MovieResponse {
   data: {
-    title: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'cancelled' | 'seasons'>;
+    title: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'cancelled' | 'seasons' | 'content_type'>;
   };
 }
 
@@ -105,7 +106,7 @@ export interface MovieFormData {
     nastya: string;
   };
   watch_link: string;
-  content_type?: string; // Added to match our Movie interface
+  content_type: string; // Changed from optional to required
   cancelled?: boolean;
   seasons?: Season[];
 }

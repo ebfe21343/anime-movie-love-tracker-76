@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Movie, Season } from '@/types/movie';
@@ -545,11 +544,6 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                                   <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                                     <Calendar className="h-3 w-3" />
                                     <span>{season.year}</span>
-                                    {season.episode_count && (
-                                      <Badge variant="outline" className="ml-1 text-xs">
-                                        {season.episode_count} episodes
-                                      </Badge>
-                                    )}
                                   </div>
                                 </div>
                                 <div className="flex items-center">
