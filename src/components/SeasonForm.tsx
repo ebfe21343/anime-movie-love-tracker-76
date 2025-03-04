@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Season } from '@/types/movie';
 import { SeasonHeader } from './season-form/SeasonHeader';
@@ -30,6 +31,7 @@ const SeasonForm = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [seasonToDelete, setSeasonToDelete] = useState<number | null>(null);
   
+  // Always render the SeasonHeader with content type selector
   if (contentType === 'movie') {
     return (
       <div className="space-y-6">

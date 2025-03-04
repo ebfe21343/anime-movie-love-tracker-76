@@ -23,7 +23,7 @@ export function SeasonHeader({
     <div className="flex justify-between items-center">
       <h3 className="text-xl font-medium mb-4">{title}</h3>
       
-      {/* Only show content type selector if onContentTypeChange is explicitly provided */}
+      {/* Always show content type selector if onContentTypeChange is provided */}
       {onContentTypeChange && (
         <div className="w-48">
           <Label htmlFor="content-type" className="text-sm mb-1 block">Content Type</Label>
