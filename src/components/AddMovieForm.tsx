@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -122,7 +123,7 @@ const AddMovieForm = () => {
             contentType={contentType} 
           />
           
-          {preview && (
+          {preview && contentType !== 'movie' && (
             <div className="pt-4 pb-2">
               <SeasonForm 
                 seasons={seasons} 

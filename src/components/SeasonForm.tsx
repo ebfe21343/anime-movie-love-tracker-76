@@ -30,6 +30,21 @@ const SeasonForm = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [seasonToDelete, setSeasonToDelete] = useState<number | null>(null);
   
+  if (contentType === 'movie') {
+    return (
+      <div className="space-y-6">
+        <SeasonHeader 
+          title="Content Type" 
+          contentType={contentType} 
+          onContentTypeChange={onContentTypeChange} 
+        />
+        <p className="text-center text-muted-foreground py-4">
+          Season management is only available for series, cartoons, and anime.
+        </p>
+      </div>
+    );
+  }
+  
   const addSeason = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();

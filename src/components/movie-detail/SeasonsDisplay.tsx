@@ -24,6 +24,11 @@ export const SeasonsDisplay = ({
   onContentTypeChange,
   setEditMode,
 }: SeasonsDisplayProps) => {
+  // If it's a movie, don't render anything
+  if (contentType === 'movie') {
+    return null;
+  }
+  
   function getRatingBadgeColor(rating: number) {
     if (rating >= 8) return "bg-mint-500 text-white";
     if (rating >= 6) return "bg-lavender-500 text-white";
