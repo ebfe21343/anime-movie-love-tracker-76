@@ -30,7 +30,12 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
           movie.primary_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           movie.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase())) ||
           movie.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          movie.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase())
+          movie.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          // Search in season comments if the movie has seasons
+          (movie.seasons && movie.seasons.some(season => 
+            season.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            season.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase())
+          ))
         )
       : movies;
     
@@ -67,7 +72,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search movies by title, genre, or comments..."
+            placeholder="Search by title, genre, or comments (including season comments)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 bg-white/50 backdrop-blur-sm border-sakura-200 focus-visible:ring-sakura-400"
