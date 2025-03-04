@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMovieCollection, removeMovieFromCollection } from '@/lib/api';
@@ -12,7 +13,6 @@ const MoviePage = () => {
   const navigate = useNavigate();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isUpdating, setIsUpdating] = useState(false);
   
   useEffect(() => {
     const loadMovie = async () => {
@@ -42,11 +42,13 @@ const MoviePage = () => {
     loadMovie();
   }, [id, navigate]);
   
+  // Set up realtime subscription for movie updates
   useEffect(() => {
     if (!id) return;
     
+    // Make sure we're subscribed to the specific movie updates
     const channel = supabase
-      .channel(`movie_updates_${id}`)
+      .channel(`movie_updates_${id}`) // Use unique channel name with movie ID
       .on(
         'postgres_changes',
         {
@@ -57,32 +59,31 @@ const MoviePage = () => {
         },
         async (payload) => {
           console.log('Movie updated:', payload);
-          if (!isUpdating) {
-            try {
-              const movieCollection = await getMovieCollection();
-              const updatedMovie = movieCollection.find(m => m.id === id);
-              if (updatedMovie) {
-                setMovie(updatedMovie);
-                toast.success('Movie details updated');
-              }
-            } catch (error) {
-              console.error('Error refreshing movie data:', error);
+          // Refresh the movie data when an update occurs
+          try {
+            const movieCollection = await getMovieCollection();
+            const updatedMovie = movieCollection.find(m => m.id === id);
+            if (updatedMovie) {
+              setMovie(updatedMovie);
+              toast.success('Movie details updated');
             }
+          } catch (error) {
+            console.error('Error refreshing movie data:', error);
           }
         }
       )
       .subscribe();
     
+    // Clean up subscription when component unmounts
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [id, isUpdating]);
+  }, [id]);
   
   const handleMovieUpdate = async () => {
     if (!id) return;
     
-    setIsUpdating(true);
-    
+    // Refresh movie data immediately after update
     try {
       const movieCollection = await getMovieCollection();
       const updatedMovie = movieCollection.find(m => m.id === id);
@@ -93,8 +94,6 @@ const MoviePage = () => {
     } catch (error) {
       console.error('Error refreshing movie data:', error);
       toast.error('Failed to refresh movie data');
-    } finally {
-      setTimeout(() => setIsUpdating(false), 1000);
     }
   };
   
