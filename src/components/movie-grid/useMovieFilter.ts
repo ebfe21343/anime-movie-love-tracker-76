@@ -1,0 +1,158 @@
+
+import { useMemo, useState } from 'react';
+import { Movie } from '@/types/movie';
+import { SortCategory, SortDirection, SortState } from './MovieGridSearchBar';
+
+export const MOVIES_PER_PAGE = 10;
+
+export function useMovieFilter(movies: Movie[]) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortState, setSortState] = useState<SortState>({
+    category: 'recently_added',
+    direction: 'desc'
+  });
+  const [visibleMoviesCount, setVisibleMoviesCount] = useState(MOVIES_PER_PAGE);
+
+  const effectiveSortOption = useMemo(() => {
+    switch (sortState.category) {
+      case 'rating':
+        return sortState.direction === 'desc' ? 'rating_high' : 'rating_low';
+      case 'year':
+        return sortState.direction === 'desc' ? 'year_new' : 'year_old';
+      case 'personal':
+        return sortState.direction === 'desc' ? 'personal_high' : 'personal_low';
+      case 'queue_status':
+        return sortState.direction === 'desc' ? 'queue_high' : 'queue_low';
+      case 'waiting_status':
+        return sortState.direction === 'desc' ? 'waiting_high' : 'waiting_low';
+      case 'recently_added':
+      default:
+        return sortState.direction === 'desc' ? 'recently_added' : 'recently_added_asc';
+    }
+  }, [sortState]);
+
+  const filteredAndSortedMovies = useMemo(() => {
+    const filtered = searchQuery 
+      ? movies.filter(movie => 
+          movie.primary_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          movie.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          movie.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          movie.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (movie.seasons && movie.seasons.some(season => 
+            season.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            season.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase())
+          )) ||
+          (movie.in_queue === (searchQuery.toLowerCase() === 'queue')) ||
+          (movie.waiting === (searchQuery.toLowerCase() === 'waiting'))
+        )
+      : movies;
+    
+    return [...filtered].sort((a, b) => {
+      switch (effectiveSortOption) {
+        case 'rating_high':
+          return b.rating.aggregate_rating - a.rating.aggregate_rating;
+        case 'rating_low':
+          return a.rating.aggregate_rating - b.rating.aggregate_rating;
+        case 'year_new':
+          return b.start_year - a.start_year;
+        case 'year_old':
+          return a.start_year - b.start_year;
+        case 'personal_high':
+          const avgA = (a.personal_ratings.lyan + a.personal_ratings.nastya) / 2;
+          const avgB = (b.personal_ratings.lyan + b.personal_ratings.nastya) / 2;
+          return avgB - avgA;
+        case 'personal_low':
+          const avgALow = (a.personal_ratings.lyan + a.personal_ratings.nastya) / 2;
+          const avgBLow = (b.personal_ratings.lyan + b.personal_ratings.nastya) / 2;
+          return avgALow - avgBLow;
+        case 'queue_high':
+          return a.in_queue === b.in_queue ? 0 : a.in_queue ? -1 : 1;
+        case 'queue_low':
+          return a.in_queue === b.in_queue ? 0 : a.in_queue ? 1 : -1;
+        case 'waiting_high':
+          return a.waiting === b.waiting ? 0 : a.waiting ? -1 : 1;
+        case 'waiting_low':
+          return a.waiting === b.waiting ? 0 : a.waiting ? 1 : -1;
+        case 'recently_added':
+          return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
+        case 'recently_added_asc':
+          return new Date(a.added_at).getTime() - new Date(b.added_at).getTime();
+        default:
+          return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
+      }
+    });
+  }, [movies, searchQuery, effectiveSortOption]);
+
+  const handleSortClick = (category: SortCategory) => {
+    setSortState(prev => {
+      if (prev.category === category) {
+        return {
+          category,
+          direction: prev.direction === 'desc' ? 'asc' : 'desc'
+        };
+      }
+      return {
+        category,
+        direction: 'desc'
+      };
+    });
+  };
+
+  const getSortIcon = () => {
+    return sortState.direction === 'desc' ? 
+      <ArrowDown className="h-4 w-4" /> : 
+      <ArrowUp className="h-4 w-4" />;
+  };
+
+  const getSortLabel = () => {
+    const directionText = sortState.direction === 'desc' ? 'Newest' : 'Oldest';
+    const highLowText = sortState.direction === 'desc' ? 'Highest' : 'Lowest';
+    const waitingText = sortState.direction === 'desc' ? 'Waiting First' : 'Regular First';
+    const queueText = sortState.direction === 'desc' ? 'Queue First' : 'Regular First';
+
+    switch (sortState.category) {
+      case 'recently_added': return `${directionText} Added`;
+      case 'rating': return `${highLowText} IMDb Rating`;
+      case 'year': return `${directionText} Released`;
+      case 'personal': return `${highLowText} Personal Rating`;
+      case 'queue_status': return `${queueText}`;
+      case 'waiting_status': return `${waitingText}`;
+      default: return 'Sort By';
+    }
+  };
+
+  const resetVisibleMoviesCount = () => {
+    setVisibleMoviesCount(MOVIES_PER_PAGE);
+  };
+
+  const loadMoreMovies = () => {
+    if (visibleMoviesCount < filteredAndSortedMovies.length) {
+      setVisibleMoviesCount(prev => prev + MOVIES_PER_PAGE);
+    }
+  };
+
+  const currentMovies = filteredAndSortedMovies.slice(0, visibleMoviesCount);
+  const hasMoreMovies = visibleMoviesCount < filteredAndSortedMovies.length;
+  const isQueueView = movies.some(movie => movie.in_queue);
+  const isWaitingView = movies.some(movie => movie.waiting);
+
+  return {
+    searchQuery,
+    setSearchQuery,
+    sortState,
+    handleSortClick,
+    getSortIcon,
+    getSortLabel,
+    filteredAndSortedMovies,
+    currentMovies,
+    hasMoreMovies,
+    loadMoreMovies,
+    resetVisibleMoviesCount,
+    isQueueView,
+    isWaitingView,
+    visibleMoviesCount,
+  };
+}
+
+// Need to import these here to avoid circular references
+import { ArrowUp, ArrowDown } from 'lucide-react';

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { getMovieCollection } from '@/lib/api';
 import { Movie } from '@/types/movie';
