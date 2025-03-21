@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { getMovieCollection } from '@/lib/api';
 import { Movie } from '@/types/movie';
@@ -6,14 +5,13 @@ import Header from '@/components/Header';
 import MovieGrid from '@/components/MovieGrid';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ListTodo, Queue } from 'lucide-react';
+import { ListTodo, Clock } from 'lucide-react';
 
 const Index = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Load movies from Supabase
     const loadMovies = async () => {
       setLoading(true);
       try {
@@ -30,12 +28,10 @@ const Index = () => {
     loadMovies();
   }, []);
 
-  // Separate movies into collection, waiting and queue
   const collectionMovies = movies.filter(movie => !movie.in_queue && !movie.waiting);
   const waitingMovies = movies.filter(movie => movie.waiting);
   const queueMovies = movies.filter(movie => movie.in_queue);
 
-  // Count for each category
   const collectionCount = collectionMovies.length;
   const waitingCount = waitingMovies.length;
   const queueCount = queueMovies.length;
@@ -76,7 +72,7 @@ const Index = () => {
                   </span>
                 </TabsTrigger>
                 <TabsTrigger value="queue" className="flex items-center gap-2">
-                  <Queue className="h-4 w-4" />
+                  <Clock className="h-4 w-4" />
                   Queue
                   <span className="bg-lavender-100 text-lavender-800 px-2 py-0.5 rounded-full text-xs font-medium">
                     {queueCount}
@@ -115,7 +111,7 @@ const Index = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="w-16 h-16 mb-4 rounded-full bg-muted/50 flex items-center justify-center">
-                    <Queue className="h-8 w-8 text-muted-foreground" />
+                    <Clock className="h-8 w-8 text-muted-foreground" />
                   </div>
                   <h3 className="text-xl font-medium mb-2">Your queue is empty</h3>
                   <p className="text-muted-foreground mb-6 max-w-md">
