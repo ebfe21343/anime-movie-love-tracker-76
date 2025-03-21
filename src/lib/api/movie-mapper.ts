@@ -1,3 +1,4 @@
+
 import { Movie, Season } from '@/types/movie';
 import { safeParseJson } from '../utils/json-utils';
 
@@ -57,7 +58,8 @@ export function mapDbMovieToMovie(data: any): Movie {
     cancelled: data.cancelled || false,
     content_type: data.type || 'movie',
     seasons: data.seasons ? safeParseJson<Season[]>(data.seasons, []) : [],
-    in_queue: data.in_queue || false
+    in_queue: data.in_queue || false,
+    waiting: data.waiting || false
   };
 }
 
@@ -75,6 +77,7 @@ export function mapMovieToDbMovie(
     cancelled?: boolean;
     seasons?: Season[];
     in_queue?: boolean;
+    waiting?: boolean;
   }
 ) {
   return {
@@ -106,6 +109,7 @@ export function mapMovieToDbMovie(
     watch_link: personalData.watch_link,
     cancelled: personalData.cancelled || false,
     seasons: personalData.seasons || null,
-    in_queue: personalData.in_queue || false
+    in_queue: personalData.in_queue || false,
+    waiting: personalData.waiting || false
   };
 }

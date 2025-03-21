@@ -20,6 +20,7 @@ interface FormContainerProps {
   preview: any;
   contentType: string;
   inQueue?: boolean;
+  waiting?: boolean;
 }
 
 const FormContainer = ({
@@ -37,12 +38,15 @@ const FormContainer = ({
   isLoading,
   preview,
   contentType,
-  inQueue = false
+  inQueue = false,
+  waiting = false
 }: FormContainerProps) => {
+  const shouldShowRatings = !waiting && !inQueue;
+  
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-6">
-        {!inQueue && (
+        {shouldShowRatings && (
           <PersonalRatingsSection
             lyanRating={lyanRating}
             nastyaRating={nastyaRating}
@@ -57,7 +61,7 @@ const FormContainer = ({
         
         <StreamingLinkSection register={register} />
         
-        {!inQueue && (
+        {shouldShowRatings && (
           <CommentsSection register={register} />
         )}
         

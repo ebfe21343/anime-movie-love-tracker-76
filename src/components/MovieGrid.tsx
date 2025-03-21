@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { Movie } from '@/types/movie';
 import MovieCard from './MovieCard';
@@ -10,14 +9,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star, Clock } from 'lucide-react';
+import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star, Clock, List } from 'lucide-react';
 
 interface MovieGridProps {
   movies: Movie[];
   showSearchBar?: boolean;
 }
 
-type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal' | 'queue_status';
+type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal' | 'queue_status' | 'waiting_status';
 
 type SortDirection = 'asc' | 'desc';
 
@@ -46,7 +45,9 @@ const MovieGrid = ({ movies, showSearchBar = true }: MovieGridProps) => {
       case 'personal':
         return sortState.direction === 'desc' ? 'personal_high' : 'personal_low';
       case 'queue_status':
-        return sortState.direction === 'desc' ? 'waiting' : 'queue';
+        return sortState.direction === 'desc' ? 'queue_high' : 'queue_low';
+      case 'waiting_status':
+        return sortState.direction === 'desc' ? 'waiting_high' : 'waiting_low';
       case 'recently_added':
       default:
         return sortState.direction === 'desc' ? 'recently_added' : 'recently_added_asc';
@@ -64,7 +65,8 @@ const MovieGrid = ({ movies, showSearchBar = true }: MovieGridProps) => {
             season.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
             season.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase())
           )) ||
-          (movie.in_queue === (searchQuery.toLowerCase() === 'queue'))
+          (movie.in_queue === (searchQuery.toLowerCase() === 'queue')) ||
+          (movie.waiting === (searchQuery.toLowerCase() === 'waiting'))
         )
       : movies;
     
@@ -86,10 +88,14 @@ const MovieGrid = ({ movies, showSearchBar = true }: MovieGridProps) => {
           const avgALow = (a.personal_ratings.lyan + a.personal_ratings.nastya) / 2;
           const avgBLow = (b.personal_ratings.lyan + b.personal_ratings.nastya) / 2;
           return avgALow - avgBLow;
-        case 'waiting':
+        case 'queue_high':
           return a.in_queue === b.in_queue ? 0 : a.in_queue ? -1 : 1;
-        case 'queue':
+        case 'queue_low':
           return a.in_queue === b.in_queue ? 0 : a.in_queue ? 1 : -1;
+        case 'waiting_high':
+          return a.waiting === b.waiting ? 0 : a.waiting ? -1 : 1;
+        case 'waiting_low':
+          return a.waiting === b.waiting ? 0 : a.waiting ? 1 : -1;
         case 'recently_added':
           return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
         case 'recently_added_asc':
@@ -124,14 +130,16 @@ const MovieGrid = ({ movies, showSearchBar = true }: MovieGridProps) => {
   const getSortLabel = () => {
     const directionText = sortState.direction === 'desc' ? 'Newest' : 'Oldest';
     const highLowText = sortState.direction === 'desc' ? 'Highest' : 'Lowest';
-    const waitingQueueText = sortState.direction === 'desc' ? 'Waiting' : 'Queue';
+    const waitingText = sortState.direction === 'desc' ? 'Waiting First' : 'Regular First';
+    const queueText = sortState.direction === 'desc' ? 'Queue First' : 'Regular First';
 
     switch (sortState.category) {
       case 'recently_added': return `${directionText} Added`;
       case 'rating': return `${highLowText} IMDb Rating`;
       case 'year': return `${directionText} Released`;
       case 'personal': return `${highLowText} Personal Rating`;
-      case 'queue_status': return `${waitingQueueText}`;
+      case 'queue_status': return `${queueText}`;
+      case 'waiting_status': return `${waitingText}`;
       default: return 'Sort By';
     }
   };
@@ -171,6 +179,7 @@ const MovieGrid = ({ movies, showSearchBar = true }: MovieGridProps) => {
   const currentMovies = filteredAndSortedMovies.slice(0, visibleMoviesCount);
   const hasMoreMovies = visibleMoviesCount < filteredAndSortedMovies.length;
   const isQueueView = movies.some(movie => movie.in_queue);
+  const isWaitingView = movies.some(movie => movie.waiting);
 
   return (
     <div className="w-full animate-fade-in">
@@ -184,6 +193,7 @@ const MovieGrid = ({ movies, showSearchBar = true }: MovieGridProps) => {
           getSortLabel={getSortLabel}
           getSortIcon={getSortIcon}
           isQueueView={isQueueView}
+          isWaitingView={isWaitingView}
         />
       )}
       
@@ -247,7 +257,6 @@ const MovieGrid = ({ movies, showSearchBar = true }: MovieGridProps) => {
   );
 };
 
-// Create a SearchAndFilterBar component as a property of MovieGrid
 MovieGrid.SearchAndFilterBar = function SearchAndFilterBar({ 
   movies,
   searchQuery,
@@ -256,12 +265,11 @@ MovieGrid.SearchAndFilterBar = function SearchAndFilterBar({
   handleSortClick, 
   getSortLabel, 
   getSortIcon,
-  isQueueView
+  isQueueView,
+  isWaitingView
 }: any) {
-  // Local state if called directly from a parent
   const [localSearchQuery, setLocalSearchQuery] = useState('');
   
-  // Use provided props or local state
   const actualSearchQuery = searchQuery !== undefined ? searchQuery : localSearchQuery;
   const actualSetSearchQuery = setSearchQuery !== undefined ? setSearchQuery : setLocalSearchQuery;
   
@@ -289,6 +297,7 @@ MovieGrid.SearchAndFilterBar = function SearchAndFilterBar({
               {sortState?.category === 'personal' && <Star className="h-4 w-4 fill-current" />}
               {sortState?.category === 'year' && <CalendarDays className="h-4 w-4" />}
               {sortState?.category === 'queue_status' && <Clock className="h-4 w-4" />}
+              {sortState?.category === 'waiting_status' && <List className="h-4 w-4" />}
               {getSortLabel ? getSortLabel() : 'Sort By'}
               {getSortIcon ? getSortIcon() : <ChevronDown className="h-4 w-4" />}
             </Button>
@@ -300,10 +309,18 @@ MovieGrid.SearchAndFilterBar = function SearchAndFilterBar({
               {sortState?.category === 'recently_added' && getSortIcon && getSortIcon()}
             </DropdownMenuItem>
             
+            {isWaitingView && (
+              <DropdownMenuItem onClick={() => handleSortClick('waiting_status')} className="cursor-pointer">
+                <List className="h-4 w-4 mr-2" />
+                <span>Waiting Status</span>
+                {sortState?.category === 'waiting_status' && getSortIcon && getSortIcon()}
+              </DropdownMenuItem>
+            )}
+            
             {isQueueView && (
               <DropdownMenuItem onClick={() => handleSortClick('queue_status')} className="cursor-pointer">
                 <Clock className="h-4 w-4 mr-2" />
-                <span>Waiting Status</span>
+                <span>Queue Status</span>
                 {sortState?.category === 'queue_status' && getSortIcon && getSortIcon()}
               </DropdownMenuItem>
             )}

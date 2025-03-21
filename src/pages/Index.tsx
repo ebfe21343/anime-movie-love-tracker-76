@@ -6,7 +6,7 @@ import Header from '@/components/Header';
 import MovieGrid from '@/components/MovieGrid';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ListTodo } from 'lucide-react';
+import { ListTodo, Queue } from 'lucide-react';
 
 const Index = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -30,12 +30,14 @@ const Index = () => {
     loadMovies();
   }, []);
 
-  // Separate movies into collection and queue
-  const collectionMovies = movies.filter(movie => !movie.in_queue);
+  // Separate movies into collection, waiting and queue
+  const collectionMovies = movies.filter(movie => !movie.in_queue && !movie.waiting);
+  const waitingMovies = movies.filter(movie => movie.waiting);
   const queueMovies = movies.filter(movie => movie.in_queue);
 
   // Count for each category
   const collectionCount = collectionMovies.length;
+  const waitingCount = waitingMovies.length;
   const queueCount = queueMovies.length;
 
   return (
@@ -58,28 +60,53 @@ const Index = () => {
           </div>
         ) : (
           <Tabs defaultValue="collection" className="w-full">
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-              <TabsList className="w-auto h-10">
+            <div className="flex flex-row gap-4 mb-6 items-center">
+              <TabsList className="h-10">
                 <TabsTrigger value="collection" className="flex items-center gap-2">
                   Collection
                   <span className="bg-lavender-100 text-lavender-800 px-2 py-0.5 rounded-full text-xs font-medium">
                     {collectionCount}
                   </span>
                 </TabsTrigger>
-                <TabsTrigger value="queue" className="flex items-center gap-2">
+                <TabsTrigger value="waiting" className="flex items-center gap-2">
                   <ListTodo className="h-4 w-4" />
                   Waiting
+                  <span className="bg-lavender-100 text-lavender-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                    {waitingCount}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value="queue" className="flex items-center gap-2">
+                  <Queue className="h-4 w-4" />
+                  Queue
                   <span className="bg-lavender-100 text-lavender-800 px-2 py-0.5 rounded-full text-xs font-medium">
                     {queueCount}
                   </span>
                 </TabsTrigger>
               </TabsList>
               
-              <MovieGrid.SearchAndFilterBar movies={movies} />
+              <div className="flex-1">
+                <MovieGrid.SearchAndFilterBar movies={movies} />
+              </div>
             </div>
             
             <TabsContent value="collection" className="focus-visible:outline-none focus-visible:ring-0">
               <MovieGrid movies={collectionMovies} showSearchBar={false} />
+            </TabsContent>
+            
+            <TabsContent value="waiting" className="focus-visible:outline-none focus-visible:ring-0">
+              {waitingMovies.length > 0 ? (
+                <MovieGrid movies={waitingMovies} showSearchBar={false} />
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-16 h-16 mb-4 rounded-full bg-muted/50 flex items-center justify-center">
+                    <ListTodo className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-xl font-medium mb-2">Your waiting list is empty</h3>
+                  <p className="text-muted-foreground mb-6 max-w-md">
+                    Add movies to your waiting list by checking the "Waiting" option when adding a new movie.
+                  </p>
+                </div>
+              )}
             </TabsContent>
             
             <TabsContent value="queue" className="focus-visible:outline-none focus-visible:ring-0">
@@ -88,11 +115,11 @@ const Index = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="w-16 h-16 mb-4 rounded-full bg-muted/50 flex items-center justify-center">
-                    <ListTodo className="h-8 w-8 text-muted-foreground" />
+                    <Queue className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h3 className="text-xl font-medium mb-2">Your watch queue is empty</h3>
+                  <h3 className="text-xl font-medium mb-2">Your queue is empty</h3>
                   <p className="text-muted-foreground mb-6 max-w-md">
-                    Add movies to your queue by checking the "Waiting" option when adding a new movie.
+                    Add movies to your queue by checking the "Queue" option when adding a new movie.
                   </p>
                 </div>
               )}
