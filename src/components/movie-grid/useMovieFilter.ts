@@ -1,7 +1,7 @@
-
 import { useMemo, useState } from 'react';
 import { Movie } from '@/types/movie';
 import { SortCategory, SortDirection, SortState } from './MovieGridSearchBar';
+import { ArrowUp, ArrowDown } from 'lucide-react';
 
 export const MOVIES_PER_PAGE = 10;
 
@@ -100,8 +100,8 @@ export function useMovieFilter(movies: Movie[]) {
 
   const getSortIcon = () => {
     return sortState.direction === 'desc' ? 
-      <ArrowDown className="h-4 w-4" /> : 
-      <ArrowUp className="h-4 w-4" />;
+      ArrowDown : 
+      ArrowUp;
   };
 
   const getSortLabel = () => {
@@ -153,6 +153,3 @@ export function useMovieFilter(movies: Movie[]) {
     visibleMoviesCount,
   };
 }
-
-// Need to import these here to avoid circular references
-import { ArrowUp, ArrowDown } from 'lucide-react';

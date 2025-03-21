@@ -26,7 +26,7 @@ interface MovieGridSearchBarProps {
   sortState?: SortState;
   handleSortClick?: (category: SortCategory) => void;
   getSortLabel?: () => string;
-  getSortIcon?: () => JSX.Element;
+  getSortIcon?: () => typeof ArrowUp | typeof ArrowDown;
   isQueueView?: boolean;
   isWaitingView?: boolean;
 }
@@ -46,6 +46,9 @@ const MovieGridSearchBar = ({
   
   const actualSearchQuery = searchQuery !== undefined ? searchQuery : localSearchQuery;
   const actualSetSearchQuery = setSearchQuery !== undefined ? setSearchQuery : setLocalSearchQuery;
+  
+  // Create the icon component if getSortIcon is provided
+  const SortIconComponent = getSortIcon && getSortIcon();
   
   return (
     <div className="flex flex-col md:flex-row gap-4 mb-6 flex-1">
@@ -73,21 +76,21 @@ const MovieGridSearchBar = ({
               {sortState?.category === 'queue_status' && <Clock className="h-4 w-4" />}
               {sortState?.category === 'waiting_status' && <List className="h-4 w-4" />}
               {getSortLabel ? getSortLabel() : 'Sort By'}
-              {getSortIcon ? getSortIcon() : <ChevronDown className="h-4 w-4" />}
+              {SortIconComponent && <SortIconComponent className="h-4 w-4" />}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-white border-sakura-200">
             <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('recently_added')} className="cursor-pointer">
               <CalendarDays className="h-4 w-4 mr-2" />
               <span>Recently Added</span>
-              {sortState?.category === 'recently_added' && getSortIcon && getSortIcon()}
+              {sortState?.category === 'recently_added' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
             </DropdownMenuItem>
             
             {isWaitingView && (
               <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('waiting_status')} className="cursor-pointer">
                 <List className="h-4 w-4 mr-2" />
                 <span>Waiting Status</span>
-                {sortState?.category === 'waiting_status' && getSortIcon && getSortIcon()}
+                {sortState?.category === 'waiting_status' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
               </DropdownMenuItem>
             )}
             
@@ -95,26 +98,26 @@ const MovieGridSearchBar = ({
               <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('queue_status')} className="cursor-pointer">
                 <Clock className="h-4 w-4 mr-2" />
                 <span>Queue Status</span>
-                {sortState?.category === 'queue_status' && getSortIcon && getSortIcon()}
+                {sortState?.category === 'queue_status' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
               </DropdownMenuItem>
             )}
             
             <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('personal')} className="cursor-pointer">
               <Star className="h-4 w-4 fill-current mr-2" />
               <span>Personal Rating</span>
-              {sortState?.category === 'personal' && getSortIcon && getSortIcon()}
+              {sortState?.category === 'personal' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
             </DropdownMenuItem>
             
             <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('rating')} className="cursor-pointer">
               <Star className="h-4 w-4 mr-2" />
               <span>IMDb Rating</span>
-              {sortState?.category === 'rating' && getSortIcon && getSortIcon()}
+              {sortState?.category === 'rating' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
             </DropdownMenuItem>
             
             <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('year')} className="cursor-pointer">
               <CalendarDays className="h-4 w-4 mr-2" />
               <span>Release Date</span>
-              {sortState?.category === 'year' && getSortIcon && getSortIcon()}
+              {sortState?.category === 'year' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
