@@ -42,7 +42,7 @@ export function RatingCommentSection({
         step={1}
         onValueChange={(values) => onRatingChange(values[0])}
       />
-      {(watched && (comment.trim() !== '' || id === '')) && (
+      {watched && (
         <div className="mt-2">
           <Label htmlFor={commentId} className="text-sm">Comment</Label>
           <Textarea

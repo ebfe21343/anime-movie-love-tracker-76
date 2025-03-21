@@ -26,7 +26,7 @@ const CommentsSection = ({ register, lyanWatched = true, nastyaWatched = true }:
           />
         ) : (
           <div className="opacity-50 mt-1.5">
-            <p className="text-sm italic text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Nastya hasn't watched this yet
             </p>
           </div>
@@ -45,7 +45,7 @@ const CommentsSection = ({ register, lyanWatched = true, nastyaWatched = true }:
           />
         ) : (
           <div className="opacity-50 mt-1.5">
-            <p className="text-sm italic text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Lyan hasn't watched this yet
             </p>
           </div>

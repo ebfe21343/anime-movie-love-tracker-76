@@ -23,10 +23,10 @@ export const CommentsSection = ({
 }: CommentsSectionProps) => {
   // Check if there are no comments and we're not in edit mode
   const hasNoComments = !editMode && 
-    ((!lyanWatched || !lyanComment) && (!nastyaWatched || !nastyaComment));
+    ((!lyanWatched || !lyanComment.trim()) && (!nastyaWatched || !nastyaComment.trim()));
   
   if (hasNoComments) {
-    return null; // Don't render anything if no comments
+    return null; // Don't render anything if no comments in view mode
   }
 
   return (
