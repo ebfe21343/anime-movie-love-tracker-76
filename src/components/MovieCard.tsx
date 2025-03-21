@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Film, Tv, X, Palette, ImageOff, ListTodo } from 'lucide-react';
+import { Star, Film, Tv, X, Palette, ImageOff } from 'lucide-react';
 import { Movie } from '@/types/movie';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +19,6 @@ const MovieCard = ({ movie }: MovieCardProps) => {
   const hasValidPoster = poster && poster !== '/placeholder.svg' && !imageLoadError;
   const releaseYear = movie.start_year;
   const endYear = movie.end_year ? ` - ${movie.end_year}` : '';
-  const inQueue = movie.in_queue === true;
   
   // Calculate average personal rating
   const avgPersonalRating = ((movie.personal_ratings.lyan + movie.personal_ratings.nastya) / 2).toFixed(1);
@@ -121,17 +120,6 @@ const MovieCard = ({ movie }: MovieCardProps) => {
                 <span>Cancelled</span>
               </Badge>
             )}
-
-            {/* Watch Queue badge */}
-            {inQueue && (
-              <Badge 
-                variant="outline" 
-                className="bg-sakura-500/90 text-white border-sakura-400 flex items-center gap-1 text-xs"
-              >
-                <ListTodo className="w-3.5 h-3.5" />
-                <span>Watch Queue</span>
-              </Badge>
-            )}
           </div>
           
           {/* Genres */}
@@ -157,19 +145,12 @@ const MovieCard = ({ movie }: MovieCardProps) => {
           </div>
           
           <div className="flex items-center justify-between">
-            {/* Show either Watch Queue status or Rating */}
-            {inQueue ? (
-              <div className="flex items-center gap-1">
-                <ListTodo className="w-4 h-4 text-sakura-500" />
-                <span className="font-medium text-sakura-700">Watch Queue</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 fill-lavender-500 text-lavender-500" />
-                <span className="font-medium">{avgPersonalRating}</span>
-                <span className="text-xs text-muted-foreground">Rating</span>
-              </div>
-            )}
+            {/* Average personal rating */}
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 fill-lavender-500 text-lavender-500" />
+              <span className="font-medium">{avgPersonalRating}</span>
+              <span className="text-xs text-muted-foreground">Rating</span>
+            </div>
             
             {/* IMDb rating */}
             {movie.rating && (

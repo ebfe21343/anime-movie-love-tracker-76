@@ -36,8 +36,7 @@ export const addMovieToCollection = async (
     watch_link: string,
     content_type?: string,
     cancelled?: boolean,
-    seasons?: Season[],
-    in_queue?: boolean
+    seasons?: Season[]
   }
 ): Promise<Movie> => {
   try {
@@ -55,6 +54,7 @@ export const addMovieToCollection = async (
     
     const movieForDb = mapMovieToDbMovie(movieData, personalData);
     
+    // Convert necessary fields to Json for database storage
     const movieForDbWithJson = {
       ...movieForDb,
       certificates: convertToJson(movieForDb.certificates),
@@ -67,8 +67,7 @@ export const addMovieToCollection = async (
       personal_ratings: convertToJson(movieForDb.personal_ratings),
       comments: convertToJson(movieForDb.comments),
       watched_by: convertToJson(movieForDb.watched_by),
-      seasons: movieForDb.seasons ? convertToJson(movieForDb.seasons) : null,
-      in_queue: personalData.in_queue || false
+      seasons: movieForDb.seasons ? convertToJson(movieForDb.seasons) : null
     };
     
     const { data, error } = await supabase
@@ -118,8 +117,7 @@ export const updateMovieInCollection = async (
     watch_link: string,
     cancelled: boolean,
     content_type: string,
-    seasons: Season[],
-    in_queue: boolean
+    seasons: Season[]
   }>
 ): Promise<Movie | null> => {
   try {
@@ -152,10 +150,6 @@ export const updateMovieInCollection = async (
     if (updates.seasons !== undefined) {
       updatesForDb.seasons = convertToJson(updates.seasons);
       console.log("Converted seasons for DB:", updatesForDb.seasons);
-    }
-    
-    if (updates.in_queue !== undefined) {
-      updatesForDb.in_queue = updates.in_queue;
     }
     
     const { data, error } = await supabase

@@ -56,8 +56,7 @@ export function mapDbMovieToMovie(data: any): Movie {
     added_at: data.added_at || new Date().toISOString(),
     cancelled: data.cancelled || false,
     content_type: data.type || 'movie',
-    seasons: data.seasons ? safeParseJson<Season[]>(data.seasons, []) : [],
-    in_queue: data.in_queue || false
+    seasons: data.seasons ? safeParseJson<Season[]>(data.seasons, []) : []
   };
 }
 
@@ -74,7 +73,6 @@ export function mapMovieToDbMovie(
     content_type?: string;
     cancelled?: boolean;
     seasons?: Season[];
-    in_queue?: boolean;
   }
 ) {
   return {
@@ -105,7 +103,6 @@ export function mapMovieToDbMovie(
     watched_by: personalData.watched_by || { lyan: true, nastya: true },
     watch_link: personalData.watch_link,
     cancelled: personalData.cancelled || false,
-    seasons: personalData.seasons || null,
-    in_queue: personalData.in_queue || false
+    seasons: personalData.seasons || null
   };
 }

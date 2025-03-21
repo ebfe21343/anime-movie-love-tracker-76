@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Season } from '@/types/movie';
 import { Plus } from 'lucide-react';
@@ -64,6 +65,7 @@ const SeasonForm = ({
       cancelled: false
     });
     
+    // Hide the form after adding
     setShowNewSeasonForm(false);
   };
   
@@ -97,6 +99,7 @@ const SeasonForm = ({
     onSeasonsChange(updatedSeasons);
   };
 
+  // We'll keep this function but it won't be exposed to users via UI checkboxes
   const updateSeasonWatched = (index: number, person: 'lyan' | 'nastya', watched: boolean) => {
     const updatedSeasons = [...seasons];
     updatedSeasons[index].watched_by[person] = watched;
@@ -127,8 +130,9 @@ const SeasonForm = ({
   return (
     <div className="space-y-6">
       <SeasonHeader 
-        contentType={contentType}
-        seasonsCount={seasons.length}
+        title="Manage Seasons" 
+        contentType={contentType} 
+        onContentTypeChange={onContentTypeChange} 
       />
       
       {supportsSeasons ? (
@@ -152,6 +156,12 @@ const SeasonForm = ({
           
           <SeasonList 
             seasons={seasons}
+            updateSeason={updateSeason}
+            updateSeasonRating={updateSeasonRating}
+            updateSeasonComment={updateSeasonComment}
+            updateSeasonWatched={updateSeasonWatched}
+            updateSeasonCancelled={updateSeasonCancelled}
+            confirmRemoveSeason={confirmRemoveSeason}
             contentType={contentType}
           />
         </>

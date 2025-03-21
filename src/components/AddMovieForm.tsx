@@ -9,9 +9,6 @@ import FetchMovieSection from './add-movie-form/FetchMovieSection';
 import FormContainer from './add-movie-form/FormContainer';
 import MoviePreview from './add-movie-form/MoviePreview';
 import SeasonForm from '@/components/SeasonForm';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const AddMovieForm = () => {
   const navigate = useNavigate();
@@ -23,7 +20,6 @@ const AddMovieForm = () => {
   const [nastyaWatched, setNastyaWatched] = useState(true);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [contentType, setContentType] = useState('movie');
-  const [inQueue, setInQueue] = useState(false);
 
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<MovieFormData>({
     defaultValues: {
@@ -66,8 +62,7 @@ const AddMovieForm = () => {
       const dataToSubmit = {
         ...data,
         content_type: contentType,
-        seasons: contentType !== 'movie' ? seasons : undefined,
-        in_queue: inQueue,
+        seasons: contentType !== 'movie' ? seasons : undefined
       };
       
       await addMovieToCollection(data.id, {
@@ -76,8 +71,7 @@ const AddMovieForm = () => {
         watched_by: data.watched_by,
         watch_link: data.watch_link,
         content_type: contentType,
-        seasons: dataToSubmit.seasons,
-        in_queue: inQueue,
+        seasons: dataToSubmit.seasons
       });
       
       toast.success('Movie added to your collection!');
@@ -115,37 +109,6 @@ const AddMovieForm = () => {
             errors={errors}
           />
           
-          {/* Content Type Selection */}
-          {preview && (
-            <div className="mb-6">
-              <Label htmlFor="content-type" className="block mb-1.5">Content Type</Label>
-              <Select
-                value={contentType}
-                onValueChange={handleContentTypeChange}
-              >
-                <SelectTrigger id="content-type" className="w-full bg-white/50">
-                  <SelectValue placeholder="Select Content Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="movie">Movie</SelectItem>
-                  <SelectItem value="series">Series</SelectItem>
-                  <SelectItem value="cartoon">Cartoon</SelectItem>
-                  <SelectItem value="anime">Anime</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          
-          {/* In Queue checkbox */}
-          <div className="mt-4 mb-6 flex items-center gap-2">
-            <Checkbox 
-              id="in-queue"
-              checked={inQueue}
-              onCheckedChange={(checked) => setInQueue(!!checked)}
-            />
-            <Label htmlFor="in-queue" className="cursor-pointer">Add to Watch Queue</Label>
-          </div>
-          
           <FormContainer
             register={register}
             handleSubmit={handleSubmit}
@@ -161,7 +124,6 @@ const AddMovieForm = () => {
             isLoading={isLoading}
             preview={preview}
             contentType={contentType}
-            inQueue={inQueue}
           />
         </div>
         
@@ -171,7 +133,7 @@ const AddMovieForm = () => {
             contentType={contentType} 
           />
           
-          {preview && !inQueue && (
+          {preview && (
             <div className="pt-4 pb-2">
               <SeasonForm 
                 seasons={seasons} 
