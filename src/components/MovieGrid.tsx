@@ -30,7 +30,7 @@ const MovieGrid = ({ movies, showSearchBar = true }: MovieGridProps) => {
   // Reset visible movies count when search query or sort state changes
   useEffect(() => {
     resetVisibleMoviesCount();
-  }, [searchQuery, sortState]);
+  }, [searchQuery, sortState, resetVisibleMoviesCount]);
 
   return (
     <div className="w-full animate-fade-in">

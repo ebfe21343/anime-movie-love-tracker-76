@@ -8,10 +8,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star, Clock, List } from 'lucide-react';
+import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star } from 'lucide-react';
 import { Movie } from '@/types/movie';
 
-export type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal' | 'queue_status' | 'waiting_status';
+export type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal';
 export type SortDirection = 'asc' | 'desc';
 
 export interface SortState {
@@ -73,8 +73,6 @@ const MovieGridSearchBar = ({
               {sortState?.category === 'rating' && <Star className="h-4 w-4" />}
               {sortState?.category === 'personal' && <Star className="h-4 w-4 fill-current" />}
               {sortState?.category === 'year' && <CalendarDays className="h-4 w-4" />}
-              {sortState?.category === 'queue_status' && <Clock className="h-4 w-4" />}
-              {sortState?.category === 'waiting_status' && <List className="h-4 w-4" />}
               {getSortLabel ? getSortLabel() : 'Sort By'}
               {SortIconComponent && <SortIconComponent className="h-4 w-4" />}
             </Button>
@@ -85,22 +83,6 @@ const MovieGridSearchBar = ({
               <span>Recently Added</span>
               {sortState?.category === 'recently_added' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
             </DropdownMenuItem>
-            
-            {isWaitingView && (
-              <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('waiting_status')} className="cursor-pointer">
-                <List className="h-4 w-4 mr-2" />
-                <span>Waiting Status</span>
-                {sortState?.category === 'waiting_status' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
-              </DropdownMenuItem>
-            )}
-            
-            {isQueueView && (
-              <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('queue_status')} className="cursor-pointer">
-                <Clock className="h-4 w-4 mr-2" />
-                <span>Queue Status</span>
-                {sortState?.category === 'queue_status' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
-              </DropdownMenuItem>
-            )}
             
             <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('personal')} className="cursor-pointer">
               <Star className="h-4 w-4 fill-current mr-2" />

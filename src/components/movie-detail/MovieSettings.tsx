@@ -17,6 +17,8 @@ interface MovieSettingsProps {
   onContentTypeChange: (type: string) => void;
   onCancelledChange: (cancelled: boolean) => void;
   onWatchLinkChange: (link: string) => void;
+  inQueue?: boolean;
+  waiting?: boolean;
 }
 
 export const MovieSettings = ({
@@ -26,6 +28,8 @@ export const MovieSettings = ({
   onContentTypeChange,
   onCancelledChange,
   onWatchLinkChange,
+  inQueue = false,
+  waiting = false,
 }: MovieSettingsProps) => {
   return (
     <div className="space-y-3 pt-2">
@@ -68,6 +72,15 @@ export const MovieSettings = ({
           className="mt-1"
         />
       </div>
+      
+      {(inQueue || waiting) && (
+        <div className="mt-2 p-2 bg-muted/20 rounded-md text-xs text-muted-foreground">
+          {waiting ? 
+            "This movie is in your waiting list. You'll be able to rate it once you watch it." :
+            "This movie is in your queue. You'll be able to rate it once you watch it."
+          }
+        </div>
+      )}
     </div>
   );
 };
