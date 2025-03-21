@@ -10,13 +10,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star } from 'lucide-react';
+import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star, Layout } from 'lucide-react';
 
 interface MovieGridProps {
   movies: Movie[];
 }
 
-type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal';
+type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal' | 'type';
 
 type SortDirection = 'asc' | 'desc';
 
@@ -44,6 +44,8 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
         return sortState.direction === 'desc' ? 'year_new' : 'year_old';
       case 'personal':
         return sortState.direction === 'desc' ? 'personal_high' : 'personal_low';
+      case 'type':
+        return sortState.direction === 'desc' ? 'type_desc' : 'type_asc';
       case 'recently_added':
       default:
         return sortState.direction === 'desc' ? 'recently_added' : 'recently_added_asc';
@@ -82,6 +84,16 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
           const avgALow = (a.personal_ratings.lyan + a.personal_ratings.nastya) / 2;
           const avgBLow = (b.personal_ratings.lyan + b.personal_ratings.nastya) / 2;
           return avgALow - avgBLow;
+        case 'type_desc':
+          // Order: Movie, Series, Cartoon, Anime
+          const typeOrderDesc = { movie: 0, series: 1, cartoon: 2, anime: 3 };
+          return (typeOrderDesc[a.type as keyof typeof typeOrderDesc] || 0) - 
+                 (typeOrderDesc[b.type as keyof typeof typeOrderDesc] || 0);
+        case 'type_asc':
+          // Order: Anime, Cartoon, Series, Movie
+          const typeOrderAsc = { anime: 0, cartoon: 1, series: 2, movie: 3 };
+          return (typeOrderAsc[a.type as keyof typeof typeOrderAsc] || 0) - 
+                 (typeOrderAsc[b.type as keyof typeof typeOrderAsc] || 0);
         case 'recently_added':
           return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
         case 'recently_added_asc':
@@ -116,12 +128,14 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
   const getSortLabel = () => {
     const directionText = sortState.direction === 'desc' ? 'Newest' : 'Oldest';
     const highLowText = sortState.direction === 'desc' ? 'Highest' : 'Lowest';
+    const typeOrderText = sortState.direction === 'desc' ? 'Movie First' : 'Anime First';
 
     switch (sortState.category) {
       case 'recently_added': return `${directionText} Added`;
       case 'rating': return `${highLowText} IMDb Rating`;
       case 'year': return `${directionText} Released`;
       case 'personal': return `${highLowText} Personal Rating`;
+      case 'type': return `Type: ${typeOrderText}`;
       default: return 'Sort By';
     }
   };
@@ -185,6 +199,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
                 {sortState.category === 'rating' && <Star className="h-4 w-4" />}
                 {sortState.category === 'personal' && <Star className="h-4 w-4 fill-current" />}
                 {sortState.category === 'year' && <CalendarDays className="h-4 w-4" />}
+                {sortState.category === 'type' && <Layout className="h-4 w-4" />}
                 {getSortLabel()}
                 {getSortIcon()}
               </Button>
@@ -209,6 +224,11 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
                 <CalendarDays className="h-4 w-4 mr-2" />
                 <span>Release Date</span>
                 {sortState.category === 'year' && getSortIcon()}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSortClick('type')} className="cursor-pointer">
+                <Layout className="h-4 w-4 mr-2" />
+                <span>Content Type</span>
+                {sortState.category === 'type' && getSortIcon()}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
