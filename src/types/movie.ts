@@ -119,7 +119,7 @@ export interface MovieFormData {
     nastya: boolean;
   };
   watch_link: string;
-  content_type: string;
+  content_type?: string;
   cancelled?: boolean;
   seasons?: Season[];
   in_queue?: boolean;
