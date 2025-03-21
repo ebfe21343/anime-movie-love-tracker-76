@@ -1,5 +1,5 @@
 
-import { Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { Season } from '@/types/movie';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,17 +12,31 @@ interface NewSeasonFormProps {
   newSeason: Omit<Season, 'id'>;
   setNewSeason: (season: Omit<Season, 'id'>) => void;
   addSeason: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onCancel: () => void;
 }
 
 export function NewSeasonForm({ 
   newSeason, 
   setNewSeason, 
-  addSeason 
+  addSeason,
+  onCancel
 }: NewSeasonFormProps) {
   return (
     <Card className="bg-white/40">
       <CardContent className="p-4">
-        <h4 className="font-medium mb-4">Add New Season</h4>
+        <div className="flex justify-between items-center mb-4">
+          <h4 className="font-medium">Add New Season</h4>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onCancel}
+            className="h-8 w-8 p-0 rounded-full"
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Cancel</span>
+          </Button>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <Label htmlFor="season_number">Season Number</Label>
@@ -148,14 +162,25 @@ export function NewSeasonForm({
           </div>
         </div>
         
-        <Button 
-          type="button"
-          onClick={addSeason}
-          className="w-full bg-lavender-500 hover:bg-lavender-600"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Season
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            type="button"
+            onClick={addSeason}
+            className="flex-1 bg-lavender-500 hover:bg-lavender-600"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Season
+          </Button>
+          
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

@@ -1,6 +1,8 @@
 
 import { useState } from 'react';
 import { Season } from '@/types/movie';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { SeasonHeader } from './season-form/SeasonHeader';
 import { NewSeasonForm } from './season-form/NewSeasonForm';
 import { SeasonList } from './season-form/SeasonList';
@@ -19,6 +21,7 @@ const SeasonForm = ({
   contentType = 'movie',
   onContentTypeChange 
 }: SeasonFormProps) => {
+  const [showNewSeasonForm, setShowNewSeasonForm] = useState(false);
   const [newSeason, setNewSeason] = useState<Omit<Season, 'id'>>({
     season_number: (seasons.length > 0 ? Math.max(...seasons.map(s => s.season_number)) : 0) + 1,
     title: '',
@@ -57,6 +60,9 @@ const SeasonForm = ({
       watched_by: { lyan: true, nastya: true },
       cancelled: false
     });
+    
+    // Hide the form after adding
+    setShowNewSeasonForm(false);
   };
   
   const confirmRemoveSeason = (index: number) => {
@@ -120,11 +126,22 @@ const SeasonForm = ({
       
       {supportsSeasons ? (
         <>
-          <NewSeasonForm 
-            newSeason={newSeason}
-            setNewSeason={setNewSeason}
-            addSeason={addSeason}
-          />
+          {!showNewSeasonForm ? (
+            <Button
+              onClick={() => setShowNewSeasonForm(true)}
+              className="w-full bg-lavender-500 hover:bg-lavender-600 mb-4"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add New Season
+            </Button>
+          ) : (
+            <NewSeasonForm 
+              newSeason={newSeason}
+              setNewSeason={setNewSeason}
+              addSeason={addSeason}
+              onCancel={() => setShowNewSeasonForm(false)}
+            />
+          )}
           
           <SeasonList 
             seasons={seasons}
