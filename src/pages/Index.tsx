@@ -7,20 +7,10 @@ import MovieGrid from '@/components/MovieGrid';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ListTodo, Clock } from 'lucide-react';
-import { useMovieFilter } from '@/components/movie-grid/useMovieFilter';
 
 const Index = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  const {
-    searchQuery,
-    setSearchQuery,
-    sortState,
-    handleSortClick,
-    getSortIcon,
-    getSortLabel
-  } = useMovieFilter(movies);
   
   useEffect(() => {
     const loadMovies = async () => {
@@ -92,43 +82,17 @@ const Index = () => {
               </TabsList>
               
               <div className="flex-1">
-                <MovieGrid.SearchAndFilterBar 
-                  movies={movies}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  sortState={sortState}
-                  handleSortClick={handleSortClick}
-                  getSortLabel={getSortLabel}
-                  getSortIcon={getSortIcon}
-                />
+                <MovieGrid.SearchAndFilterBar movies={movies} />
               </div>
             </div>
             
             <TabsContent value="collection" className="focus-visible:outline-none focus-visible:ring-0">
-              <MovieGrid 
-                movies={collectionMovies} 
-                showSearchBar={false} 
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                sortState={sortState}
-                handleSortClick={handleSortClick}
-                getSortIcon={getSortIcon}
-                getSortLabel={getSortLabel}
-              />
+              <MovieGrid movies={collectionMovies} showSearchBar={false} />
             </TabsContent>
             
             <TabsContent value="waiting" className="focus-visible:outline-none focus-visible:ring-0">
               {waitingMovies.length > 0 ? (
-                <MovieGrid 
-                  movies={waitingMovies}
-                  showSearchBar={false}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  sortState={sortState}
-                  handleSortClick={handleSortClick}
-                  getSortIcon={getSortIcon}
-                  getSortLabel={getSortLabel}
-                />
+                <MovieGrid movies={waitingMovies} showSearchBar={false} />
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="w-16 h-16 mb-4 rounded-full bg-muted/50 flex items-center justify-center">
@@ -144,16 +108,7 @@ const Index = () => {
             
             <TabsContent value="queue" className="focus-visible:outline-none focus-visible:ring-0">
               {queueMovies.length > 0 ? (
-                <MovieGrid 
-                  movies={queueMovies}
-                  showSearchBar={false}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  sortState={sortState}
-                  handleSortClick={handleSortClick}
-                  getSortIcon={getSortIcon}
-                  getSortLabel={getSortLabel}
-                />
+                <MovieGrid movies={queueMovies} showSearchBar={false} />
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="w-16 h-16 mb-4 rounded-full bg-muted/50 flex items-center justify-center">

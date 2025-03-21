@@ -8,10 +8,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Search, CalendarDays, Star } from 'lucide-react';
+import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star, Clock, List } from 'lucide-react';
 import { Movie } from '@/types/movie';
 
-export type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal';
+export type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal' | 'queue_status' | 'waiting_status';
 export type SortDirection = 'asc' | 'desc';
 
 export interface SortState {
@@ -26,55 +26,29 @@ interface MovieGridSearchBarProps {
   sortState?: SortState;
   handleSortClick?: (category: SortCategory) => void;
   getSortLabel?: () => string;
-  getSortIcon?: () => any;
+  getSortIcon?: () => typeof ArrowUp | typeof ArrowDown;
   isQueueView?: boolean;
   isWaitingView?: boolean;
 }
 
 const MovieGridSearchBar = ({ 
   movies,
-  searchQuery = '',
-  setSearchQuery = () => {},
-  sortState = { category: 'recently_added', direction: 'desc' },
-  handleSortClick = () => {},
-  getSortLabel = () => 'Sort By',
-  getSortIcon = () => null,
-  isQueueView = false,
-  isWaitingView = false
+  searchQuery,
+  setSearchQuery, 
+  sortState, 
+  handleSortClick, 
+  getSortLabel, 
+  getSortIcon,
+  isQueueView,
+  isWaitingView
 }: MovieGridSearchBarProps) => {
   const [localSearchQuery, setLocalSearchQuery] = useState('');
-  const [localSortState, setLocalSortState] = useState<SortState>({
-    category: 'recently_added',
-    direction: 'desc'
-  });
   
-  // Determine if we're using props or local state
   const actualSearchQuery = searchQuery !== undefined ? searchQuery : localSearchQuery;
-  const actualSetSearchQuery = setSearchQuery || setLocalSearchQuery;
-  const actualSortState = sortState || localSortState;
+  const actualSetSearchQuery = setSearchQuery !== undefined ? setSearchQuery : setLocalSearchQuery;
   
-  // Local sort handler if no external one is provided
-  const actualHandleSortClick = (category: SortCategory) => {
-    if (handleSortClick) {
-      handleSortClick(category);
-    } else {
-      setLocalSortState(prev => {
-        if (prev.category === category) {
-          return {
-            category,
-            direction: prev.direction === 'desc' ? 'asc' : 'desc'
-          };
-        }
-        return {
-          category,
-          direction: 'desc'
-        };
-      });
-    }
-  };
-  
-  // Get appropriate icon
-  const SortIconComponent = getSortIcon();
+  // Create the icon component if getSortIcon is provided
+  const SortIconComponent = getSortIcon && getSortIcon();
   
   return (
     <div className="flex flex-col md:flex-row gap-4 mb-6 flex-1">
@@ -95,45 +69,55 @@ const MovieGridSearchBar = ({
               variant="outline"
               className="flex items-center gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
             >
-              {actualSortState.category === 'recently_added' && <CalendarDays className="h-4 w-4" />}
-              {actualSortState.category === 'rating' && <Star className="h-4 w-4" />}
-              {actualSortState.category === 'personal' && <Star className="h-4 w-4 fill-current" />}
-              {actualSortState.category === 'year' && <CalendarDays className="h-4 w-4" />}
-              {getSortLabel()}
-              {SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
+              {sortState?.category === 'recently_added' && <CalendarDays className="h-4 w-4" />}
+              {sortState?.category === 'rating' && <Star className="h-4 w-4" />}
+              {sortState?.category === 'personal' && <Star className="h-4 w-4 fill-current" />}
+              {sortState?.category === 'year' && <CalendarDays className="h-4 w-4" />}
+              {sortState?.category === 'queue_status' && <Clock className="h-4 w-4" />}
+              {sortState?.category === 'waiting_status' && <List className="h-4 w-4" />}
+              {getSortLabel ? getSortLabel() : 'Sort By'}
+              {SortIconComponent && <SortIconComponent className="h-4 w-4" />}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-white border-sakura-200">
-            <DropdownMenuItem onClick={() => actualHandleSortClick('recently_added')} className="cursor-pointer">
+            <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('recently_added')} className="cursor-pointer">
               <CalendarDays className="h-4 w-4 mr-2" />
               <span>Recently Added</span>
-              {actualSortState.category === 'recently_added' && (
-                SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />
-              )}
+              {sortState?.category === 'recently_added' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => actualHandleSortClick('personal')} className="cursor-pointer">
+            {isWaitingView && (
+              <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('waiting_status')} className="cursor-pointer">
+                <List className="h-4 w-4 mr-2" />
+                <span>Waiting Status</span>
+                {sortState?.category === 'waiting_status' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
+              </DropdownMenuItem>
+            )}
+            
+            {isQueueView && (
+              <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('queue_status')} className="cursor-pointer">
+                <Clock className="h-4 w-4 mr-2" />
+                <span>Queue Status</span>
+                {sortState?.category === 'queue_status' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
+              </DropdownMenuItem>
+            )}
+            
+            <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('personal')} className="cursor-pointer">
               <Star className="h-4 w-4 fill-current mr-2" />
               <span>Personal Rating</span>
-              {actualSortState.category === 'personal' && (
-                SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />
-              )}
+              {sortState?.category === 'personal' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => actualHandleSortClick('rating')} className="cursor-pointer">
+            <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('rating')} className="cursor-pointer">
               <Star className="h-4 w-4 mr-2" />
               <span>IMDb Rating</span>
-              {actualSortState.category === 'rating' && (
-                SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />
-              )}
+              {sortState?.category === 'rating' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => actualHandleSortClick('year')} className="cursor-pointer">
+            <DropdownMenuItem onClick={() => handleSortClick && handleSortClick('year')} className="cursor-pointer">
               <CalendarDays className="h-4 w-4 mr-2" />
               <span>Release Date</span>
-              {actualSortState.category === 'year' && (
-                SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />
-              )}
+              {sortState?.category === 'year' && SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

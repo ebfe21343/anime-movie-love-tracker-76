@@ -19,8 +19,6 @@ interface SeasonsDisplayProps {
   seasons: Season[];
   contentType: string;
   editMode: boolean;
-  waiting: boolean;
-  inQueue: boolean;
   onSeasonsChange: (seasons: Season[]) => void;
   onContentTypeChange: (type: string) => void;
   setEditMode: (editMode: boolean) => void;
@@ -30,8 +28,6 @@ export const SeasonsDisplay = ({
   seasons,
   contentType,
   editMode,
-  waiting,
-  inQueue,
   onSeasonsChange,
   onContentTypeChange,
   setEditMode,
@@ -54,7 +50,6 @@ export const SeasonsDisplay = ({
             onSeasonsChange={onSeasonsChange}
             contentType={contentType}
             onContentTypeChange={onContentTypeChange}
-            waiting={waiting}
           />
         ) : (
           <div>
@@ -82,51 +77,39 @@ export const SeasonsDisplay = ({
                               <span>{season.year}</span>
                             </div>
                           </div>
-                          {!waiting && !inQueue && (
-                            <div className="flex items-center">
-                              <Badge className={cn(
-                                "mr-2 font-bold",
-                                getRatingBadgeColor((season.personal_ratings.lyan + season.personal_ratings.nastya) / 2)
-                              )}>
-                                {((season.personal_ratings.lyan + season.personal_ratings.nastya) / 2).toFixed(1)}/10
-                              </Badge>
+                          <div className="flex items-center">
+                            <Badge className={cn(
+                              "mr-2 font-bold",
+                              getRatingBadgeColor((season.personal_ratings.lyan + season.personal_ratings.nastya) / 2)
+                            )}>
+                              {((season.personal_ratings.lyan + season.personal_ratings.nastya) / 2).toFixed(1)}/10
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          {season.comments.lyan ? (
+                            <div>
+                              <p className="font-medium mb-1">Lyan's Rating: {season.personal_ratings.lyan}/10</p>
+                              <p className="text-sm">{season.comments.lyan}</p>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="font-medium mb-1">Lyan's Rating: {season.personal_ratings.lyan}/10</p>
+                            </div>
+                          )}
+                          
+                          {season.comments.nastya ? (
+                            <div>
+                              <p className="font-medium mb-1">Nastya's Rating: {season.personal_ratings.nastya}/10</p>
+                              <p className="text-sm">{season.comments.nastya}</p>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="font-medium mb-1">Nastya's Rating: {season.personal_ratings.nastya}/10</p>
                             </div>
                           )}
                         </div>
-                        
-                        {!waiting && !inQueue && (
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            {season.comments.lyan ? (
-                              <div>
-                                <p className="font-medium mb-1">Lyan's Rating: {season.personal_ratings.lyan}/10</p>
-                                <p className="text-sm">{season.comments.lyan}</p>
-                              </div>
-                            ) : (
-                              <div>
-                                <p className="font-medium mb-1">Lyan's Rating: {season.personal_ratings.lyan}/10</p>
-                              </div>
-                            )}
-                            
-                            {season.comments.nastya ? (
-                              <div>
-                                <p className="font-medium mb-1">Nastya's Rating: {season.personal_ratings.nastya}/10</p>
-                                <p className="text-sm">{season.comments.nastya}</p>
-                              </div>
-                            ) : (
-                              <div>
-                                <p className="font-medium mb-1">Nastya's Rating: {season.personal_ratings.nastya}/10</p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        {(waiting || inQueue) && (
-                          <div className="text-center p-2">
-                            <p className="text-sm text-muted-foreground">
-                              {waiting ? "In waiting list - ratings will be added after watching" : 
-                               "In queue - ratings will be added after watching"}
-                            </p>
-                          </div>
-                        )}
                       </CardContent>
                     </Card>
                   ))}
@@ -149,3 +132,4 @@ export const SeasonsDisplay = ({
 };
 
 import { Calendar } from 'lucide-react';
+

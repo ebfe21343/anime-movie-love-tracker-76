@@ -8,8 +8,6 @@ interface CommentsSectionProps {
   lyanWatched: boolean;
   nastyaWatched: boolean;
   editMode: boolean;
-  waiting?: boolean;
-  inQueue?: boolean;
   onLyanCommentChange?: (comment: string) => void;
   onNastyaCommentChange?: (comment: string) => void;
 }
@@ -20,19 +18,12 @@ export const CommentsSection = ({
   lyanWatched,
   nastyaWatched,
   editMode,
-  waiting = false,
-  inQueue = false,
   onLyanCommentChange,
   onNastyaCommentChange,
 }: CommentsSectionProps) => {
   // Check if there are no comments and we're not in edit mode
   const hasNoComments = !editMode && 
     ((!lyanWatched || !lyanComment.trim()) && (!nastyaWatched || !nastyaComment.trim()));
-  
-  // Don't show comments section for items in waiting or queue 
-  if ((waiting || inQueue) && !editMode) {
-    return null;
-  }
   
   if (hasNoComments) {
     return null; // Don't render anything if no comments in view mode
@@ -58,57 +49,45 @@ export const CommentsSection = ({
         </div>
       ) : (
         <div className="space-y-6">
-          {waiting || inQueue ? (
-            <div className="bg-muted/30 p-4 rounded-lg text-center">
-              <p className="text-muted-foreground">
-                {waiting ? 
-                  "Comments will be available after watching this title from your waiting list." : 
-                  "Comments will be available after watching this title from your queue."}
-              </p>
-            </div>
-          ) : (
-            <>
-              <div>
-                <Label htmlFor="nastya-comment" className="mb-2 block">Nastya's Comment</Label>
-                {nastyaWatched ? (
-                  <Textarea
-                    id="nastya-comment"
-                    value={nastyaComment}
-                    onChange={(e) => onNastyaCommentChange?.(e.target.value)}
-                    placeholder="What did Nastya think of this movie?"
-                    className="resize-none bg-white/50"
-                    rows={4}
-                  />
-                ) : (
-                  <div className="opacity-50">
-                    <p className="text-sm text-muted-foreground">
-                      Nastya hasn't watched this yet
-                    </p>
-                  </div>
-                )}
+          <div>
+            <Label htmlFor="nastya-comment" className="mb-2 block">Nastya's Comment</Label>
+            {nastyaWatched ? (
+              <Textarea
+                id="nastya-comment"
+                value={nastyaComment}
+                onChange={(e) => onNastyaCommentChange?.(e.target.value)}
+                placeholder="What did Nastya think of this movie?"
+                className="resize-none bg-white/50"
+                rows={4}
+              />
+            ) : (
+              <div className="opacity-50">
+                <p className="text-sm text-muted-foreground">
+                  Nastya hasn't watched this yet
+                </p>
               </div>
-              
-              <div>
-                <Label htmlFor="lyan-comment" className="mb-2 block">Lyan's Comment</Label>
-                {lyanWatched ? (
-                  <Textarea
-                    id="lyan-comment"
-                    value={lyanComment}
-                    onChange={(e) => onLyanCommentChange?.(e.target.value)}
-                    placeholder="What did you think of this movie?"
-                    className="resize-none bg-white/50"
-                    rows={4}
-                  />
-                ) : (
-                  <div className="opacity-50">
-                    <p className="text-sm text-muted-foreground">
-                      Lyan hasn't watched this yet
-                    </p>
-                  </div>
-                )}
+            )}
+          </div>
+          
+          <div>
+            <Label htmlFor="lyan-comment" className="mb-2 block">Lyan's Comment</Label>
+            {lyanWatched ? (
+              <Textarea
+                id="lyan-comment"
+                value={lyanComment}
+                onChange={(e) => onLyanCommentChange?.(e.target.value)}
+                placeholder="What did you think of this movie?"
+                className="resize-none bg-white/50"
+                rows={4}
+              />
+            ) : (
+              <div className="opacity-50">
+                <p className="text-sm text-muted-foreground">
+                  Lyan hasn't watched this yet
+                </p>
               </div>
-            </>
-          )}
+            )}
+          </div>
         </div>
       )}
     </>
