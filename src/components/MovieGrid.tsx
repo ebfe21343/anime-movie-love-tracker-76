@@ -1,42 +1,56 @@
-
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { Movie } from '@/types/movie';
 import MovieCard from './MovieCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowUpDown, Search, ChevronDown } from 'lucide-react';
+import { ArrowUpDown, Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star } from 'lucide-react';
 
 interface MovieGridProps {
   movies: Movie[];
 }
 
-type SortOption = 
-  | 'recently_added' 
-  | 'rating_high' 
-  | 'rating_low' 
-  | 'year_new' 
-  | 'year_old'
-  | 'personal_high'
-  | 'personal_low';
+type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal';
+
+type SortDirection = 'asc' | 'desc';
+
+interface SortState {
+  category: SortCategory;
+  direction: SortDirection;
+}
 
 const MOVIES_PER_PAGE = 10;
 
 const MovieGrid = ({ movies }: MovieGridProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('recently_added');
+  const [sortState, setSortState] = useState<SortState>({
+    category: 'recently_added',
+    direction: 'desc'
+  });
   const [visibleMoviesCount, setVisibleMoviesCount] = useState(MOVIES_PER_PAGE);
   const observerTarget = useRef<HTMLDivElement>(null);
   
+  const effectiveSortOption = useMemo(() => {
+    switch (sortState.category) {
+      case 'rating':
+        return sortState.direction === 'desc' ? 'rating_high' : 'rating_low';
+      case 'year':
+        return sortState.direction === 'desc' ? 'year_new' : 'year_old';
+      case 'personal':
+        return sortState.direction === 'desc' ? 'personal_high' : 'personal_low';
+      case 'recently_added':
+      default:
+        return sortState.direction === 'desc' ? 'recently_added' : 'recently_added_asc';
+    }
+  }, [sortState]);
+
   const filteredAndSortedMovies = useMemo(() => {
-    // Filter movies by search query (title, genre, or comments)
     const filtered = searchQuery 
       ? movies.filter(movie => 
           movie.primary_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           movie.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase())) ||
           movie.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
           movie.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          // Search in season comments if the movie has seasons
           (movie.seasons && movie.seasons.some(season => 
             season.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
             season.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase())
@@ -44,9 +58,8 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
         )
       : movies;
     
-    // Sort movies
     return [...filtered].sort((a, b) => {
-      switch (sortBy) {
+      switch (effectiveSortOption) {
         case 'rating_high':
           return b.rating.aggregate_rating - a.rating.aggregate_rating;
         case 'rating_low':
@@ -64,25 +77,70 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
           const avgBLow = (b.personal_ratings.lyan + b.personal_ratings.nastya) / 2;
           return avgALow - avgBLow;
         case 'recently_added':
+          return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
+        case 'recently_added_asc':
+          return new Date(a.added_at).getTime() - new Date(b.added_at).getTime();
         default:
           return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
       }
     });
-  }, [movies, searchQuery, sortBy]);
+  }, [movies, searchQuery, effectiveSortOption]);
 
-  // Reset visible movies count when the search or sort changes
+  const handleSortChange = (newCategory: SortCategory) => {
+    setSortState(prev => {
+      if (prev.category === newCategory) {
+        return {
+          category: newCategory,
+          direction: prev.direction === 'desc' ? 'asc' : 'desc'
+        };
+      }
+      return {
+        category: newCategory,
+        direction: 'desc'
+      };
+    });
+  };
+
+  const getSortIcon = (category: SortCategory) => {
+    if (sortState.category !== category) {
+      return <ArrowUpDown className="h-4 w-4" />;
+    }
+    return sortState.direction === 'desc' ? 
+      <ArrowDown className="h-4 w-4" /> : 
+      <ArrowUp className="h-4 w-4" />;
+  };
+
+  const getSortLabel = (category: SortCategory) => {
+    if (sortState.category !== category) {
+      switch (category) {
+        case 'recently_added': return 'Recently Added';
+        case 'rating': return 'IMDb Rating';
+        case 'year': return 'Release Date';
+        case 'personal': return 'Personal Rating';
+      }
+    }
+
+    const directionText = sortState.direction === 'desc' ? 'Newest' : 'Oldest';
+    const highLowText = sortState.direction === 'desc' ? 'Highest' : 'Lowest';
+
+    switch (category) {
+      case 'recently_added': return `${directionText} Added`;
+      case 'rating': return `${highLowText} IMDb Rating`;
+      case 'year': return `${directionText} Released`;
+      case 'personal': return `${highLowText} Personal Rating`;
+    }
+  };
+
   useEffect(() => {
     setVisibleMoviesCount(MOVIES_PER_PAGE);
-  }, [searchQuery, sortBy]);
+  }, [searchQuery, sortState]);
 
-  // Implementation of infinite scrolling using Intersection Observer
   const loadMoreMovies = useCallback(() => {
     if (visibleMoviesCount < filteredAndSortedMovies.length) {
       setVisibleMoviesCount(prev => prev + MOVIES_PER_PAGE);
     }
   }, [visibleMoviesCount, filteredAndSortedMovies.length]);
 
-  // Set up intersection observer for infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -105,14 +163,12 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
     };
   }, [loadMoreMovies]);
 
-  // Get current visible movies
   const currentMovies = filteredAndSortedMovies.slice(0, visibleMoviesCount);
   const hasMoreMovies = visibleMoviesCount < filteredAndSortedMovies.length;
 
   return (
     <div className="w-full animate-fade-in">
       <div className="flex flex-col md:flex-row gap-4 mb-6">
-        {/* Search input */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -123,26 +179,48 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
           />
         </div>
         
-        {/* Sort select */}
         <div className="flex gap-2 items-center">
-          <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-          <Select 
-            defaultValue="recently_added"
-            onValueChange={(value) => setSortBy(value as SortOption)}
-          >
-            <SelectTrigger className="w-[200px] bg-white/50 backdrop-blur-sm border-sakura-200 focus:ring-sakura-400">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="recently_added">Recently Added</SelectItem>
-              <SelectItem value="rating_high">Highest IMDb Rating</SelectItem>
-              <SelectItem value="rating_low">Lowest IMDb Rating</SelectItem>
-              <SelectItem value="year_new">Newest First</SelectItem>
-              <SelectItem value="year_old">Oldest First</SelectItem>
-              <SelectItem value="personal_high">Highest Personal Rating</SelectItem>
-              <SelectItem value="personal_low">Lowest Personal Rating</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => handleSortChange('recently_added')}
+              className="flex items-center gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
+            >
+              <CalendarDays className="h-4 w-4" />
+              {getSortLabel('recently_added')}
+              {getSortIcon('recently_added')}
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={() => handleSortChange('rating')}
+              className="flex items-center gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
+            >
+              <Star className="h-4 w-4" />
+              {getSortLabel('rating')}
+              {getSortIcon('rating')}
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => handleSortChange('personal')}
+              className="flex items-center gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
+            >
+              <Star className="h-4 w-4 fill-current" />
+              {getSortLabel('personal')}
+              {getSortIcon('personal')}
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => handleSortChange('year')}
+              className="flex items-center gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
+            >
+              <CalendarDays className="h-4 w-4" />
+              {getSortLabel('year')}
+              {getSortIcon('year')}
+            </Button>
+          </div>
         </div>
       </div>
       
@@ -177,7 +255,6 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
             ))}
           </div>
           
-          {/* Loading indicator and observer target */}
           {hasMoreMovies && (
             <div 
               ref={observerTarget} 
@@ -190,7 +267,6 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
             </div>
           )}
 
-          {/* Manual load more button as fallback */}
           {hasMoreMovies && (
             <div className="flex justify-center mt-4">
               <Button 
