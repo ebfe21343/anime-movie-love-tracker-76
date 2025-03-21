@@ -62,12 +62,22 @@ export const MovieInfo = ({
           )}
         </div>
         
-        {/* Rating Badge over the image */}
+        {/* Rating Badge over the image - show only if not in queue */}
         {imdbRating && !inQueue && (
           <div className="absolute bottom-0 right-0 p-2">
             <Badge className="bg-yellow-500/90 text-black border-none font-semibold flex items-center">
               <Star className="w-3 h-3 fill-current mr-1" />
               {imdbRating} IMDb
+            </Badge>
+          </div>
+        )}
+        
+        {/* Watch Queue Badge - show if in queue */}
+        {inQueue && (
+          <div className="absolute bottom-0 right-0 p-2">
+            <Badge className="bg-sakura-500/90 text-white border-none font-semibold flex items-center">
+              <ListTodo className="w-3 h-3 mr-1" />
+              Watch Queue
             </Badge>
           </div>
         )}
