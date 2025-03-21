@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Movie } from '@/types/movie';
@@ -98,7 +97,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
     }
   };
   
-  const poster = movie.posters?.[0]?.url || movie.poster_url || '/placeholder.svg';
+  const poster = movie.posters?.[0]?.url || '';
   
   return (
     <div className="w-full animate-fade-in">

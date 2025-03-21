@@ -23,10 +23,11 @@ export const MovieInfo = ({
   if (contentType === "series") contentTypeLabel = "TV Series";
   if (contentType === "anime") contentTypeLabel = "Anime";
   
-  const year = movie.start_year || (movie.years && movie.years[0]);
-  const endYear = movie.end_year || (movie.years && movie.years[1]);
+  const year = movie.start_year;
+  const endYear = movie.end_year;
   
-  const imdbRating = movie.aggregate_rating || movie.rating;
+  // Get the IMDb rating from the rating object
+  const imdbRating = movie.rating?.aggregate_rating;
   
   return (
     <div className="relative">

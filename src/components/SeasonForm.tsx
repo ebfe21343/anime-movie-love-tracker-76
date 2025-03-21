@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Season } from '@/types/movie';
 import { Plus } from 'lucide-react';
@@ -130,9 +129,8 @@ const SeasonForm = ({
   return (
     <div className="space-y-6">
       <SeasonHeader 
-        title="Manage Seasons" 
-        contentType={contentType} 
-        onContentTypeChange={onContentTypeChange} 
+        contentType={contentType}
+        seasonsCount={seasons.length}
       />
       
       {supportsSeasons ? (
@@ -156,12 +154,6 @@ const SeasonForm = ({
           
           <SeasonList 
             seasons={seasons}
-            updateSeason={updateSeason}
-            updateSeasonRating={updateSeasonRating}
-            updateSeasonComment={updateSeasonComment}
-            updateSeasonWatched={updateSeasonWatched}
-            updateSeasonCancelled={updateSeasonCancelled}
-            confirmRemoveSeason={confirmRemoveSeason}
             contentType={contentType}
           />
         </>

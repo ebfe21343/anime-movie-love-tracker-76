@@ -38,10 +38,18 @@ export const SeasonsDisplay = ({
     return (
       <Card className="border-none glass rounded-2xl overflow-hidden mb-6">
         <CardContent className="p-6">
-          <EmptySeasonsList 
-            contentType={contentType} 
-            onClick={() => setEditMode(true)}
-          />
+          <div className="text-center py-8">
+            <p className="text-muted-foreground mb-4">
+              No seasons added yet for this {contentType === 'anime' ? 'anime' : 'series'}.
+            </p>
+            <Button
+              onClick={() => setEditMode(true)}
+              variant="outline"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Seasons
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
