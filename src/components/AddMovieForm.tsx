@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -8,7 +9,8 @@ import FetchMovieSection from './add-movie-form/FetchMovieSection';
 import FormContainer from './add-movie-form/FormContainer';
 import MoviePreview from './add-movie-form/MoviePreview';
 import SeasonForm from '@/components/SeasonForm';
-import { Label, Checkbox } from '@/components/Inputs';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const AddMovieForm = () => {
   const navigate = useNavigate();
@@ -149,9 +151,10 @@ const AddMovieForm = () => {
         </div>
       </div>
       
-      <div>
-        <Label>In Queue</Label>
+      <div className="mt-4 flex items-center gap-2">
+        <Label htmlFor="in-queue" className="cursor-pointer">In Queue</Label>
         <Checkbox 
+          id="in-queue"
           checked={inQueue}
           onCheckedChange={(checked) => setInQueue(!!checked)}
         />
