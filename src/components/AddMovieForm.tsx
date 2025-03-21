@@ -11,6 +11,7 @@ import MoviePreview from './add-movie-form/MoviePreview';
 import SeasonForm from '@/components/SeasonForm';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const AddMovieForm = () => {
   const navigate = useNavigate();
@@ -114,7 +115,27 @@ const AddMovieForm = () => {
             errors={errors}
           />
           
-          {/* In Queue checkbox has been moved from the bottom to here */}
+          {/* Content Type Selection */}
+          {preview && (
+            <div className="mb-6">
+              <Label htmlFor="content-type" className="block mb-1.5">Content Type</Label>
+              <Select
+                value={contentType}
+                onValueChange={handleContentTypeChange}
+              >
+                <SelectTrigger id="content-type" className="w-full bg-white/50">
+                  <SelectValue placeholder="Select Content Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="movie">Movie</SelectItem>
+                  <SelectItem value="series">TV Series</SelectItem>
+                  <SelectItem value="anime">Anime</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          
+          {/* In Queue checkbox */}
           <div className="mt-4 mb-6 flex items-center gap-2">
             <Checkbox 
               id="in-queue"
