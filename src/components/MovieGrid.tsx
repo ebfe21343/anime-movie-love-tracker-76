@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { Movie } from '@/types/movie';
 import MovieCard from './MovieCard';
@@ -60,7 +59,8 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
           (movie.seasons && movie.seasons.some(season => 
             season.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
             season.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase())
-          ))
+          )) ||
+          (movie.in_queue === (searchQuery.toLowerCase() === 'queue'))
         )
       : movies;
     

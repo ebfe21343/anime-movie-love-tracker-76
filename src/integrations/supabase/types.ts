@@ -22,6 +22,7 @@ export type Database = {
           end_year: number | null
           genres: string[] | null
           id: string
+          in_queue: boolean | null
           is_adult: boolean | null
           origin_countries: Json | null
           original_title: string | null
@@ -53,6 +54,7 @@ export type Database = {
           end_year?: number | null
           genres?: string[] | null
           id: string
+          in_queue?: boolean | null
           is_adult?: boolean | null
           origin_countries?: Json | null
           original_title?: string | null
@@ -84,6 +86,7 @@ export type Database = {
           end_year?: number | null
           genres?: string[] | null
           id?: string
+          in_queue?: boolean | null
           is_adult?: boolean | null
           origin_countries?: Json | null
           original_title?: string | null

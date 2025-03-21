@@ -1,4 +1,3 @@
-
 export interface Movie {
   id: string;
   type: string;
@@ -59,6 +58,7 @@ export interface Movie {
   cancelled: boolean;
   seasons?: Season[];
   content_type: string;
+  in_queue?: boolean; // Add optional in_queue field
 }
 
 interface Credit {
@@ -121,4 +121,5 @@ export interface MovieFormData {
   content_type: string;
   cancelled?: boolean;
   seasons?: Season[];
+  in_queue?: boolean; // Add optional in_queue field to form data
 }

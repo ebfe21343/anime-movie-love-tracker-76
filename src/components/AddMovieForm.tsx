@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -9,6 +8,7 @@ import FetchMovieSection from './add-movie-form/FetchMovieSection';
 import FormContainer from './add-movie-form/FormContainer';
 import MoviePreview from './add-movie-form/MoviePreview';
 import SeasonForm from '@/components/SeasonForm';
+import { Label, Checkbox } from '@/components/Inputs';
 
 const AddMovieForm = () => {
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ const AddMovieForm = () => {
   const [nastyaWatched, setNastyaWatched] = useState(true);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [contentType, setContentType] = useState('movie');
+  const [inQueue, setInQueue] = useState(false);
 
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<MovieFormData>({
     defaultValues: {
@@ -62,7 +63,8 @@ const AddMovieForm = () => {
       const dataToSubmit = {
         ...data,
         content_type: contentType,
-        seasons: contentType !== 'movie' ? seasons : undefined
+        seasons: contentType !== 'movie' ? seasons : undefined,
+        in_queue: inQueue,
       };
       
       await addMovieToCollection(data.id, {
@@ -71,7 +73,8 @@ const AddMovieForm = () => {
         watched_by: data.watched_by,
         watch_link: data.watch_link,
         content_type: contentType,
-        seasons: dataToSubmit.seasons
+        seasons: dataToSubmit.seasons,
+        in_queue: inQueue,
       });
       
       toast.success('Movie added to your collection!');
@@ -144,6 +147,14 @@ const AddMovieForm = () => {
             </div>
           )}
         </div>
+      </div>
+      
+      <div>
+        <Label>In Queue</Label>
+        <Checkbox 
+          checked={inQueue}
+          onCheckedChange={(checked) => setInQueue(!!checked)}
+        />
       </div>
     </div>
   );
