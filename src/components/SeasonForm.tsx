@@ -34,7 +34,7 @@ const SeasonForm = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [seasonToDelete, setSeasonToDelete] = useState<number | null>(null);
   
-  const supportsSeasons = contentType === 'series' || contentType === 'anime' || contentType === 'cartoon';
+  const supportsSeasons = contentType === 'series' || contentType === 'anime';
 
   const addSeason = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -157,7 +157,7 @@ const SeasonForm = ({
         </>
       ) : (
         <p className="text-center text-muted-foreground py-4">
-          Season management is only available for series, anime, and cartoons.
+          Season management is only available for series and anime.
         </p>
       )}
       
