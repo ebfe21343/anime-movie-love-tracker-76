@@ -1,4 +1,3 @@
-
 import { Plus, Palette, Tv } from 'lucide-react';
 import { Season } from '@/types/movie';
 import { Button } from '@/components/ui/button';
@@ -32,8 +31,7 @@ export const SeasonsDisplay = ({
   onContentTypeChange,
   setEditMode,
 }: SeasonsDisplayProps) => {
-  // Remove the early return - always render the component regardless of contentType
-  // We'll conditionally render the UI based on contentType inside
+  const supportsSeasons = contentType === 'series' || contentType === 'anime';
   
   function getRatingBadgeColor(rating: number) {
     if (rating >= 8) return "bg-mint-500 text-white";
@@ -56,21 +54,11 @@ export const SeasonsDisplay = ({
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-medium flex items-center gap-2">
-                {contentType === 'cartoon' ? (
-                  <>
-                    <Palette className="h-5 w-5 text-lavender-500" />
-                    Seasons
-                  </>
-                ) : (
-                  <>
-                    <Tv className="h-5 w-5 text-lavender-500" />
-                    Seasons
-                  </>
-                )}
+                <Tv className="h-5 w-5 text-lavender-500" />
+                Seasons
               </h3>
               
               <div className="flex items-center gap-3">
-                {/* Always show content type selector */}
                 <div className="w-40">
                   <Select 
                     value={contentType} 
@@ -88,20 +76,21 @@ export const SeasonsDisplay = ({
                   </Select>
                 </div>
                 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-lavender-500/10 border-lavender-200 text-lavender-900"
-                  onClick={() => setEditMode(true)}
-                >
-                  <Plus className="h-3.5 w-3.5 mr-1" />
-                  Manage Seasons
-                </Button>
+                {supportsSeasons && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-lavender-500/10 border-lavender-200 text-lavender-900"
+                    onClick={() => setEditMode(true)}
+                  >
+                    <Plus className="h-3.5 w-3.5 mr-1" />
+                    Manage Seasons
+                  </Button>
+                )}
               </div>
             </div>
             
-            {/* Only show season content when contentType isn't 'movie' */}
-            {contentType !== 'movie' ? (
+            {supportsSeasons ? (
               seasons && seasons.length > 0 ? (
                 <div className="space-y-4">
                   {seasons.map((season) => (
@@ -157,7 +146,7 @@ export const SeasonsDisplay = ({
               )
             ) : (
               <p className="text-center text-muted-foreground py-4">
-                Season management is only available for series, cartoons, and anime.
+                Season management is only available for series and anime.
               </p>
             )}
           </div>

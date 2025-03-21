@@ -20,7 +20,7 @@ type SortOption =
   | 'personal_high'
   | 'personal_low';
 
-const MOVIES_PER_PAGE = 8;
+const MOVIES_PER_PAGE = 10;
 
 const MovieGrid = ({ movies }: MovieGridProps) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -169,7 +169,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {currentMovies.map((movie) => (
               <div key={movie.id} className="animate-enter" style={{ animationDelay: '0ms' }}>
                 <MovieCard movie={movie} />

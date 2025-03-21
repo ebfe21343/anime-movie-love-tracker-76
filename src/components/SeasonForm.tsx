@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Season } from '@/types/movie';
 import { SeasonHeader } from './season-form/SeasonHeader';
@@ -31,8 +30,7 @@ const SeasonForm = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [seasonToDelete, setSeasonToDelete] = useState<number | null>(null);
   
-  // Remove the early return - we always want to render the component regardless of contentType
-  // We just conditionally render the season management UI
+  const supportsSeasons = contentType === 'series' || contentType === 'anime';
 
   const addSeason = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -103,7 +101,6 @@ const SeasonForm = ({
     onSeasonsChange(updatedSeasons);
   };
   
-  // Always render the SeasonHeader with content type selector
   return (
     <div className="space-y-6">
       <SeasonHeader 
@@ -112,8 +109,7 @@ const SeasonForm = ({
         onContentTypeChange={onContentTypeChange} 
       />
       
-      {/* Only render season management UI when contentType isn't 'movie' */}
-      {contentType !== 'movie' && (
+      {supportsSeasons ? (
         <>
           <NewSeasonForm 
             newSeason={newSeason}
@@ -131,11 +127,9 @@ const SeasonForm = ({
             contentType={contentType}
           />
         </>
-      )}
-      
-      {contentType === 'movie' && (
+      ) : (
         <p className="text-center text-muted-foreground py-4">
-          Season management is only available for series, cartoons, and anime.
+          Season management is only available for series and anime.
         </p>
       )}
       

@@ -22,13 +22,13 @@ export function SeasonList({
   confirmRemoveSeason,
   contentType
 }: SeasonListProps) {
-  // Only render season content if it's not a movie
-  const showSeasonContent = contentType !== 'movie';
+  // Only render season content if content type supports seasons
+  const supportsSeasons = contentType === 'series' || contentType === 'anime';
   
   return (
     <>
       <h4 className="font-medium">Existing Seasons</h4>
-      {showSeasonContent ? (
+      {supportsSeasons ? (
         seasons.length > 0 ? (
           <div className="space-y-4">
             {seasons.map((season, index) => (
@@ -49,7 +49,7 @@ export function SeasonList({
         )
       ) : (
         <p className="text-center text-muted-foreground py-4">
-          Season management is only available for series, cartoons, and anime.
+          Season management is only available for series and anime.
         </p>
       )}
     </>
