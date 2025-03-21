@@ -1,8 +1,4 @@
 
-// We cannot modify SeasonForm.tsx directly as it's in read-only files
-// Instead we'll create a wrapper to pass the waiting parameter
-// This is a minimal change to make it work as requested
-
 import { useEffect } from 'react';
 import { Season } from '@/types/movie';
 import { SeasonsFormManager } from './season-form/SeasonsFormManager';
@@ -22,7 +18,7 @@ const SeasonForm = ({
   onContentTypeChange,
   waiting = false 
 }: SeasonFormProps) => {
-  // When in waiting mode, modify seasons to not have ratings/comments
+  // Set ratings and watched status to 0/false for waiting and queue items
   useEffect(() => {
     if (waiting && seasons.length > 0) {
       // Create a copy of seasons but clear ratings/comments for waiting mode
@@ -46,6 +42,7 @@ const SeasonForm = ({
       onSeasonsChange={onSeasonsChange}
       contentType={contentType}
       onContentTypeChange={onContentTypeChange}
+      waiting={waiting}
     />
   );
 };

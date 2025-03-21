@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -63,6 +62,17 @@ const AddMovieForm = () => {
   const onSubmit = async (data: MovieFormData) => {
     setIsLoading(true);
     try {
+      if (waiting || inQueue) {
+        data.personal_ratings = {
+          lyan: 0,
+          nastya: 0
+        };
+        data.watched_by = {
+          lyan: false,
+          nastya: false
+        };
+      }
+      
       const dataToSubmit = {
         ...data,
         content_type: contentType,
@@ -149,10 +159,6 @@ const AddMovieForm = () => {
                     Add to Queue
                   </Label>
                 </div>
-                
-                <p className="text-sm text-muted-foreground mt-1 ml-6">
-                  Movies in your waiting list or queue won't require ratings or comments until you watch them
-                </p>
               </div>
             </div>
           )}
