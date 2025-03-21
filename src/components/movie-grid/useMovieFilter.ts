@@ -1,4 +1,3 @@
-
 import { useMemo, useState } from 'react';
 import { Movie } from '@/types/movie';
 import { SortCategory, SortDirection, SortState } from './MovieGridSearchBar';
@@ -47,13 +46,13 @@ export function useMovieFilter(movies: Movie[]) {
     return [...filtered].sort((a, b) => {
       switch (effectiveSortOption) {
         case 'rating_high':
-          return b.rating.aggregate_rating - a.rating.aggregate_rating;
+          return (b.rating?.aggregate_rating || 0) - (a.rating?.aggregate_rating || 0);
         case 'rating_low':
-          return a.rating.aggregate_rating - b.rating.aggregate_rating;
+          return (a.rating?.aggregate_rating || 0) - (b.rating?.aggregate_rating || 0);
         case 'year_new':
-          return b.start_year - a.start_year;
+          return (b.start_year || 0) - (a.start_year || 0);
         case 'year_old':
-          return a.start_year - b.start_year;
+          return (a.start_year || 0) - (b.start_year || 0);
         case 'personal_high':
           const avgA = (a.personal_ratings.lyan + a.personal_ratings.nastya) / 2;
           const avgB = (b.personal_ratings.lyan + b.personal_ratings.nastya) / 2;
@@ -63,11 +62,11 @@ export function useMovieFilter(movies: Movie[]) {
           const avgBLow = (b.personal_ratings.lyan + b.personal_ratings.nastya) / 2;
           return avgALow - avgBLow;
         case 'recently_added':
-          return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
+          return new Date(b.added_at || 0).getTime() - new Date(a.added_at || 0).getTime();
         case 'recently_added_asc':
-          return new Date(a.added_at).getTime() - new Date(b.added_at).getTime();
+          return new Date(a.added_at || 0).getTime() - new Date(b.added_at || 0).getTime();
         default:
-          return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
+          return new Date(b.added_at || 0).getTime() - new Date(a.added_at || 0).getTime();
       }
     });
   }, [movies, searchQuery, effectiveSortOption]);
