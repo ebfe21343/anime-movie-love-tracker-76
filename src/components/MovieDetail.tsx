@@ -36,6 +36,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
   const [seasons, setSeasons] = useState(movie.seasons || []);
   const [cancelled, setCancelled] = useState(movie.cancelled || false);
   const [contentType, setContentType] = useState(movie.content_type || movie.type || 'movie');
+  const [inQueue, setInQueue] = useState(movie.in_queue || false);
   
   const isSeries = contentType === 'series' || contentType === 'anime';
   
@@ -50,6 +51,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
     setSeasons(movie.seasons || []);
     setCancelled(movie.cancelled || false);
     setContentType(movie.content_type || movie.type || 'movie');
+    setInQueue(movie.in_queue || false);
   }, [movie]);
   
   const handleContentTypeChange = (type: string) => {
@@ -77,6 +79,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
         },
         cancelled: cancelled,
         content_type: contentType,
+        in_queue: inQueue,
       };
 
       // Only include seasons if it's a series or anime
@@ -95,7 +98,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
     }
   };
   
-  const poster = movie.posters[0]?.url || '/placeholder.svg';
+  const poster = movie.posters?.[0]?.url || movie.poster_url || '/placeholder.svg';
   
   return (
     <div className="w-full animate-fade-in">
@@ -115,6 +118,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
               poster={poster}
               contentType={contentType}
               cancelled={cancelled}
+              inQueue={inQueue}
             />
             
             <CardContent className="p-4">
@@ -137,6 +141,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                   contentType={contentType}
                   cancelled={cancelled}
                   watchLink={watchLink}
+                  inQueue={inQueue}
+                  onInQueueChange={setInQueue}
                   onContentTypeChange={handleContentTypeChange}
                   onCancelledChange={setCancelled}
                   onWatchLinkChange={setWatchLink}
@@ -158,26 +164,29 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
             </CardContent>
           </Card>
           
-          <Card className="border-none glass rounded-2xl overflow-hidden">
-            <CardContent className="p-4">
-              <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
-                <Heart className="w-4 h-4 text-sakura-500" />
-                Personal Ratings
-              </h3>
-              
-              <RatingDisplay 
-                lyanRating={lyanRating}
-                nastyaRating={nastyaRating}
-                lyanWatched={lyanWatched}
-                nastyaWatched={nastyaWatched}
-                editMode={editMode}
-                onLyanRatingChange={setLyanRating}
-                onNastyaRatingChange={setNastyaRating}
-                onLyanWatchedChange={setLyanWatched}
-                onNastyaWatchedChange={setNastyaWatched}
-              />
-            </CardContent>
-          </Card>
+          {/* Only show ratings if not in queue */}
+          {!inQueue && (
+            <Card className="border-none glass rounded-2xl overflow-hidden">
+              <CardContent className="p-4">
+                <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-sakura-500" />
+                  Personal Ratings
+                </h3>
+                
+                <RatingDisplay 
+                  lyanRating={lyanRating}
+                  nastyaRating={nastyaRating}
+                  lyanWatched={lyanWatched}
+                  nastyaWatched={nastyaWatched}
+                  editMode={editMode}
+                  onLyanRatingChange={setLyanRating}
+                  onNastyaRatingChange={setNastyaRating}
+                  onLyanWatchedChange={setLyanWatched}
+                  onNastyaWatchedChange={setNastyaWatched}
+                />
+              </CardContent>
+            </Card>
+          )}
         </div>
         
         <div className="w-full lg:w-2/3">
@@ -207,10 +216,12 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
               onSeasonsChange={setSeasons}
               onContentTypeChange={handleContentTypeChange}
               setEditMode={setEditMode}
+              inQueue={inQueue}
             />
           )}
           
-          {(editMode || (lyanComment.trim() || nastyaComment.trim())) && (
+          {/* Only show comments if not in queue */}
+          {!inQueue && (editMode || (lyanComment.trim() || nastyaComment.trim())) && (
             <Card className="border-none glass rounded-2xl overflow-hidden">
               <CardContent className="p-6">
                 <h3 className="text-xl font-medium mb-4">Comments</h3>

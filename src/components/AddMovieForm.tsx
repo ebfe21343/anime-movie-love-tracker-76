@@ -139,6 +139,7 @@ const AddMovieForm = () => {
             isLoading={isLoading}
             preview={preview}
             contentType={contentType}
+            inQueue={inQueue}
           />
         </div>
         
@@ -148,7 +149,7 @@ const AddMovieForm = () => {
             contentType={contentType} 
           />
           
-          {preview && (
+          {preview && !inQueue && (
             <div className="pt-4 pb-2">
               <SeasonForm 
                 seasons={seasons} 

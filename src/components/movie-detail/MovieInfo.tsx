@@ -1,129 +1,83 @@
 
-import { useEffect, useState } from 'react';
-import { Film, Palette, Tv, X, ImageOff } from 'lucide-react';
 import { Movie } from '@/types/movie';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { getCachedImageUrl } from '@/lib/utils/image-cache';
+import { Star, ListTodo } from 'lucide-react';
 
 interface MovieInfoProps {
   movie: Movie;
   poster: string;
   contentType: string;
   cancelled: boolean;
+  inQueue?: boolean;
 }
 
-export const MovieInfo = ({ movie, poster, contentType, cancelled }: MovieInfoProps) => {
-  const isSeries = contentType === 'series' || contentType === 'anime' || contentType === 'cartoon';
-  const [cachedPosterUrl, setCachedPosterUrl] = useState(poster);
-  const [imageLoadError, setImageLoadError] = useState(false);
-  const hasValidPoster = poster && poster !== '/placeholder.svg' && !imageLoadError;
+export const MovieInfo = ({ 
+  movie, 
+  poster, 
+  contentType, 
+  cancelled,
+  inQueue = false
+}: MovieInfoProps) => {
+  let contentTypeLabel = "Movie";
+  if (contentType === "series") contentTypeLabel = "TV Series";
+  if (contentType === "anime") contentTypeLabel = "Anime";
   
-  useEffect(() => {
-    // Reset error state when poster changes
-    setImageLoadError(false);
-    
-    // Try to get cached version of the poster
-    const loadCachedImage = async () => {
-      if (poster && poster !== '/placeholder.svg') {
-        try {
-          const cachedUrl = await getCachedImageUrl(poster, movie.id, 'poster');
-          if (cachedUrl) {
-            setCachedPosterUrl(cachedUrl);
-          }
-        } catch (error) {
-          console.error('Failed to load cached image:', error);
-          // Fallback to original URL
-          setCachedPosterUrl(poster);
-        }
-      }
-    };
-    
-    loadCachedImage();
-    
-    // Clean up object URLs when component unmounts or poster changes
-    return () => {
-      if (cachedPosterUrl && cachedPosterUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(cachedPosterUrl);
-      }
-    };
-  }, [poster, movie.id]);
+  const year = movie.start_year || (movie.years && movie.years[0]);
+  const endYear = movie.end_year || (movie.years && movie.years[1]);
   
-  const handleImageError = () => {
-    console.error('Image failed to load:', poster);
-    setImageLoadError(true);
-  };
+  const imdbRating = movie.aggregate_rating || movie.rating;
   
   return (
-    <div className="relative aspect-[2/3]">
-      {hasValidPoster ? (
-        <img 
-          src={cachedPosterUrl} 
+    <div className="relative">
+      <div className={cn(
+        "relative aspect-[2/3] rounded-tl-2xl rounded-tr-2xl overflow-hidden",
+        cancelled && "opacity-70"
+      )}>
+        <img
+          src={poster}
           alt={movie.primary_title}
-          className="object-cover w-full h-full"
-          onError={handleImageError}
+          className="object-cover h-full w-full"
         />
-      ) : (
-        /* Default styled placeholder when no poster is available */
-        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-lavender-100 to-lavender-200 text-lavender-800">
-          <div className="mb-4 p-3 rounded-full bg-white/30">
-            <ImageOff className="w-16 h-16 text-lavender-600" />
-          </div>
-          <div className="text-center px-4">
-            <p className="text-md font-medium">No poster available</p>
-            <h3 className="mt-2 text-xl font-bold">{movie.primary_title}</h3>
-          </div>
+        
+        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-black/50 to-transparent" />
+        
+        <div className="absolute top-0 left-0 w-full p-2 flex flex-wrap gap-1">
+          <Badge className="bg-lavender-500 text-white border-none font-normal">
+            {contentTypeLabel}
+          </Badge>
+          
+          {cancelled && (
+            <Badge variant="destructive" className="border-none font-normal">
+              Cancelled
+            </Badge>
+          )}
+          
+          {inQueue && (
+            <Badge className="bg-sakura-500 text-white border-none font-normal flex items-center gap-1">
+              <ListTodo className="w-3 h-3" />
+              Watch Queue
+            </Badge>
+          )}
         </div>
-      )}
-      
-      {movie.is_adult && (
-        <Badge variant="destructive" className="absolute top-3 right-3">
-          18+
-        </Badge>
-      )}
-      
-      <div className="absolute top-3 left-3 flex flex-col gap-2">
-        {isSeries && (
-          <Badge 
-            variant="secondary" 
-            className="bg-lavender-500 text-white"
-          >
-            {contentType === 'cartoon' ? (
-              <>
-                <Palette className="h-3.5 w-3.5 mr-1" />
-                Cartoon
-              </>
-            ) : contentType === 'anime' ? (
-              <>
-                <Tv className="h-3.5 w-3.5 mr-1" />
-                Anime
-              </>
-            ) : (
-              <>
-                <Tv className="h-3.5 w-3.5 mr-1" />
-                Series
-              </>
-            )}
-          </Badge>
+        
+        {/* Rating Badge over the image */}
+        {imdbRating && !inQueue && (
+          <div className="absolute bottom-0 right-0 p-2">
+            <Badge className="bg-yellow-500/90 text-black border-none font-semibold flex items-center">
+              <Star className="w-3 h-3 fill-current mr-1" />
+              {imdbRating} IMDb
+            </Badge>
+          </div>
         )}
         
-        {!isSeries && (
-          <Badge 
-            variant="secondary" 
-            className="bg-lavender-500 text-white"
-          >
-            <Film className="h-3.5 w-3.5 mr-1" />
-            Movie
-          </Badge>
-        )}
-        
-        {cancelled && (
-          <Badge 
-            className="bg-red-500 text-white border-red-400 flex items-center gap-1"
-          >
-            <X className="h-3.5 w-3.5" />
-            Cancelled
-          </Badge>
+        {/* Year Range at bottom left */}
+        {year && (
+          <div className="absolute bottom-0 left-0 p-2">
+            <Badge variant="outline" className="bg-black/50 border-none text-white font-normal">
+              {year}{endYear && endYear !== year ? `-${endYear}` : ""}
+            </Badge>
+          </div>
         )}
       </div>
     </div>
