@@ -58,29 +58,33 @@ const Index = () => {
           </div>
         ) : (
           <Tabs defaultValue="collection" className="w-full">
-            <TabsList className="mb-6 mx-auto">
-              <TabsTrigger value="collection" className="flex items-center gap-2">
-                Collection
-                <span className="bg-lavender-100 text-lavender-800 px-2 py-0.5 rounded-full text-xs font-medium">
-                  {collectionCount}
-                </span>
-              </TabsTrigger>
-              <TabsTrigger value="queue" className="flex items-center gap-2">
-                <ListTodo className="h-4 w-4" />
-                Watch Queue
-                <span className="bg-lavender-100 text-lavender-800 px-2 py-0.5 rounded-full text-xs font-medium">
-                  {queueCount}
-                </span>
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <TabsList className="w-auto h-10">
+                <TabsTrigger value="collection" className="flex items-center gap-2">
+                  Collection
+                  <span className="bg-lavender-100 text-lavender-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                    {collectionCount}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value="queue" className="flex items-center gap-2">
+                  <ListTodo className="h-4 w-4" />
+                  Waiting
+                  <span className="bg-lavender-100 text-lavender-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                    {queueCount}
+                  </span>
+                </TabsTrigger>
+              </TabsList>
+              
+              <MovieGrid.SearchAndFilterBar movies={movies} />
+            </div>
             
             <TabsContent value="collection" className="focus-visible:outline-none focus-visible:ring-0">
-              <MovieGrid movies={collectionMovies} />
+              <MovieGrid movies={collectionMovies} showSearchBar={false} />
             </TabsContent>
             
             <TabsContent value="queue" className="focus-visible:outline-none focus-visible:ring-0">
               {queueMovies.length > 0 ? (
-                <MovieGrid movies={queueMovies} />
+                <MovieGrid movies={queueMovies} showSearchBar={false} />
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="w-16 h-16 mb-4 rounded-full bg-muted/50 flex items-center justify-center">
@@ -88,7 +92,7 @@ const Index = () => {
                   </div>
                   <h3 className="text-xl font-medium mb-2">Your watch queue is empty</h3>
                   <p className="text-muted-foreground mb-6 max-w-md">
-                    Add movies to your queue by checking the "In Queue" option when adding a new movie.
+                    Add movies to your queue by checking the "Waiting" option when adding a new movie.
                   </p>
                 </div>
               )}

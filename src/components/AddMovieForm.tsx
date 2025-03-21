@@ -114,6 +114,24 @@ const AddMovieForm = () => {
             errors={errors}
           />
           
+          {preview && (
+            <div className="mt-4 mb-4 bg-white/50 rounded-lg p-4 border border-sakura-100">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="in-queue"
+                  checked={inQueue}
+                  onCheckedChange={(checked) => setInQueue(!!checked)}
+                />
+                <Label htmlFor="in-queue" className="cursor-pointer font-medium">
+                  Add to Waiting List
+                </Label>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1 ml-6">
+                Movies in your waiting list won't require ratings or comments until you watch them
+              </p>
+            </div>
+          )}
+          
           <FormContainer
             register={register}
             handleSubmit={handleSubmit}
@@ -129,6 +147,7 @@ const AddMovieForm = () => {
             isLoading={isLoading}
             preview={preview}
             contentType={contentType}
+            inQueue={inQueue}
           />
         </div>
         
@@ -149,15 +168,6 @@ const AddMovieForm = () => {
             </div>
           )}
         </div>
-      </div>
-      
-      <div className="mt-4 flex items-center gap-2">
-        <Label htmlFor="in-queue" className="cursor-pointer">In Queue</Label>
-        <Checkbox 
-          id="in-queue"
-          checked={inQueue}
-          onCheckedChange={(checked) => setInQueue(!!checked)}
-        />
       </div>
     </div>
   );

@@ -19,6 +19,7 @@ interface FormContainerProps {
   isLoading: boolean;
   preview: any;
   contentType: string;
+  inQueue?: boolean;
 }
 
 const FormContainer = ({
@@ -35,25 +36,30 @@ const FormContainer = ({
   setNastyaWatched,
   isLoading,
   preview,
-  contentType
+  contentType,
+  inQueue = false
 }: FormContainerProps) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-6">
-        <PersonalRatingsSection
-          lyanRating={lyanRating}
-          nastyaRating={nastyaRating}
-          lyanWatched={lyanWatched}
-          nastyaWatched={nastyaWatched}
-          setLyanRating={setLyanRating}
-          setNastyaRating={setNastyaRating}
-          setLyanWatched={setLyanWatched}
-          setNastyaWatched={setNastyaWatched}
-        />
+        {!inQueue && (
+          <PersonalRatingsSection
+            lyanRating={lyanRating}
+            nastyaRating={nastyaRating}
+            lyanWatched={lyanWatched}
+            nastyaWatched={nastyaWatched}
+            setLyanRating={setLyanRating}
+            setNastyaRating={setNastyaRating}
+            setLyanWatched={setLyanWatched}
+            setNastyaWatched={setNastyaWatched}
+          />
+        )}
         
         <StreamingLinkSection register={register} />
         
-        <CommentsSection register={register} />
+        {!inQueue && (
+          <CommentsSection register={register} />
+        )}
         
         <SubmitButtonSection
           isLoading={isLoading}
