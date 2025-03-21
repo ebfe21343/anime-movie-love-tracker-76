@@ -38,7 +38,6 @@ export type Database = {
           start_year: number | null
           type: string | null
           votes_count: number | null
-          waiting: boolean | null
           watch_link: string | null
           watched_by: Json | null
           writers: Json | null
@@ -71,7 +70,6 @@ export type Database = {
           start_year?: number | null
           type?: string | null
           votes_count?: number | null
-          waiting?: boolean | null
           watch_link?: string | null
           watched_by?: Json | null
           writers?: Json | null
@@ -104,7 +102,6 @@ export type Database = {
           start_year?: number | null
           type?: string | null
           votes_count?: number | null
-          waiting?: boolean | null
           watch_link?: string | null
           watched_by?: Json | null
           writers?: Json | null

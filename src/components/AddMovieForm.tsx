@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -21,7 +22,6 @@ const AddMovieForm = () => {
   const [nastyaWatched, setNastyaWatched] = useState(true);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [contentType, setContentType] = useState('movie');
-  const [waiting, setWaiting] = useState(false);
   const [inQueue, setInQueue] = useState(false);
 
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<MovieFormData>({
@@ -62,23 +62,11 @@ const AddMovieForm = () => {
   const onSubmit = async (data: MovieFormData) => {
     setIsLoading(true);
     try {
-      if (waiting || inQueue) {
-        data.personal_ratings = {
-          lyan: 0,
-          nastya: 0
-        };
-        data.watched_by = {
-          lyan: false,
-          nastya: false
-        };
-      }
-      
       const dataToSubmit = {
         ...data,
         content_type: contentType,
         seasons: contentType !== 'movie' ? seasons : undefined,
         in_queue: inQueue,
-        waiting: waiting
       };
       
       await addMovieToCollection(data.id, {
@@ -89,7 +77,6 @@ const AddMovieForm = () => {
         content_type: contentType,
         seasons: dataToSubmit.seasons,
         in_queue: inQueue,
-        waiting: waiting
       });
       
       toast.success('Movie added to your collection!');
@@ -101,8 +88,6 @@ const AddMovieForm = () => {
       setNastyaWatched(true);
       setSeasons([]);
       setContentType('movie');
-      setWaiting(false);
-      setInQueue(false);
       navigate('/');
     } catch (error: any) {
       console.error('Error adding movie:', error);
@@ -129,40 +114,6 @@ const AddMovieForm = () => {
             errors={errors}
           />
           
-          {preview && (
-            <div className="mt-4 mb-4 bg-white/50 rounded-lg p-4 border border-sakura-100">
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="waiting"
-                    checked={waiting}
-                    onCheckedChange={(checked) => {
-                      setWaiting(!!checked);
-                      if (!!checked) setInQueue(false);
-                    }}
-                  />
-                  <Label htmlFor="waiting" className="cursor-pointer font-medium">
-                    Add to Waiting List
-                  </Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="in-queue"
-                    checked={inQueue}
-                    onCheckedChange={(checked) => {
-                      setInQueue(!!checked);
-                      if (!!checked) setWaiting(false);
-                    }}
-                  />
-                  <Label htmlFor="in-queue" className="cursor-pointer font-medium">
-                    Add to Queue
-                  </Label>
-                </div>
-              </div>
-            </div>
-          )}
-          
           <FormContainer
             register={register}
             handleSubmit={handleSubmit}
@@ -178,8 +129,6 @@ const AddMovieForm = () => {
             isLoading={isLoading}
             preview={preview}
             contentType={contentType}
-            inQueue={inQueue}
-            waiting={waiting}
           />
         </div>
         
@@ -196,11 +145,19 @@ const AddMovieForm = () => {
                 onSeasonsChange={setSeasons} 
                 contentType={contentType}
                 onContentTypeChange={handleContentTypeChange}
-                waiting={waiting || inQueue}
               />
             </div>
           )}
         </div>
+      </div>
+      
+      <div className="mt-4 flex items-center gap-2">
+        <Label htmlFor="in-queue" className="cursor-pointer">In Queue</Label>
+        <Checkbox 
+          id="in-queue"
+          checked={inQueue}
+          onCheckedChange={(checked) => setInQueue(!!checked)}
+        />
       </div>
     </div>
   );

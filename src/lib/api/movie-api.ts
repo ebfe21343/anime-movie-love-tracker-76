@@ -1,4 +1,3 @@
-
 import { Movie, Season } from '@/types/movie';
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMovieById } from './imdb-api';
@@ -38,8 +37,7 @@ export const addMovieToCollection = async (
     content_type?: string,
     cancelled?: boolean,
     seasons?: Season[],
-    in_queue?: boolean,
-    waiting?: boolean
+    in_queue?: boolean
   }
 ): Promise<Movie> => {
   try {
@@ -70,8 +68,7 @@ export const addMovieToCollection = async (
       comments: convertToJson(movieForDb.comments),
       watched_by: convertToJson(movieForDb.watched_by),
       seasons: movieForDb.seasons ? convertToJson(movieForDb.seasons) : null,
-      in_queue: personalData.in_queue || false,
-      waiting: personalData.waiting || false
+      in_queue: personalData.in_queue || false
     };
     
     const { data, error } = await supabase
@@ -122,8 +119,7 @@ export const updateMovieInCollection = async (
     cancelled: boolean,
     content_type: string,
     seasons: Season[],
-    in_queue: boolean,
-    waiting: boolean
+    in_queue: boolean
   }>
 ): Promise<Movie | null> => {
   try {
@@ -160,10 +156,6 @@ export const updateMovieInCollection = async (
     
     if (updates.in_queue !== undefined) {
       updatesForDb.in_queue = updates.in_queue;
-    }
-    
-    if (updates.waiting !== undefined) {
-      updatesForDb.waiting = updates.waiting;
     }
     
     const { data, error } = await supabase

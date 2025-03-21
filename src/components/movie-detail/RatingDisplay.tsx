@@ -1,3 +1,4 @@
+
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
@@ -10,8 +11,6 @@ interface RatingDisplayProps {
   lyanWatched: boolean;
   nastyaWatched: boolean;
   editMode: boolean;
-  waiting?: boolean;
-  inQueue?: boolean;
   onLyanRatingChange?: (rating: number) => void;
   onNastyaRatingChange?: (rating: number) => void;
   onLyanWatchedChange?: (watched: boolean) => void;
@@ -24,8 +23,6 @@ export const RatingDisplay = ({
   lyanWatched,
   nastyaWatched,
   editMode,
-  waiting = false,
-  inQueue = false,
   onLyanRatingChange,
   onNastyaRatingChange,
   onLyanWatchedChange,
@@ -65,19 +62,6 @@ export const RatingDisplay = ({
   };
 
   const averageRating = calculateAverage();
-  
-  // If the movie is in waiting list or queue, show a message instead of ratings
-  if (waiting || inQueue) {
-    return (
-      <div className="p-4 bg-muted/30 rounded-lg text-center">
-        {waiting ? (
-          <p className="text-sm text-muted-foreground">This movie is in your waiting list. You'll be able to rate it after watching.</p>
-        ) : (
-          <p className="text-sm text-muted-foreground">This movie is in your queue. You'll be able to rate it after watching.</p>
-        )}
-      </div>
-    );
-  }
 
   return (
     <>
