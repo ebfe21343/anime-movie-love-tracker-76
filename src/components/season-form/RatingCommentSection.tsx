@@ -27,16 +27,6 @@ export function RatingCommentSection({
   const ratingId = id ? `${person}-rating-${id}` : `${person}-new-rating`;
   const commentId = id ? `${person}-comment-${id}` : `${person}-new-comment`;
 
-  if (!watched) {
-    return (
-      <div className="opacity-50">
-        <p className="text-sm italic text-muted-foreground">
-          {personName} hasn't watched this yet
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div>
       <div className="flex justify-between items-center mb-2">

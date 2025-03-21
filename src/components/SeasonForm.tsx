@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Season } from '@/types/movie';
 import { Plus } from 'lucide-react';
@@ -92,6 +91,7 @@ const SeasonForm = ({
     onSeasonsChange(updatedSeasons);
   };
 
+  // We'll keep this function but it won't be exposed to users via UI checkboxes
   const updateSeasonWatched = (index: number, person: 'lyan' | 'nastya', watched: boolean) => {
     const updatedSeasons = [...seasons];
     updatedSeasons[index].watched_by[person] = watched;

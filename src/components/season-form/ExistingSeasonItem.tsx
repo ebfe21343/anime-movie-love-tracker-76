@@ -90,17 +90,6 @@ export function ExistingSeasonItem({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <div className="flex items-center space-x-2 mb-3">
-              <Checkbox
-                id={`nastya-watched-${index}`}
-                checked={season.watched_by?.nastya !== false}
-                onCheckedChange={(checked) => updateSeasonWatched(index, 'nastya', checked === true)}
-              />
-              <Label htmlFor={`nastya-watched-${index}`} className="text-sm cursor-pointer">
-                Nastya watched this season
-              </Label>
-            </div>
-            
             <RatingCommentSection
               person="nastya"
               rating={season.personal_ratings.nastya}
@@ -113,17 +102,6 @@ export function ExistingSeasonItem({
           </div>
           
           <div>
-            <div className="flex items-center space-x-2 mb-3">
-              <Checkbox
-                id={`lyan-watched-${index}`}
-                checked={season.watched_by?.lyan !== false}
-                onCheckedChange={(checked) => updateSeasonWatched(index, 'lyan', checked === true)}
-              />
-              <Label htmlFor={`lyan-watched-${index}`} className="text-sm cursor-pointer">
-                Lyan watched this season
-              </Label>
-            </div>
-            
             <RatingCommentSection
               person="lyan"
               rating={season.personal_ratings.lyan}

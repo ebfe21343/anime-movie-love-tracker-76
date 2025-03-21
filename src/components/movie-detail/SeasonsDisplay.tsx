@@ -60,6 +60,7 @@ export const SeasonsDisplay = ({
               </h3>
               
               <div className="flex items-center gap-3">
+                {/* Only show content type selector in edit mode */}
                 {editMode && (
                   <div className="w-40">
                     <Select 
@@ -79,15 +80,18 @@ export const SeasonsDisplay = ({
                   </div>
                 )}
                 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-lavender-500/10 border-lavender-200 text-lavender-900"
-                  onClick={() => setEditMode(true)}
-                >
-                  <Plus className="h-3.5 w-3.5 mr-1" />
-                  {editMode ? "Save Changes" : "Manage Seasons"}
-                </Button>
+                {/* Only show Manage Seasons button in edit mode */}
+                {editMode && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-lavender-500/10 border-lavender-200 text-lavender-900"
+                    onClick={() => setEditMode(true)}
+                  >
+                    <Plus className="h-3.5 w-3.5 mr-1" />
+                    Manage Seasons
+                  </Button>
+                )}
               </div>
             </div>
             

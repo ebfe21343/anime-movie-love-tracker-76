@@ -68,97 +68,47 @@ export function NewSeasonForm({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
           <div>
-            <div className="flex items-center space-x-2 mb-3">
-              <Checkbox
-                id="nastya-watched-new"
-                checked={newSeason.watched_by?.nastya !== false}
-                onCheckedChange={(checked) => setNewSeason({
-                  ...newSeason,
-                  watched_by: {
-                    ...newSeason.watched_by,
-                    nastya: checked === true
-                  }
-                })}
-              />
-              <Label htmlFor="nastya-watched-new" className="text-sm cursor-pointer">
-                Nastya watched this season
-              </Label>
-            </div>
-            
-            {newSeason.watched_by?.nastya !== false ? (
-              <RatingCommentSection
-                person="nastya"
-                rating={newSeason.personal_ratings.nastya}
-                comment={newSeason.comments.nastya}
-                onRatingChange={(value) => setNewSeason({
-                  ...newSeason,
-                  personal_ratings: {
-                    ...newSeason.personal_ratings,
-                    nastya: value
-                  }
-                })}
-                onCommentChange={(value) => setNewSeason({
-                  ...newSeason,
-                  comments: {
-                    ...newSeason.comments,
-                    nastya: value
-                  }
-                })}
-              />
-            ) : (
-              <div className="opacity-50">
-                <p className="text-sm italic text-muted-foreground">
-                  Nastya hasn't watched this yet
-                </p>
-              </div>
-            )}
+            <RatingCommentSection
+              person="nastya"
+              rating={newSeason.personal_ratings.nastya}
+              comment={newSeason.comments.nastya}
+              onRatingChange={(value) => setNewSeason({
+                ...newSeason,
+                personal_ratings: {
+                  ...newSeason.personal_ratings,
+                  nastya: value
+                }
+              })}
+              onCommentChange={(value) => setNewSeason({
+                ...newSeason,
+                comments: {
+                  ...newSeason.comments,
+                  nastya: value
+                }
+              })}
+            />
           </div>
           
           <div>
-            <div className="flex items-center space-x-2 mb-3">
-              <Checkbox
-                id="lyan-watched-new"
-                checked={newSeason.watched_by?.lyan !== false}
-                onCheckedChange={(checked) => setNewSeason({
-                  ...newSeason,
-                  watched_by: {
-                    ...newSeason.watched_by,
-                    lyan: checked === true
-                  }
-                })}
-              />
-              <Label htmlFor="lyan-watched-new" className="text-sm cursor-pointer">
-                Lyan watched this season
-              </Label>
-            </div>
-            
-            {newSeason.watched_by?.lyan !== false ? (
-              <RatingCommentSection
-                person="lyan"
-                rating={newSeason.personal_ratings.lyan}
-                comment={newSeason.comments.lyan}
-                onRatingChange={(value) => setNewSeason({
-                  ...newSeason,
-                  personal_ratings: {
-                    ...newSeason.personal_ratings,
-                    lyan: value
-                  }
-                })}
-                onCommentChange={(value) => setNewSeason({
-                  ...newSeason,
-                  comments: {
-                    ...newSeason.comments,
-                    lyan: value
-                  }
-                })}
-              />
-            ) : (
-              <div className="opacity-50">
-                <p className="text-sm italic text-muted-foreground">
-                  Lyan hasn't watched this yet
-                </p>
-              </div>
-            )}
+            <RatingCommentSection
+              person="lyan"
+              rating={newSeason.personal_ratings.lyan}
+              comment={newSeason.comments.lyan}
+              onRatingChange={(value) => setNewSeason({
+                ...newSeason,
+                personal_ratings: {
+                  ...newSeason.personal_ratings,
+                  lyan: value
+                }
+              })}
+              onCommentChange={(value) => setNewSeason({
+                ...newSeason,
+                comments: {
+                  ...newSeason.comments,
+                  lyan: value
+                }
+              })}
+            />
           </div>
         </div>
         
