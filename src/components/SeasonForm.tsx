@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Season } from '@/types/movie';
 import { Plus } from 'lucide-react';
@@ -40,15 +41,19 @@ const SeasonForm = ({
     e.preventDefault();
     e.stopPropagation();
     
+    console.log("Adding new season");
     const id = `season_${Date.now()}`;
     
-    onSeasonsChange([
+    const updatedSeasons = [
       ...seasons,
       {
         ...newSeason,
         id
       }
-    ]);
+    ];
+    
+    console.log("Updated seasons after add:", updatedSeasons);
+    onSeasonsChange(updatedSeasons);
     
     setNewSeason({
       season_number: newSeason.season_number + 1,
@@ -73,6 +78,7 @@ const SeasonForm = ({
     if (seasonToDelete !== null) {
       const updatedSeasons = [...seasons];
       updatedSeasons.splice(seasonToDelete, 1);
+      console.log("Updated seasons after remove:", updatedSeasons);
       onSeasonsChange(updatedSeasons);
       setIsDeleteDialogOpen(false);
       setSeasonToDelete(null);
@@ -82,12 +88,14 @@ const SeasonForm = ({
   const updateSeasonRating = (index: number, person: 'lyan' | 'nastya', value: number) => {
     const updatedSeasons = [...seasons];
     updatedSeasons[index].personal_ratings[person] = value;
+    console.log("Updated seasons after rating change:", updatedSeasons);
     onSeasonsChange(updatedSeasons);
   };
   
   const updateSeasonComment = (index: number, person: 'lyan' | 'nastya', value: string) => {
     const updatedSeasons = [...seasons];
     updatedSeasons[index].comments[person] = value;
+    console.log("Updated seasons after comment change:", updatedSeasons);
     onSeasonsChange(updatedSeasons);
   };
 
@@ -95,6 +103,7 @@ const SeasonForm = ({
   const updateSeasonWatched = (index: number, person: 'lyan' | 'nastya', watched: boolean) => {
     const updatedSeasons = [...seasons];
     updatedSeasons[index].watched_by[person] = watched;
+    console.log("Updated seasons after watched change:", updatedSeasons);
     onSeasonsChange(updatedSeasons);
   };
   
@@ -104,6 +113,7 @@ const SeasonForm = ({
       ...updatedSeasons[index],
       cancelled
     };
+    console.log("Updated seasons after cancelled change:", updatedSeasons);
     onSeasonsChange(updatedSeasons);
   };
   
@@ -113,6 +123,7 @@ const SeasonForm = ({
       ...updatedSeasons[index],
       [field]: value
     };
+    console.log("Updated seasons after field change:", updatedSeasons);
     onSeasonsChange(updatedSeasons);
   };
   

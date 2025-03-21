@@ -53,12 +53,15 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
   }, [movie]);
   
   const handleContentTypeChange = (type: string) => {
+    console.log("Content type changed to:", type);
     setContentType(type);
   };
   
   const handleSaveChanges = async () => {
     try {
-      await updateMovieInCollection(movie.id, {
+      console.log("Saving changes with seasons:", seasons);
+      
+      const updateData = {
         watch_link: watchLink,
         personal_ratings: {
           lyan: lyanRating,
@@ -74,8 +77,14 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
         },
         cancelled: cancelled,
         content_type: contentType,
-        seasons: isSeries ? seasons : undefined,
-      });
+      };
+
+      // Only include seasons if it's a series or anime
+      if (isSeries) {
+        Object.assign(updateData, { seasons: seasons });
+      }
+      
+      await updateMovieInCollection(movie.id, updateData);
       
       toast.success('Movie details updated!');
       setEditMode(false);
@@ -201,21 +210,23 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
             />
           )}
           
-          <Card className="border-none glass rounded-2xl overflow-hidden">
-            <CardContent className="p-6">
-              <h3 className="text-xl font-medium mb-4">Comments</h3>
-              
-              <CommentsSection 
-                lyanComment={lyanComment}
-                nastyaComment={nastyaComment}
-                lyanWatched={lyanWatched}
-                nastyaWatched={nastyaWatched}
-                editMode={editMode}
-                onLyanCommentChange={setLyanComment}
-                onNastyaCommentChange={setNastyaComment}
-              />
-            </CardContent>
-          </Card>
+          {(editMode || (lyanComment.trim() || nastyaComment.trim())) && (
+            <Card className="border-none glass rounded-2xl overflow-hidden">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-medium mb-4">Comments</h3>
+                
+                <CommentsSection 
+                  lyanComment={lyanComment}
+                  nastyaComment={nastyaComment}
+                  lyanWatched={lyanWatched}
+                  nastyaWatched={nastyaWatched}
+                  editMode={editMode}
+                  onLyanCommentChange={setLyanComment}
+                  onNastyaCommentChange={setNastyaComment}
+                />
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

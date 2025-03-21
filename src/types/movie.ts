@@ -58,7 +58,7 @@ export interface Movie {
   added_at: string;
   cancelled: boolean;
   seasons?: Season[];
-  content_type: string; // Changed from optional to required
+  content_type: string;
 }
 
 interface Credit {

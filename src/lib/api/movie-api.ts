@@ -122,6 +122,8 @@ export const updateMovieInCollection = async (
   }>
 ): Promise<Movie | null> => {
   try {
+    console.log("Updating movie with seasons:", updates.seasons);
+    
     const updatesForDb: any = {};
     
     if (updates.personal_ratings) {
@@ -150,6 +152,7 @@ export const updateMovieInCollection = async (
     
     if (updates.seasons !== undefined) {
       updatesForDb.seasons = convertToJson(updates.seasons);
+      console.log("Converted seasons for DB:", updatesForDb.seasons);
     }
     
     const { data, error } = await supabase
@@ -159,7 +162,11 @@ export const updateMovieInCollection = async (
       .select()
       .single();
     
-    if (error) throw error;
+    if (error) {
+      console.error("Supabase update error:", error);
+      throw error;
+    }
+    
     if (!data) return null;
     
     return mapDbMovieToMovie(data);

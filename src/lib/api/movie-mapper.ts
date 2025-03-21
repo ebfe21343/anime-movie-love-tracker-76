@@ -6,6 +6,11 @@ import { safeParseJson } from '../utils/json-utils';
  * Maps a database movie record to the application Movie type
  */
 export function mapDbMovieToMovie(data: any): Movie {
+  // Ensure watched_by has default values if undefined or null
+  const watched_by = safeParseJson<{ lyan: boolean; nastya: boolean; }>(
+    data.watched_by, { lyan: true, nastya: true }
+  );
+
   return {
     id: data.id,
     type: data.type || '',
@@ -47,9 +52,7 @@ export function mapDbMovieToMovie(data: any): Movie {
     comments: safeParseJson<{ lyan: string; nastya: string; }>(
       data.comments, { lyan: '', nastya: '' }
     ),
-    watched_by: safeParseJson<{ lyan: boolean; nastya: boolean; }>(
-      data.watched_by, { lyan: true, nastya: true }
-    ),
+    watched_by: watched_by,
     watch_link: data.watch_link || '',
     added_at: data.added_at || new Date().toISOString(),
     cancelled: data.cancelled || false,
