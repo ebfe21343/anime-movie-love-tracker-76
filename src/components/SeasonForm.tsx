@@ -34,7 +34,7 @@ const SeasonForm = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [seasonToDelete, setSeasonToDelete] = useState<number | null>(null);
   
-  const supportsSeasons = contentType === 'series' || contentType === 'anime';
+  const supportsSeasons = contentType === 'series' || contentType === 'anime' || contentType === 'cartoon';
 
   const addSeason = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -64,7 +64,6 @@ const SeasonForm = ({
       cancelled: false
     });
     
-    // Hide the form after adding
     setShowNewSeasonForm(false);
   };
   
@@ -98,7 +97,6 @@ const SeasonForm = ({
     onSeasonsChange(updatedSeasons);
   };
 
-  // We'll keep this function but it won't be exposed to users via UI checkboxes
   const updateSeasonWatched = (index: number, person: 'lyan' | 'nastya', watched: boolean) => {
     const updatedSeasons = [...seasons];
     updatedSeasons[index].watched_by[person] = watched;
@@ -159,7 +157,7 @@ const SeasonForm = ({
         </>
       ) : (
         <p className="text-center text-muted-foreground py-4">
-          Season management is only available for series and anime.
+          Season management is only available for series, anime, and cartoons.
         </p>
       )}
       

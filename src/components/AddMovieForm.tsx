@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -130,6 +129,7 @@ const AddMovieForm = () => {
                   <SelectItem value="movie">Movie</SelectItem>
                   <SelectItem value="series">TV Series</SelectItem>
                   <SelectItem value="anime">Anime</SelectItem>
+                  <SelectItem value="cartoon">Cartoon</SelectItem>
                 </SelectContent>
               </Select>
             </div>
