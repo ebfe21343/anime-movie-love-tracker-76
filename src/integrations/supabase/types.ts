@@ -38,6 +38,7 @@ export type Database = {
           type: string | null
           votes_count: number | null
           watch_link: string | null
+          watched_by: Json | null
           writers: Json | null
         }
         Insert: {
@@ -68,6 +69,7 @@ export type Database = {
           type?: string | null
           votes_count?: number | null
           watch_link?: string | null
+          watched_by?: Json | null
           writers?: Json | null
         }
         Update: {
@@ -98,6 +100,7 @@ export type Database = {
           type?: string | null
           votes_count?: number | null
           watch_link?: string | null
+          watched_by?: Json | null
           writers?: Json | null
         }
         Relationships: []

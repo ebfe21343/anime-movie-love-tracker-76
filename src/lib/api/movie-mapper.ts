@@ -1,4 +1,3 @@
-
 import { Movie, Season } from '@/types/movie';
 import { safeParseJson } from '../utils/json-utils';
 

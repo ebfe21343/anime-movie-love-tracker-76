@@ -1,4 +1,3 @@
-
 import { Movie, Season } from '@/types/movie';
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMovieById } from './imdb-api';
@@ -122,8 +121,6 @@ export const updateMovieInCollection = async (
   }>
 ): Promise<Movie | null> => {
   try {
-    console.log("Updating movie with seasons:", updates.seasons);
-    
     const updatesForDb: any = {};
     
     if (updates.personal_ratings) {
