@@ -62,7 +62,7 @@ export const CommentsSection = ({
               />
             ) : (
               <div className="opacity-50">
-                <p className="text-sm italic text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Nastya hasn't watched this yet
                 </p>
               </div>
@@ -82,7 +82,7 @@ export const CommentsSection = ({
               />
             ) : (
               <div className="opacity-50">
-                <p className="text-sm italic text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Lyan hasn't watched this yet
                 </p>
               </div>

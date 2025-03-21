@@ -42,16 +42,18 @@ export function RatingCommentSection({
         step={1}
         onValueChange={(values) => onRatingChange(values[0])}
       />
-      <div className="mt-2">
-        <Label htmlFor={commentId} className="text-sm">Comment</Label>
-        <Textarea
-          id={commentId}
-          value={comment}
-          onChange={(e) => onCommentChange(e.target.value)}
-          className="mt-1 resize-none h-20"
-          placeholder={`${personName}'s thoughts...`}
-        />
-      </div>
+      {(watched && (comment.trim() !== '' || id === '')) && (
+        <div className="mt-2">
+          <Label htmlFor={commentId} className="text-sm">Comment</Label>
+          <Textarea
+            id={commentId}
+            value={comment}
+            onChange={(e) => onCommentChange(e.target.value)}
+            className="mt-1 resize-none h-20"
+            placeholder={`${personName}'s thoughts...`}
+          />
+        </div>
+      )}
     </div>
   );
 }

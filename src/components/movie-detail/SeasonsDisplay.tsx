@@ -58,41 +58,6 @@ export const SeasonsDisplay = ({
                 <Tv className="h-5 w-5 text-lavender-500" />
                 Seasons
               </h3>
-              
-              <div className="flex items-center gap-3">
-                {/* Only show content type selector in edit mode */}
-                {editMode && (
-                  <div className="w-40">
-                    <Select 
-                      value={contentType} 
-                      onValueChange={onContentTypeChange}
-                    >
-                      <SelectTrigger id="content-type" className="h-9">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="movie">Movie</SelectItem>
-                        <SelectItem value="series">Series</SelectItem>
-                        <SelectItem value="cartoon">Cartoon</SelectItem>
-                        <SelectItem value="anime">Anime</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-                
-                {/* Only show Manage Seasons button in edit mode */}
-                {editMode && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-lavender-500/10 border-lavender-200 text-lavender-900"
-                    onClick={() => setEditMode(true)}
-                  >
-                    <Plus className="h-3.5 w-3.5 mr-1" />
-                    Manage Seasons
-                  </Button>
-                )}
-              </div>
             </div>
             
             {supportsSeasons ? (
@@ -123,22 +88,27 @@ export const SeasonsDisplay = ({
                         </div>
                         
                         <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <p className="font-medium mb-1">Lyan's Rating: {season.personal_ratings.lyan}/10</p>
-                            {season.comments.lyan ? (
-                              <p className="text-sm italic">{season.comments.lyan}</p>
-                            ) : (
-                              <p className="text-xs text-muted-foreground italic">No comment</p>
-                            )}
-                          </div>
-                          <div>
-                            <p className="font-medium mb-1">Nastya's Rating: {season.personal_ratings.nastya}/10</p>
-                            {season.comments.nastya ? (
-                              <p className="text-sm italic">{season.comments.nastya}</p>
-                            ) : (
-                              <p className="text-xs text-muted-foreground italic">No comment</p>
-                            )}
-                          </div>
+                          {season.comments.lyan ? (
+                            <div>
+                              <p className="font-medium mb-1">Lyan's Rating: {season.personal_ratings.lyan}/10</p>
+                              <p className="text-sm">{season.comments.lyan}</p>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="font-medium mb-1">Lyan's Rating: {season.personal_ratings.lyan}/10</p>
+                            </div>
+                          )}
+                          
+                          {season.comments.nastya ? (
+                            <div>
+                              <p className="font-medium mb-1">Nastya's Rating: {season.personal_ratings.nastya}/10</p>
+                              <p className="text-sm">{season.comments.nastya}</p>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="font-medium mb-1">Nastya's Rating: {season.personal_ratings.nastya}/10</p>
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -162,3 +132,4 @@ export const SeasonsDisplay = ({
 };
 
 import { Calendar } from 'lucide-react';
+
