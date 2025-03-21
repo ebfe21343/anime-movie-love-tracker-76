@@ -20,7 +20,7 @@ const SubmitButtonSection = ({ isLoading, preview, contentType, inQueue = false 
       <Button
         type="submit"
         disabled={isLoading || !preview}
-        className="bg-sakura-500 hover:bg-sakura-600 text-white"
+        className="bg-sakura-500 hover:bg-sakura-600 text-white h-10"
       >
         {isLoading ? (
           <>

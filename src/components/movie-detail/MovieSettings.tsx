@@ -40,7 +40,7 @@ export function MovieSettings({
           value={contentType}
           onValueChange={onContentTypeChange}
         >
-          <SelectTrigger id="content-type">
+          <SelectTrigger id="content-type" className="h-10">
             <SelectValue placeholder="Select a content type" />
           </SelectTrigger>
           <SelectContent>
@@ -61,7 +61,7 @@ export function MovieSettings({
             value={watchLink}
             onChange={(e) => onWatchLinkChange(e.target.value)}
             placeholder="https://..."
-            className="pl-10"
+            className="pl-10 h-10"
           />
         </div>
       </div>

@@ -202,6 +202,10 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
   const currentMovies = filteredAndSortedMovies.slice(0, visibleMoviesCount);
   const hasMoreMovies = visibleMoviesCount < filteredAndSortedMovies.length;
 
+  // Count movies by type (completed vs queue)
+  const completedCount = movies.filter(movie => !movie.in_queue).length;
+  const queueCount = movies.filter(movie => movie.in_queue).length;
+
   return (
     <div className="w-full animate-fade-in">
       <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -210,11 +214,21 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
             defaultValue="completed" 
             value={viewMode} 
             onValueChange={handleViewModeChange}
-            className="bg-white/50 backdrop-blur-sm rounded-lg p-1 border border-sakura-200"
+            className="bg-white/50 backdrop-blur-sm rounded-lg border border-sakura-200 h-10"
           >
-            <TabsList className="grid grid-cols-2">
-              <TabsTrigger value="completed">Completed</TabsTrigger>
-              <TabsTrigger value="queue">In Queue</TabsTrigger>
+            <TabsList className="grid grid-cols-2 h-full">
+              <TabsTrigger value="completed" className="h-full flex items-center gap-2">
+                Completed
+                <span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-sakura-100 text-sakura-700 text-xs font-medium">
+                  {completedCount}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="queue" className="h-full flex items-center gap-2">
+                In Queue
+                <span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-sakura-100 text-sakura-700 text-xs font-medium">
+                  {queueCount}
+                </span>
+              </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -225,7 +239,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
             placeholder="Search by title, genre, or comments (including season comments)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white/50 backdrop-blur-sm border-sakura-200 focus-visible:ring-sakura-400"
+            className="pl-10 h-10 bg-white/50 backdrop-blur-sm border-sakura-200 focus-visible:ring-sakura-400"
           />
         </div>
         
@@ -234,7 +248,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="flex items-center gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
+                className="flex items-center h-10 gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
               >
                 {sortState.category === 'recently_added' && <CalendarDays className="h-4 w-4" />}
                 {sortState.category === 'rating' && <Star className="h-4 w-4" />}
