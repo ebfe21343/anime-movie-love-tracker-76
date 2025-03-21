@@ -47,6 +47,9 @@ export function mapDbMovieToMovie(data: any): Movie {
     comments: safeParseJson<{ lyan: string; nastya: string; }>(
       data.comments, { lyan: '', nastya: '' }
     ),
+    watched_by: safeParseJson<{ lyan: boolean; nastya: boolean; }>(
+      data.watched_by, { lyan: true, nastya: true }
+    ),
     watch_link: data.watch_link || '',
     added_at: data.added_at || new Date().toISOString(),
     cancelled: data.cancelled || false,
@@ -59,10 +62,11 @@ export function mapDbMovieToMovie(data: any): Movie {
  * Maps movie data to database format for insertion or update
  */
 export function mapMovieToDbMovie(
-  movieData: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'cancelled' | 'seasons' | 'content_type'>, 
+  movieData: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'cancelled' | 'seasons' | 'content_type' | 'watched_by'>, 
   personalData: {
     personal_ratings: { lyan: number; nastya: number; };
     comments: { lyan: string; nastya: string; };
+    watched_by?: { lyan: boolean; nastya: boolean; };
     watch_link: string;
     content_type?: string;
     cancelled?: boolean;
@@ -94,6 +98,7 @@ export function mapMovieToDbMovie(
     casts: movieData.casts || [],
     personal_ratings: personalData.personal_ratings,
     comments: personalData.comments,
+    watched_by: personalData.watched_by || { lyan: true, nastya: true },
     watch_link: personalData.watch_link,
     cancelled: personalData.cancelled || false,
     seasons: personalData.seasons || null

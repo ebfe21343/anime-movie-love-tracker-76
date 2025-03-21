@@ -31,11 +31,13 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
   const [nastyaRating, setNastyaRating] = useState(movie.personal_ratings.nastya);
   const [lyanComment, setLyanComment] = useState(movie.comments.lyan);
   const [nastyaComment, setNastyaComment] = useState(movie.comments.nastya);
+  const [lyanWatched, setLyanWatched] = useState(movie.watched_by?.lyan !== false);
+  const [nastyaWatched, setNastyaWatched] = useState(movie.watched_by?.nastya !== false);
   const [seasons, setSeasons] = useState(movie.seasons || []);
   const [cancelled, setCancelled] = useState(movie.cancelled || false);
   const [contentType, setContentType] = useState(movie.content_type || movie.type || 'movie');
   
-  const isSeries = contentType === 'series' || contentType === 'anime' || contentType === 'cartoon';
+  const isSeries = contentType === 'series' || contentType === 'anime';
   
   useEffect(() => {
     setWatchLink(movie.watch_link);
@@ -43,6 +45,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
     setNastyaRating(movie.personal_ratings.nastya);
     setLyanComment(movie.comments.lyan);
     setNastyaComment(movie.comments.nastya);
+    setLyanWatched(movie.watched_by?.lyan !== false);
+    setNastyaWatched(movie.watched_by?.nastya !== false);
     setSeasons(movie.seasons || []);
     setCancelled(movie.cancelled || false);
     setContentType(movie.content_type || movie.type || 'movie');
@@ -63,6 +67,10 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
         comments: {
           lyan: lyanComment,
           nastya: nastyaComment,
+        },
+        watched_by: {
+          lyan: lyanWatched,
+          nastya: nastyaWatched,
         },
         cancelled: cancelled,
         content_type: contentType,
@@ -151,9 +159,13 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
               <RatingDisplay 
                 lyanRating={lyanRating}
                 nastyaRating={nastyaRating}
+                lyanWatched={lyanWatched}
+                nastyaWatched={nastyaWatched}
                 editMode={editMode}
                 onLyanRatingChange={setLyanRating}
                 onNastyaRatingChange={setNastyaRating}
+                onLyanWatchedChange={setLyanWatched}
+                onNastyaWatchedChange={setNastyaWatched}
               />
             </CardContent>
           </Card>
@@ -196,6 +208,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
               <CommentsSection 
                 lyanComment={lyanComment}
                 nastyaComment={nastyaComment}
+                lyanWatched={lyanWatched}
+                nastyaWatched={nastyaWatched}
                 editMode={editMode}
                 onLyanCommentChange={setLyanComment}
                 onNastyaCommentChange={setNastyaComment}

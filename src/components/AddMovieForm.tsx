@@ -16,6 +16,8 @@ const AddMovieForm = () => {
   const [preview, setPreview] = useState<any>(null);
   const [lyanRating, setLyanRating] = useState(5);
   const [nastyaRating, setNastyaRating] = useState(5);
+  const [lyanWatched, setLyanWatched] = useState(true);
+  const [nastyaWatched, setNastyaWatched] = useState(true);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [contentType, setContentType] = useState('movie');
 
@@ -30,6 +32,10 @@ const AddMovieForm = () => {
         lyan: '',
         nastya: ''
       },
+      watched_by: {
+        lyan: true,
+        nastya: true
+      },
       watch_link: '',
       seasons: []
     }
@@ -38,7 +44,9 @@ const AddMovieForm = () => {
   useEffect(() => {
     setValue('personal_ratings.lyan', lyanRating);
     setValue('personal_ratings.nastya', nastyaRating);
-  }, [lyanRating, nastyaRating, setValue]);
+    setValue('watched_by.lyan', lyanWatched);
+    setValue('watched_by.nastya', nastyaWatched);
+  }, [lyanRating, nastyaRating, lyanWatched, nastyaWatched, setValue]);
 
   useEffect(() => {
     setValue('seasons', seasons);
@@ -60,6 +68,7 @@ const AddMovieForm = () => {
       await addMovieToCollection(data.id, {
         personal_ratings: data.personal_ratings,
         comments: data.comments,
+        watched_by: data.watched_by,
         watch_link: data.watch_link,
         content_type: contentType,
         seasons: dataToSubmit.seasons
@@ -70,6 +79,8 @@ const AddMovieForm = () => {
       setPreview(null);
       setLyanRating(5);
       setNastyaRating(5);
+      setLyanWatched(true);
+      setNastyaWatched(true);
       setSeasons([]);
       setContentType('movie');
       navigate('/');
@@ -104,8 +115,12 @@ const AddMovieForm = () => {
             onSubmit={onSubmit}
             lyanRating={lyanRating}
             nastyaRating={nastyaRating}
+            lyanWatched={lyanWatched}
+            nastyaWatched={nastyaWatched}
             setLyanRating={setLyanRating}
             setNastyaRating={setNastyaRating}
+            setLyanWatched={setLyanWatched}
+            setNastyaWatched={setNastyaWatched}
             isLoading={isLoading}
             preview={preview}
             contentType={contentType}

@@ -8,6 +8,7 @@ interface SeasonListProps {
   updateSeason: (index: number, field: string, value: any) => void;
   updateSeasonRating: (index: number, person: 'lyan' | 'nastya', value: number) => void;
   updateSeasonComment: (index: number, person: 'lyan' | 'nastya', value: string) => void;
+  updateSeasonWatched: (index: number, person: 'lyan' | 'nastya', watched: boolean) => void;
   updateSeasonCancelled: (index: number, cancelled: boolean) => void;
   confirmRemoveSeason: (index: number) => void;
   contentType: string;
@@ -18,6 +19,7 @@ export function SeasonList({
   updateSeason,
   updateSeasonRating,
   updateSeasonComment,
+  updateSeasonWatched,
   updateSeasonCancelled,
   confirmRemoveSeason,
   contentType
@@ -39,6 +41,7 @@ export function SeasonList({
                 updateSeason={updateSeason}
                 updateSeasonRating={updateSeasonRating}
                 updateSeasonComment={updateSeasonComment}
+                updateSeasonWatched={updateSeasonWatched}
                 updateSeasonCancelled={updateSeasonCancelled}
                 confirmRemoveSeason={confirmRemoveSeason}
               />

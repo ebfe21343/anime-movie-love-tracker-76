@@ -10,8 +10,12 @@ interface FormContainerProps {
   onSubmit: (data: any) => Promise<void>;
   lyanRating: number;
   nastyaRating: number;
+  lyanWatched: boolean;
+  nastyaWatched: boolean;
   setLyanRating: (rating: number) => void;
   setNastyaRating: (rating: number) => void;
+  setLyanWatched: (watched: boolean) => void;
+  setNastyaWatched: (watched: boolean) => void;
   isLoading: boolean;
   preview: any;
   contentType: string;
@@ -23,8 +27,12 @@ const FormContainer = ({
   onSubmit,
   lyanRating,
   nastyaRating,
+  lyanWatched,
+  nastyaWatched,
   setLyanRating,
   setNastyaRating,
+  setLyanWatched,
+  setNastyaWatched,
   isLoading,
   preview,
   contentType
@@ -35,8 +43,12 @@ const FormContainer = ({
         <PersonalRatingsSection
           lyanRating={lyanRating}
           nastyaRating={nastyaRating}
+          lyanWatched={lyanWatched}
+          nastyaWatched={nastyaWatched}
           setLyanRating={setLyanRating}
           setNastyaRating={setNastyaRating}
+          setLyanWatched={setLyanWatched}
+          setNastyaWatched={setNastyaWatched}
         />
         
         <StreamingLinkSection register={register} />

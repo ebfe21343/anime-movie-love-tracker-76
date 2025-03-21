@@ -50,6 +50,10 @@ export interface Movie {
     lyan: string;
     nastya: string;
   };
+  watched_by: {
+    lyan: boolean;
+    nastya: boolean;
+  };
   watch_link: string;
   added_at: string;
   cancelled: boolean;
@@ -86,12 +90,16 @@ export interface Season {
     lyan: string;
     nastya: string;
   };
+  watched_by: {
+    lyan: boolean;
+    nastya: boolean;
+  };
   cancelled: boolean;
 }
 
 export interface MovieResponse {
   data: {
-    title: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'cancelled' | 'seasons' | 'content_type'>;
+    title: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'cancelled' | 'seasons' | 'content_type' | 'watched_by'>;
   };
 }
 
@@ -105,8 +113,12 @@ export interface MovieFormData {
     lyan: string;
     nastya: string;
   };
+  watched_by: {
+    lyan: boolean;
+    nastya: boolean;
+  };
   watch_link: string;
-  content_type: string; // Changed from optional to required
+  content_type: string;
   cancelled?: boolean;
   seasons?: Season[];
 }

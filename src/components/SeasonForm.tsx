@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Season } from '@/types/movie';
 import { SeasonHeader } from './season-form/SeasonHeader';
@@ -24,6 +25,7 @@ const SeasonForm = ({
     year: new Date().getFullYear(),
     personal_ratings: { lyan: 5, nastya: 5 },
     comments: { lyan: '', nastya: '' },
+    watched_by: { lyan: true, nastya: true },
     cancelled: false
   });
   
@@ -52,6 +54,7 @@ const SeasonForm = ({
       year: new Date().getFullYear(),
       personal_ratings: { lyan: 5, nastya: 5 },
       comments: { lyan: '', nastya: '' },
+      watched_by: { lyan: true, nastya: true },
       cancelled: false
     });
   };
@@ -80,6 +83,12 @@ const SeasonForm = ({
   const updateSeasonComment = (index: number, person: 'lyan' | 'nastya', value: string) => {
     const updatedSeasons = [...seasons];
     updatedSeasons[index].comments[person] = value;
+    onSeasonsChange(updatedSeasons);
+  };
+
+  const updateSeasonWatched = (index: number, person: 'lyan' | 'nastya', watched: boolean) => {
+    const updatedSeasons = [...seasons];
+    updatedSeasons[index].watched_by[person] = watched;
     onSeasonsChange(updatedSeasons);
   };
   
@@ -122,6 +131,7 @@ const SeasonForm = ({
             updateSeason={updateSeason}
             updateSeasonRating={updateSeasonRating}
             updateSeasonComment={updateSeasonComment}
+            updateSeasonWatched={updateSeasonWatched}
             updateSeasonCancelled={updateSeasonCancelled}
             confirmRemoveSeason={confirmRemoveSeason}
             contentType={contentType}

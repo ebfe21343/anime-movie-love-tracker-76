@@ -33,6 +33,7 @@ export const addMovieToCollection = async (
   personalData: { 
     personal_ratings: { lyan: number; nastya: number; },
     comments: { lyan: string; nastya: string; },
+    watched_by: { lyan: boolean; nastya: boolean; },
     watch_link: string,
     content_type?: string,
     cancelled?: boolean,
@@ -66,6 +67,7 @@ export const addMovieToCollection = async (
       casts: convertToJson(movieForDb.casts),
       personal_ratings: convertToJson(movieForDb.personal_ratings),
       comments: convertToJson(movieForDb.comments),
+      watched_by: convertToJson(movieForDb.watched_by),
       seasons: movieForDb.seasons ? convertToJson(movieForDb.seasons) : null
     };
     
@@ -112,6 +114,7 @@ export const updateMovieInCollection = async (
   updates: Partial<{
     personal_ratings: { lyan: number; nastya: number; },
     comments: { lyan: string; nastya: string; },
+    watched_by: { lyan: boolean; nastya: boolean; },
     watch_link: string,
     cancelled: boolean,
     content_type: string,
@@ -127,6 +130,10 @@ export const updateMovieInCollection = async (
     
     if (updates.comments) {
       updatesForDb.comments = convertToJson(updates.comments);
+    }
+    
+    if (updates.watched_by !== undefined) {
+      updatesForDb.watched_by = convertToJson(updates.watched_by);
     }
     
     if (updates.watch_link !== undefined) {

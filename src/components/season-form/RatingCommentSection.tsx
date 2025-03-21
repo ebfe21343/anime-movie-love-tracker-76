@@ -8,6 +8,7 @@ interface RatingCommentSectionProps {
   person: 'lyan' | 'nastya';
   rating: number;
   comment: string;
+  watched?: boolean;
   onRatingChange: (value: number) => void;
   onCommentChange: (value: string) => void;
   id?: string;
@@ -17,6 +18,7 @@ export function RatingCommentSection({
   person,
   rating,
   comment,
+  watched = true,
   onRatingChange,
   onCommentChange,
   id = '',
@@ -24,6 +26,16 @@ export function RatingCommentSection({
   const personName = person.charAt(0).toUpperCase() + person.slice(1);
   const ratingId = id ? `${person}-rating-${id}` : `${person}-new-rating`;
   const commentId = id ? `${person}-comment-${id}` : `${person}-new-comment`;
+
+  if (!watched) {
+    return (
+      <div className="opacity-50">
+        <p className="text-sm italic text-muted-foreground">
+          {personName} hasn't watched this yet
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
