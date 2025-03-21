@@ -3,8 +3,13 @@ import { Movie } from '@/types/movie';
 import MovieCard from './MovieCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowUpDown, Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star } from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star } from 'lucide-react';
 
 interface MovieGridProps {
   movies: Movie[];
@@ -86,48 +91,37 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
     });
   }, [movies, searchQuery, effectiveSortOption]);
 
-  const handleSortChange = (newCategory: SortCategory) => {
+  const handleSortClick = (category: SortCategory) => {
     setSortState(prev => {
-      if (prev.category === newCategory) {
+      if (prev.category === category) {
         return {
-          category: newCategory,
+          category,
           direction: prev.direction === 'desc' ? 'asc' : 'desc'
         };
       }
       return {
-        category: newCategory,
+        category,
         direction: 'desc'
       };
     });
   };
 
-  const getSortIcon = (category: SortCategory) => {
-    if (sortState.category !== category) {
-      return <ArrowUpDown className="h-4 w-4" />;
-    }
+  const getSortIcon = () => {
     return sortState.direction === 'desc' ? 
       <ArrowDown className="h-4 w-4" /> : 
       <ArrowUp className="h-4 w-4" />;
   };
 
-  const getSortLabel = (category: SortCategory) => {
-    if (sortState.category !== category) {
-      switch (category) {
-        case 'recently_added': return 'Recently Added';
-        case 'rating': return 'IMDb Rating';
-        case 'year': return 'Release Date';
-        case 'personal': return 'Personal Rating';
-      }
-    }
-
+  const getSortLabel = () => {
     const directionText = sortState.direction === 'desc' ? 'Newest' : 'Oldest';
     const highLowText = sortState.direction === 'desc' ? 'Highest' : 'Lowest';
 
-    switch (category) {
+    switch (sortState.category) {
       case 'recently_added': return `${directionText} Added`;
       case 'rating': return `${highLowText} IMDb Rating`;
       case 'year': return `${directionText} Released`;
       case 'personal': return `${highLowText} Personal Rating`;
+      default: return 'Sort By';
     }
   };
 
@@ -180,47 +174,43 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
         </div>
         
         <div className="flex gap-2 items-center">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => handleSortChange('recently_added')}
-              className="flex items-center gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
-            >
-              <CalendarDays className="h-4 w-4" />
-              {getSortLabel('recently_added')}
-              {getSortIcon('recently_added')}
-            </Button>
-            
-            <Button
-              variant="outline"
-              onClick={() => handleSortChange('rating')}
-              className="flex items-center gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
-            >
-              <Star className="h-4 w-4" />
-              {getSortLabel('rating')}
-              {getSortIcon('rating')}
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => handleSortChange('personal')}
-              className="flex items-center gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
-            >
-              <Star className="h-4 w-4 fill-current" />
-              {getSortLabel('personal')}
-              {getSortIcon('personal')}
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => handleSortChange('year')}
-              className="flex items-center gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
-            >
-              <CalendarDays className="h-4 w-4" />
-              {getSortLabel('year')}
-              {getSortIcon('year')}
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 bg-white/50 backdrop-blur-sm border-sakura-200"
+              >
+                {sortState.category === 'recently_added' && <CalendarDays className="h-4 w-4" />}
+                {sortState.category === 'rating' && <Star className="h-4 w-4" />}
+                {sortState.category === 'personal' && <Star className="h-4 w-4 fill-current" />}
+                {sortState.category === 'year' && <CalendarDays className="h-4 w-4" />}
+                {getSortLabel()}
+                {getSortIcon()}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-white border-sakura-200">
+              <DropdownMenuItem onClick={() => handleSortClick('recently_added')} className="cursor-pointer">
+                <CalendarDays className="h-4 w-4 mr-2" />
+                <span>Recently Added</span>
+                {sortState.category === 'recently_added' && getSortIcon()}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSortClick('rating')} className="cursor-pointer">
+                <Star className="h-4 w-4 mr-2" />
+                <span>IMDb Rating</span>
+                {sortState.category === 'rating' && getSortIcon()}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSortClick('personal')} className="cursor-pointer">
+                <Star className="h-4 w-4 fill-current mr-2" />
+                <span>Personal Rating</span>
+                {sortState.category === 'personal' && getSortIcon()}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSortClick('year')} className="cursor-pointer">
+                <CalendarDays className="h-4 w-4 mr-2" />
+                <span>Release Date</span>
+                {sortState.category === 'year' && getSortIcon()}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       
