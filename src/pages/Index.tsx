@@ -47,9 +47,6 @@ const Index = () => {
   const waitingCount = waitingMovies.length;
   const queueCount = queueMovies.length;
 
-  const isWaitingView = waitingMovies.length > 0;
-  const isQueueView = queueMovies.length > 0;
-
   return (
     <div className="min-h-screen pb-20">
       <Header />
@@ -103,8 +100,6 @@ const Index = () => {
                   handleSortClick={handleSortClick}
                   getSortLabel={getSortLabel}
                   getSortIcon={getSortIcon}
-                  isQueueView={isQueueView}
-                  isWaitingView={isWaitingView}
                 />
               </div>
             </div>
@@ -113,6 +108,12 @@ const Index = () => {
               <MovieGrid 
                 movies={collectionMovies} 
                 showSearchBar={false} 
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                sortState={sortState}
+                handleSortClick={handleSortClick}
+                getSortIcon={getSortIcon}
+                getSortLabel={getSortLabel}
               />
             </TabsContent>
             
@@ -121,6 +122,12 @@ const Index = () => {
                 <MovieGrid 
                   movies={waitingMovies}
                   showSearchBar={false}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  sortState={sortState}
+                  handleSortClick={handleSortClick}
+                  getSortIcon={getSortIcon}
+                  getSortLabel={getSortLabel}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -140,6 +147,12 @@ const Index = () => {
                 <MovieGrid 
                   movies={queueMovies}
                   showSearchBar={false}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  sortState={sortState}
+                  handleSortClick={handleSortClick}
+                  getSortIcon={getSortIcon}
+                  getSortLabel={getSortLabel}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">

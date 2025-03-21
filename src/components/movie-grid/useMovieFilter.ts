@@ -1,3 +1,4 @@
+
 import { useMemo, useState } from 'react';
 import { Movie } from '@/types/movie';
 import { SortCategory, SortDirection, SortState } from './MovieGridSearchBar';
@@ -21,10 +22,6 @@ export function useMovieFilter(movies: Movie[]) {
         return sortState.direction === 'desc' ? 'year_new' : 'year_old';
       case 'personal':
         return sortState.direction === 'desc' ? 'personal_high' : 'personal_low';
-      case 'queue_status':
-        return sortState.direction === 'desc' ? 'queue_high' : 'queue_low';
-      case 'waiting_status':
-        return sortState.direction === 'desc' ? 'waiting_high' : 'waiting_low';
       case 'recently_added':
       default:
         return sortState.direction === 'desc' ? 'recently_added' : 'recently_added_asc';
@@ -65,14 +62,6 @@ export function useMovieFilter(movies: Movie[]) {
           const avgALow = (a.personal_ratings.lyan + a.personal_ratings.nastya) / 2;
           const avgBLow = (b.personal_ratings.lyan + b.personal_ratings.nastya) / 2;
           return avgALow - avgBLow;
-        case 'queue_high':
-          return a.in_queue === b.in_queue ? 0 : a.in_queue ? -1 : 1;
-        case 'queue_low':
-          return a.in_queue === b.in_queue ? 0 : a.in_queue ? 1 : -1;
-        case 'waiting_high':
-          return a.waiting === b.waiting ? 0 : a.waiting ? -1 : 1;
-        case 'waiting_low':
-          return a.waiting === b.waiting ? 0 : a.waiting ? 1 : -1;
         case 'recently_added':
           return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
         case 'recently_added_asc':
@@ -107,16 +96,12 @@ export function useMovieFilter(movies: Movie[]) {
   const getSortLabel = () => {
     const directionText = sortState.direction === 'desc' ? 'Newest' : 'Oldest';
     const highLowText = sortState.direction === 'desc' ? 'Highest' : 'Lowest';
-    const waitingText = sortState.direction === 'desc' ? 'Waiting First' : 'Regular First';
-    const queueText = sortState.direction === 'desc' ? 'Queue First' : 'Regular First';
 
     switch (sortState.category) {
       case 'recently_added': return `${directionText} Added`;
       case 'rating': return `${highLowText} IMDb Rating`;
       case 'year': return `${directionText} Released`;
       case 'personal': return `${highLowText} Personal Rating`;
-      case 'queue_status': return `${queueText}`;
-      case 'waiting_status': return `${waitingText}`;
       default: return 'Sort By';
     }
   };

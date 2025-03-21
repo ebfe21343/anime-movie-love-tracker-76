@@ -8,10 +8,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star, Clock, List } from 'lucide-react';
+import { Search, CalendarDays, Star } from 'lucide-react';
 import { Movie } from '@/types/movie';
 
-export type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal' | 'queue_status' | 'waiting_status';
+export type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal';
 export type SortDirection = 'asc' | 'desc';
 
 export interface SortState {
@@ -26,7 +26,7 @@ interface MovieGridSearchBarProps {
   sortState?: SortState;
   handleSortClick?: (category: SortCategory) => void;
   getSortLabel?: () => string;
-  getSortIcon?: () => typeof ArrowUp | typeof ArrowDown;
+  getSortIcon?: () => any;
   isQueueView?: boolean;
   isWaitingView?: boolean;
 }
@@ -38,7 +38,7 @@ const MovieGridSearchBar = ({
   sortState = { category: 'recently_added', direction: 'desc' },
   handleSortClick = () => {},
   getSortLabel = () => 'Sort By',
-  getSortIcon = () => ArrowDown,
+  getSortIcon = () => null,
   isQueueView = false,
   isWaitingView = false
 }: MovieGridSearchBarProps) => {
@@ -74,37 +74,7 @@ const MovieGridSearchBar = ({
   };
   
   // Get appropriate icon
-  const getSortIconFn = () => {
-    if (getSortIcon) {
-      return getSortIcon();
-    }
-    return actualSortState.direction === 'desc' ? ArrowDown : ArrowUp;
-  };
-  
-  // Get appropriate label
-  const getSortLabelFn = () => {
-    if (getSortLabel) {
-      return getSortLabel();
-    }
-    
-    const directionText = actualSortState.direction === 'desc' ? 'Newest' : 'Oldest';
-    const highLowText = actualSortState.direction === 'desc' ? 'Highest' : 'Lowest';
-    const waitingText = actualSortState.direction === 'desc' ? 'Waiting First' : 'Regular First';
-    const queueText = actualSortState.direction === 'desc' ? 'Queue First' : 'Regular First';
-
-    switch (actualSortState.category) {
-      case 'recently_added': return `${directionText} Added`;
-      case 'rating': return `${highLowText} IMDb Rating`;
-      case 'year': return `${directionText} Released`;
-      case 'personal': return `${highLowText} Personal Rating`;
-      case 'queue_status': return `${queueText}`;
-      case 'waiting_status': return `${waitingText}`;
-      default: return 'Sort By';
-    }
-  };
-  
-  // Create the icon component
-  const SortIconComponent = getSortIconFn();
+  const SortIconComponent = getSortIcon();
   
   return (
     <div className="flex flex-col md:flex-row gap-4 mb-6 flex-1">
@@ -129,9 +99,7 @@ const MovieGridSearchBar = ({
               {actualSortState.category === 'rating' && <Star className="h-4 w-4" />}
               {actualSortState.category === 'personal' && <Star className="h-4 w-4 fill-current" />}
               {actualSortState.category === 'year' && <CalendarDays className="h-4 w-4" />}
-              {actualSortState.category === 'queue_status' && <Clock className="h-4 w-4" />}
-              {actualSortState.category === 'waiting_status' && <List className="h-4 w-4" />}
-              {getSortLabelFn()}
+              {getSortLabel()}
               {SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
             </Button>
           </DropdownMenuTrigger>
@@ -139,41 +107,33 @@ const MovieGridSearchBar = ({
             <DropdownMenuItem onClick={() => actualHandleSortClick('recently_added')} className="cursor-pointer">
               <CalendarDays className="h-4 w-4 mr-2" />
               <span>Recently Added</span>
-              {actualSortState.category === 'recently_added' && <SortIconComponent className="h-4 w-4 ml-2" />}
+              {actualSortState.category === 'recently_added' && (
+                SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />
+              )}
             </DropdownMenuItem>
-            
-            {isWaitingView && (
-              <DropdownMenuItem onClick={() => actualHandleSortClick('waiting_status')} className="cursor-pointer">
-                <List className="h-4 w-4 mr-2" />
-                <span>Waiting Status</span>
-                {actualSortState.category === 'waiting_status' && <SortIconComponent className="h-4 w-4 ml-2" />}
-              </DropdownMenuItem>
-            )}
-            
-            {isQueueView && (
-              <DropdownMenuItem onClick={() => actualHandleSortClick('queue_status')} className="cursor-pointer">
-                <Clock className="h-4 w-4 mr-2" />
-                <span>Queue Status</span>
-                {actualSortState.category === 'queue_status' && <SortIconComponent className="h-4 w-4 ml-2" />}
-              </DropdownMenuItem>
-            )}
             
             <DropdownMenuItem onClick={() => actualHandleSortClick('personal')} className="cursor-pointer">
               <Star className="h-4 w-4 fill-current mr-2" />
               <span>Personal Rating</span>
-              {actualSortState.category === 'personal' && <SortIconComponent className="h-4 w-4 ml-2" />}
+              {actualSortState.category === 'personal' && (
+                SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />
+              )}
             </DropdownMenuItem>
             
             <DropdownMenuItem onClick={() => actualHandleSortClick('rating')} className="cursor-pointer">
               <Star className="h-4 w-4 mr-2" />
               <span>IMDb Rating</span>
-              {actualSortState.category === 'rating' && <SortIconComponent className="h-4 w-4 ml-2" />}
+              {actualSortState.category === 'rating' && (
+                SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />
+              )}
             </DropdownMenuItem>
             
             <DropdownMenuItem onClick={() => actualHandleSortClick('year')} className="cursor-pointer">
               <CalendarDays className="h-4 w-4 mr-2" />
               <span>Release Date</span>
-              {actualSortState.category === 'year' && <SortIconComponent className="h-4 w-4 ml-2" />}
+              {actualSortState.category === 'year' && (
+                SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />
+              )}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
