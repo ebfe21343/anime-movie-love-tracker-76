@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { Movie } from '@/types/movie';
 import MovieCard from './MovieCard';
@@ -194,15 +195,15 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
                 <span>Recently Added</span>
                 {sortState.category === 'recently_added' && getSortIcon()}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleSortClick('rating')} className="cursor-pointer">
-                <Star className="h-4 w-4 mr-2" />
-                <span>IMDb Rating</span>
-                {sortState.category === 'rating' && getSortIcon()}
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleSortClick('personal')} className="cursor-pointer">
                 <Star className="h-4 w-4 fill-current mr-2" />
                 <span>Personal Rating</span>
                 {sortState.category === 'personal' && getSortIcon()}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSortClick('rating')} className="cursor-pointer">
+                <Star className="h-4 w-4 mr-2" />
+                <span>IMDb Rating</span>
+                {sortState.category === 'rating' && getSortIcon()}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleSortClick('year')} className="cursor-pointer">
                 <CalendarDays className="h-4 w-4 mr-2" />

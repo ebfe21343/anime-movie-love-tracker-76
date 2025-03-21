@@ -1,3 +1,4 @@
+
 import { Plus, Palette, Tv } from 'lucide-react';
 import { Season } from '@/types/movie';
 import { Button } from '@/components/ui/button';
@@ -59,34 +60,34 @@ export const SeasonsDisplay = ({
               </h3>
               
               <div className="flex items-center gap-3">
-                <div className="w-40">
-                  <Select 
-                    value={contentType} 
-                    onValueChange={onContentTypeChange}
-                  >
-                    <SelectTrigger id="content-type" className="h-9">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="movie">Movie</SelectItem>
-                      <SelectItem value="series">Series</SelectItem>
-                      <SelectItem value="cartoon">Cartoon</SelectItem>
-                      <SelectItem value="anime">Anime</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {supportsSeasons && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-lavender-500/10 border-lavender-200 text-lavender-900"
-                    onClick={() => setEditMode(true)}
-                  >
-                    <Plus className="h-3.5 w-3.5 mr-1" />
-                    Manage Seasons
-                  </Button>
+                {editMode && (
+                  <div className="w-40">
+                    <Select 
+                      value={contentType} 
+                      onValueChange={onContentTypeChange}
+                    >
+                      <SelectTrigger id="content-type" className="h-9">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="movie">Movie</SelectItem>
+                        <SelectItem value="series">Series</SelectItem>
+                        <SelectItem value="cartoon">Cartoon</SelectItem>
+                        <SelectItem value="anime">Anime</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 )}
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-lavender-500/10 border-lavender-200 text-lavender-900"
+                  onClick={() => setEditMode(true)}
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  {editMode ? "Save Changes" : "Manage Seasons"}
+                </Button>
               </div>
             </div>
             
