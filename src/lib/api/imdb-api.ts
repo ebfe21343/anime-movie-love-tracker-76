@@ -105,7 +105,8 @@ export async function fetchMovieById(id: string): Promise<Omit<Movie, 'personal_
     return {
       ...movieData,
       cancelled: false, // Default value when fetching from IMDb
-      content_type: movieData.type || 'movie' // Add content_type based on the movie type
+      content_type: movieData.type || 'movie', // Add content_type based on the movie type
+      watched_by: { lyan: true, nastya: true } // Add default watched_by property
     };
   } catch (error) {
     console.error('Error fetching movie:', error);
