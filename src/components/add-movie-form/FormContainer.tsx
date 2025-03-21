@@ -3,6 +3,8 @@ import PersonalRatingsSection from './PersonalRatingsSection';
 import StreamingLinkSection from './StreamingLinkSection';
 import CommentsSection from './CommentsSection';
 import SubmitButtonSection from './SubmitButtonSection';
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface FormContainerProps {
   register: any;
@@ -19,6 +21,8 @@ interface FormContainerProps {
   isLoading: boolean;
   preview: any;
   contentType: string;
+  inQueue: boolean;
+  setInQueue: (inQueue: boolean) => void;
 }
 
 const FormContainer = ({
@@ -35,30 +39,48 @@ const FormContainer = ({
   setNastyaWatched,
   isLoading,
   preview,
-  contentType
+  contentType,
+  inQueue,
+  setInQueue
 }: FormContainerProps) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-6">
-        <PersonalRatingsSection
-          lyanRating={lyanRating}
-          nastyaRating={nastyaRating}
-          lyanWatched={lyanWatched}
-          nastyaWatched={nastyaWatched}
-          setLyanRating={setLyanRating}
-          setNastyaRating={setNastyaRating}
-          setLyanWatched={setLyanWatched}
-          setNastyaWatched={setNastyaWatched}
-        />
+        <div className="flex items-center space-x-2">
+          <Switch 
+            id="queue-mode"
+            checked={inQueue}
+            onCheckedChange={setInQueue}
+          />
+          <Label htmlFor="queue-mode" className="cursor-pointer">
+            Add to Queue (not watched yet)
+          </Label>
+        </div>
+        
+        {!inQueue && (
+          <PersonalRatingsSection
+            lyanRating={lyanRating}
+            nastyaRating={nastyaRating}
+            lyanWatched={lyanWatched}
+            nastyaWatched={nastyaWatched}
+            setLyanRating={setLyanRating}
+            setNastyaRating={setNastyaRating}
+            setLyanWatched={setLyanWatched}
+            setNastyaWatched={setNastyaWatched}
+          />
+        )}
         
         <StreamingLinkSection register={register} />
         
-        <CommentsSection register={register} />
+        {!inQueue && (
+          <CommentsSection register={register} />
+        )}
         
         <SubmitButtonSection
           isLoading={isLoading}
           preview={preview}
           contentType={contentType}
+          inQueue={inQueue}
         />
       </div>
     </form>

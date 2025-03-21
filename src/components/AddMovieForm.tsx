@@ -20,6 +20,7 @@ const AddMovieForm = () => {
   const [nastyaWatched, setNastyaWatched] = useState(true);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [contentType, setContentType] = useState('movie');
+  const [inQueue, setInQueue] = useState(false);
 
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<MovieFormData>({
     defaultValues: {
@@ -42,11 +43,21 @@ const AddMovieForm = () => {
   });
 
   useEffect(() => {
-    setValue('personal_ratings.lyan', lyanRating);
-    setValue('personal_ratings.nastya', nastyaRating);
-    setValue('watched_by.lyan', lyanWatched);
-    setValue('watched_by.nastya', nastyaWatched);
-  }, [lyanRating, nastyaRating, lyanWatched, nastyaWatched, setValue]);
+    if (!inQueue) {
+      setValue('personal_ratings.lyan', lyanRating);
+      setValue('personal_ratings.nastya', nastyaRating);
+      setValue('watched_by.lyan', lyanWatched);
+      setValue('watched_by.nastya', nastyaWatched);
+    } else {
+      // In queue mode, set default values
+      setValue('personal_ratings.lyan', 0);
+      setValue('personal_ratings.nastya', 0);
+      setValue('watched_by.lyan', false);
+      setValue('watched_by.nastya', false);
+      setValue('comments.lyan', '');
+      setValue('comments.nastya', '');
+    }
+  }, [lyanRating, nastyaRating, lyanWatched, nastyaWatched, inQueue, setValue]);
 
   useEffect(() => {
     setValue('seasons', seasons);
@@ -62,19 +73,25 @@ const AddMovieForm = () => {
       const dataToSubmit = {
         ...data,
         content_type: contentType,
-        seasons: contentType !== 'movie' ? seasons : undefined
+        seasons: contentType !== 'movie' ? seasons : undefined,
+        in_queue: inQueue
       };
       
       await addMovieToCollection(data.id, {
-        personal_ratings: data.personal_ratings,
-        comments: data.comments,
-        watched_by: data.watched_by,
+        personal_ratings: dataToSubmit.personal_ratings,
+        comments: dataToSubmit.comments,
+        watched_by: dataToSubmit.watched_by,
         watch_link: data.watch_link,
         content_type: contentType,
-        seasons: dataToSubmit.seasons
+        seasons: dataToSubmit.seasons,
+        in_queue: inQueue
       });
       
-      toast.success('Movie added to your collection!');
+      const successMessage = inQueue 
+        ? 'Movie added to your queue!' 
+        : 'Movie added to your collection!';
+      
+      toast.success(successMessage);
       reset();
       setPreview(null);
       setLyanRating(5);
@@ -83,6 +100,7 @@ const AddMovieForm = () => {
       setNastyaWatched(true);
       setSeasons([]);
       setContentType('movie');
+      setInQueue(false);
       navigate('/');
     } catch (error: any) {
       console.error('Error adding movie:', error);
@@ -124,6 +142,8 @@ const AddMovieForm = () => {
             isLoading={isLoading}
             preview={preview}
             contentType={contentType}
+            inQueue={inQueue}
+            setInQueue={setInQueue}
           />
         </div>
         
@@ -133,7 +153,7 @@ const AddMovieForm = () => {
             contentType={contentType} 
           />
           
-          {preview && (
+          {preview && !inQueue && contentType !== 'movie' && (
             <div className="pt-4 pb-2">
               <SeasonForm 
                 seasons={seasons} 

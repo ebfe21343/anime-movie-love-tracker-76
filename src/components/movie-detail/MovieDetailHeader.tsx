@@ -1,16 +1,18 @@
 
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Edit, Save, ArrowLeft, Trash } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface MovieDetailHeaderProps {
   movieTitle: string;
@@ -18,83 +20,77 @@ interface MovieDetailHeaderProps {
   onEditToggle: () => void;
   onSaveChanges: () => void;
   onDelete: () => void;
+  inQueue?: boolean;
 }
 
-export const MovieDetailHeader = ({
-  movieTitle,
-  editMode,
-  onEditToggle,
-  onSaveChanges,
+export function MovieDetailHeader({ 
+  movieTitle, 
+  editMode, 
+  onEditToggle, 
+  onSaveChanges, 
   onDelete,
-}: MovieDetailHeaderProps) => {
+  inQueue = false
+}: MovieDetailHeaderProps) {
   return (
-    <div className="mb-6 flex items-center justify-between">
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        className="flex items-center gap-2"
-        asChild
-      >
-        <Link to="/">
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to Collection</span>
-        </Link>
-      </Button>
-      
-      <div className="flex gap-2">
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <div className="flex items-center gap-2">
         <Button 
-          variant={editMode ? "default" : "outline"} 
-          size="sm"
-          onClick={onEditToggle}
-          className={editMode ? "bg-sakura-500 hover:bg-sakura-600" : ""}
+          variant="outline" 
+          size="icon" 
+          asChild
+          className="rounded-full shrink-0"
         >
-          {editMode ? "Cancel Editing" : "Edit Details"}
+          <Link to="/">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
         </Button>
-        
-        {editMode && (
+        <h1 className="text-xl sm:text-2xl font-semibold line-clamp-1">
+          {movieTitle} {inQueue && <span className="text-amber-500">(In Queue)</span>}
+        </h1>
+      </div>
+
+      <div className="flex gap-2 self-end sm:self-auto">
+        {editMode ? (
           <Button 
             variant="default" 
-            size="sm"
-            className="bg-mint-500 hover:bg-mint-600"
+            className="bg-lavender-600 hover:bg-lavender-700"
             onClick={onSaveChanges}
           >
+            <Save className="h-4 w-4 mr-2" />
             Save Changes
           </Button>
+        ) : (
+          <Button 
+            variant="outline" 
+            onClick={onEditToggle}
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            Edit Details
+          </Button>
         )}
-        
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="border-destructive text-destructive hover:bg-destructive/10"
-            >
-              <Trash2 className="h-4 w-4" />
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive">
+              <Trash className="h-4 w-4 mr-2" />
+              Delete
             </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Remove Movie</DialogTitle>
-            </DialogHeader>
-            <div className="py-4">
-              <p>Are you sure you want to remove <span className="font-semibold">{movieTitle}</span> from your collection?</p>
-              <p className="text-sm text-muted-foreground mt-2">This action cannot be undone.</p>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline" size="sm">Cancel</Button>
-              </DialogClose>
-              <Button 
-                variant="destructive" 
-                size="sm"
-                onClick={onDelete}
-              >
-                Remove Movie
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently delete "{movieTitle}" from your collection.
+                This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
-};
+}

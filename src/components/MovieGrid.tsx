@@ -10,13 +10,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star, ListFilter } from 'lucide-react';
 
 interface MovieGridProps {
   movies: Movie[];
 }
 
-type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal';
+type SortCategory = 'recently_added' | 'rating' | 'year' | 'personal' | 'type';
 
 type SortDirection = 'asc' | 'desc';
 
@@ -24,6 +25,8 @@ interface SortState {
   category: SortCategory;
   direction: SortDirection;
 }
+
+type ViewMode = 'completed' | 'queue';
 
 const MOVIES_PER_PAGE = 10;
 
@@ -34,6 +37,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
     direction: 'desc'
   });
   const [visibleMoviesCount, setVisibleMoviesCount] = useState(MOVIES_PER_PAGE);
+  const [viewMode, setViewMode] = useState<ViewMode>('completed');
   const observerTarget = useRef<HTMLDivElement>(null);
   
   const effectiveSortOption = useMemo(() => {
@@ -44,6 +48,8 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
         return sortState.direction === 'desc' ? 'year_new' : 'year_old';
       case 'personal':
         return sortState.direction === 'desc' ? 'personal_high' : 'personal_low';
+      case 'type':
+        return sortState.direction === 'desc' ? 'type_asc' : 'type_desc';
       case 'recently_added':
       default:
         return sortState.direction === 'desc' ? 'recently_added' : 'recently_added_asc';
@@ -51,8 +57,14 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
   }, [sortState]);
 
   const filteredAndSortedMovies = useMemo(() => {
-    const filtered = searchQuery 
-      ? movies.filter(movie => 
+    // First filter by queue/completed status
+    const queueFiltered = movies.filter(movie => 
+      viewMode === 'queue' ? movie.in_queue : !movie.in_queue
+    );
+    
+    // Then apply search filter
+    const searchFiltered = searchQuery 
+      ? queueFiltered.filter(movie => 
           movie.primary_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           movie.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase())) ||
           movie.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -62,9 +74,9 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
             season.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase())
           ))
         )
-      : movies;
+      : queueFiltered;
     
-    return [...filtered].sort((a, b) => {
+    return [...searchFiltered].sort((a, b) => {
       switch (effectiveSortOption) {
         case 'rating_high':
           return b.rating.aggregate_rating - a.rating.aggregate_rating;
@@ -82,6 +94,16 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
           const avgALow = (a.personal_ratings.lyan + a.personal_ratings.nastya) / 2;
           const avgBLow = (b.personal_ratings.lyan + b.personal_ratings.nastya) / 2;
           return avgALow - avgBLow;
+        case 'type_asc':
+          // Order by: Movie, Series, Cartoon, Anime
+          const typeOrderA = getTypeOrder(a.content_type);
+          const typeOrderB = getTypeOrder(b.content_type);
+          return typeOrderA - typeOrderB;
+        case 'type_desc':
+          // Order by: Anime, Cartoon, Series, Movie
+          const typeOrderADesc = getTypeOrder(a.content_type);
+          const typeOrderBDesc = getTypeOrder(b.content_type);
+          return typeOrderBDesc - typeOrderADesc;
         case 'recently_added':
           return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
         case 'recently_added_asc':
@@ -90,7 +112,18 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
           return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
       }
     });
-  }, [movies, searchQuery, effectiveSortOption]);
+  }, [movies, searchQuery, effectiveSortOption, viewMode]);
+
+  // Helper function to get numeric order for content types
+  const getTypeOrder = (type: string | undefined): number => {
+    switch (type) {
+      case 'movie': return 1;
+      case 'series': return 2;
+      case 'cartoon': return 3;
+      case 'anime': return 4;
+      default: return 5; // Unknown types at the end
+    }
+  };
 
   const handleSortClick = (category: SortCategory) => {
     setSortState(prev => {
@@ -116,14 +149,22 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
   const getSortLabel = () => {
     const directionText = sortState.direction === 'desc' ? 'Newest' : 'Oldest';
     const highLowText = sortState.direction === 'desc' ? 'Highest' : 'Lowest';
+    const typeOrderText = sortState.direction === 'desc' ? 'A-Z' : 'Z-A';
 
     switch (sortState.category) {
       case 'recently_added': return `${directionText} Added`;
       case 'rating': return `${highLowText} IMDb Rating`;
       case 'year': return `${directionText} Released`;
       case 'personal': return `${highLowText} Personal Rating`;
+      case 'type': return `Type ${typeOrderText}`;
       default: return 'Sort By';
     }
+  };
+
+  const handleViewModeChange = (value: string) => {
+    setViewMode(value as ViewMode);
+    // Reset pagination when switching views
+    setVisibleMoviesCount(MOVIES_PER_PAGE);
   };
 
   useEffect(() => {
@@ -164,6 +205,20 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
   return (
     <div className="w-full animate-fade-in">
       <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex gap-4 items-center">
+          <Tabs 
+            defaultValue="completed" 
+            value={viewMode} 
+            onValueChange={handleViewModeChange}
+            className="bg-white/50 backdrop-blur-sm rounded-lg p-1 border border-sakura-200"
+          >
+            <TabsList className="grid grid-cols-2">
+              <TabsTrigger value="completed">Completed</TabsTrigger>
+              <TabsTrigger value="queue">In Queue</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+        
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -185,6 +240,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
                 {sortState.category === 'rating' && <Star className="h-4 w-4" />}
                 {sortState.category === 'personal' && <Star className="h-4 w-4 fill-current" />}
                 {sortState.category === 'year' && <CalendarDays className="h-4 w-4" />}
+                {sortState.category === 'type' && <ListFilter className="h-4 w-4" />}
                 {getSortLabel()}
                 {getSortIcon()}
               </Button>
@@ -210,6 +266,11 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
                 <span>Release Date</span>
                 {sortState.category === 'year' && getSortIcon()}
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSortClick('type')} className="cursor-pointer">
+                <ListFilter className="h-4 w-4 mr-2" />
+                <span>Type</span>
+                {sortState.category === 'type' && getSortIcon()}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -224,7 +285,9 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
           <p className="text-muted-foreground mb-6">
             {searchQuery 
               ? `No movies match "${searchQuery}"`
-              : "Your collection is empty. Add your first movie!"
+              : viewMode === 'queue'
+                ? "Your queue is empty. Add movies to your queue to see them here."
+                : "Your collection is empty. Add your first movie!"
             }
           </p>
           {searchQuery && (
@@ -241,7 +304,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {currentMovies.map((movie) => (
               <div key={movie.id} className="animate-enter" style={{ animationDelay: '0ms' }}>
-                <MovieCard movie={movie} />
+                <MovieCard movie={movie} queueMode={viewMode === 'queue'} />
               </div>
             ))}
           </div>

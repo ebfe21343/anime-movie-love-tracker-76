@@ -1,131 +1,76 @@
 
-import { useEffect, useState } from 'react';
-import { Film, Palette, Tv, X, ImageOff } from 'lucide-react';
-import { Movie } from '@/types/movie';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { getCachedImageUrl } from '@/lib/utils/image-cache';
+import { Star, Clock } from 'lucide-react';
+import { Movie } from '@/types/movie';
 
 interface MovieInfoProps {
   movie: Movie;
   poster: string;
   contentType: string;
   cancelled: boolean;
+  inQueue?: boolean;
 }
 
-export const MovieInfo = ({ movie, poster, contentType, cancelled }: MovieInfoProps) => {
-  const isSeries = contentType === 'series' || contentType === 'anime' || contentType === 'cartoon';
-  const [cachedPosterUrl, setCachedPosterUrl] = useState(poster);
-  const [imageLoadError, setImageLoadError] = useState(false);
-  const hasValidPoster = poster && poster !== '/placeholder.svg' && !imageLoadError;
-  
-  useEffect(() => {
-    // Reset error state when poster changes
-    setImageLoadError(false);
-    
-    // Try to get cached version of the poster
-    const loadCachedImage = async () => {
-      if (poster && poster !== '/placeholder.svg') {
-        try {
-          const cachedUrl = await getCachedImageUrl(poster, movie.id, 'poster');
-          if (cachedUrl) {
-            setCachedPosterUrl(cachedUrl);
-          }
-        } catch (error) {
-          console.error('Failed to load cached image:', error);
-          // Fallback to original URL
-          setCachedPosterUrl(poster);
-        }
-      }
-    };
-    
-    loadCachedImage();
-    
-    // Clean up object URLs when component unmounts or poster changes
-    return () => {
-      if (cachedPosterUrl && cachedPosterUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(cachedPosterUrl);
-      }
-    };
-  }, [poster, movie.id]);
-  
-  const handleImageError = () => {
-    console.error('Image failed to load:', poster);
-    setImageLoadError(true);
-  };
+export function MovieInfo({ movie, poster, contentType, cancelled, inQueue = false }: MovieInfoProps) {
+  const formattedDate = movie.start_year + (movie.end_year ? ` - ${movie.end_year}` : '');
+  const avgRating = ((movie.personal_ratings.lyan + movie.personal_ratings.nastya) / 2).toFixed(1);
   
   return (
-    <div className="relative aspect-[2/3]">
-      {hasValidPoster ? (
-        <img 
-          src={cachedPosterUrl} 
-          alt={movie.primary_title}
-          className="object-cover w-full h-full"
-          onError={handleImageError}
-        />
-      ) : (
-        /* Default styled placeholder when no poster is available */
-        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-lavender-100 to-lavender-200 text-lavender-800">
-          <div className="mb-4 p-3 rounded-full bg-white/30">
-            <ImageOff className="w-16 h-16 text-lavender-600" />
+    <div>
+      <div className="relative aspect-[2/3] overflow-hidden">
+        {poster ? (
+          <img 
+            src={poster} 
+            alt={movie.primary_title} 
+            className="w-full h-full object-cover" 
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-muted">
+            No poster available
           </div>
-          <div className="text-center px-4">
-            <p className="text-md font-medium">No poster available</p>
-            <h3 className="mt-2 text-xl font-bold">{movie.primary_title}</h3>
-          </div>
-        </div>
-      )}
-      
-      {movie.is_adult && (
-        <Badge variant="destructive" className="absolute top-3 right-3">
-          18+
-        </Badge>
-      )}
-      
-      <div className="absolute top-3 left-3 flex flex-col gap-2">
-        {isSeries && (
-          <Badge 
-            variant="secondary" 
-            className="bg-lavender-500 text-white"
-          >
-            {contentType === 'cartoon' ? (
-              <>
-                <Palette className="h-3.5 w-3.5 mr-1" />
-                Cartoon
-              </>
-            ) : contentType === 'anime' ? (
-              <>
-                <Tv className="h-3.5 w-3.5 mr-1" />
-                Anime
-              </>
-            ) : (
-              <>
-                <Tv className="h-3.5 w-3.5 mr-1" />
-                Series
-              </>
-            )}
-          </Badge>
         )}
         
-        {!isSeries && (
-          <Badge 
-            variant="secondary" 
-            className="bg-lavender-500 text-white"
-          >
-            <Film className="h-3.5 w-3.5 mr-1" />
-            Movie
-          </Badge>
-        )}
-        
+        {/* Cancelled status */}
         {cancelled && (
-          <Badge 
-            className="bg-red-500 text-white border-red-400 flex items-center gap-1"
-          >
-            <X className="h-3.5 w-3.5" />
+          <div className="absolute top-0 right-0 left-0 bg-red-500/90 text-white text-center py-1 px-2 text-sm font-medium">
             Cancelled
+          </div>
+        )}
+        
+        {/* In Queue status */}
+        {inQueue && (
+          <div className="absolute bottom-0 right-0 left-0 bg-amber-500/90 text-white text-center py-1 px-2 text-sm font-medium flex items-center justify-center gap-1">
+            <Clock className="h-4 w-4" />
+            In Queue
+          </div>
+        )}
+      </div>
+      
+      <div className="p-4 border-t border-gray-200 flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <Badge variant="outline" className="text-xs px-2 py-0 font-medium border-lavender-400 text-lavender-700">
+            {contentType.charAt(0).toUpperCase() + contentType.slice(1)}
           </Badge>
+          <span className="text-sm text-gray-600">{formattedDate}</span>
+        </div>
+        
+        {!inQueue && (
+          <div className="flex justify-between items-center mt-1">
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-gray-600">Our rating:</span>
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4 text-amber-500 fill-amber-500" /> 
+                <span className="font-semibold">{avgRating}</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1">
+              <span className="text-xs bg-yellow-400 text-black px-1 rounded font-medium">IMDb</span>
+              <span className="font-semibold">{movie.rating.aggregate_rating.toFixed(1)}</span>
+            </div>
+          </div>
         )}
       </div>
     </div>
   );
-};
+}

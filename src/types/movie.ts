@@ -59,6 +59,7 @@ export interface Movie {
   cancelled: boolean;
   seasons?: Season[];
   content_type: string;
+  in_queue?: boolean;
 }
 
 interface Credit {
@@ -99,7 +100,7 @@ export interface Season {
 
 export interface MovieResponse {
   data: {
-    title: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'cancelled' | 'seasons' | 'content_type' | 'watched_by'>;
+    title: Omit<Movie, 'personal_ratings' | 'comments' | 'watch_link' | 'added_at' | 'cancelled' | 'seasons' | 'content_type' | 'watched_by' | 'in_queue'>;
   };
 }
 
@@ -121,4 +122,5 @@ export interface MovieFormData {
   content_type: string;
   cancelled?: boolean;
   seasons?: Season[];
+  in_queue?: boolean;
 }

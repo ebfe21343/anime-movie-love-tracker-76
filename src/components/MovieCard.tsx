@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Film, Tv, X, Palette, ImageOff } from 'lucide-react';
+import { Star, Film, Tv, X, Palette, ImageOff, Clock } from 'lucide-react';
 import { Movie } from '@/types/movie';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,9 +10,10 @@ import { getCachedImageUrl } from '@/lib/utils/image-cache';
 
 interface MovieCardProps {
   movie: Movie;
+  queueMode?: boolean;
 }
 
-const MovieCard = ({ movie }: MovieCardProps) => {
+const MovieCard = ({ movie, queueMode = false }: MovieCardProps) => {
   const poster = movie.posters[0]?.url || '';
   const [cachedPosterUrl, setCachedPosterUrl] = useState(poster);
   const [imageLoadError, setImageLoadError] = useState(false);
@@ -20,8 +21,10 @@ const MovieCard = ({ movie }: MovieCardProps) => {
   const releaseYear = movie.start_year;
   const endYear = movie.end_year ? ` - ${movie.end_year}` : '';
   
-  // Calculate average personal rating
-  const avgPersonalRating = ((movie.personal_ratings.lyan + movie.personal_ratings.nastya) / 2).toFixed(1);
+  // Calculate average personal rating (only for completed movies)
+  const avgPersonalRating = !queueMode 
+    ? ((movie.personal_ratings.lyan + movie.personal_ratings.nastya) / 2).toFixed(1)
+    : '0.0';
 
   // Get the correct content type icon and name
   let TypeIcon = Film;
@@ -110,6 +113,17 @@ const MovieCard = ({ movie }: MovieCardProps) => {
               <span>{typeName}</span>
             </Badge>
             
+            {/* In Queue badge */}
+            {queueMode && (
+              <Badge 
+                variant="outline" 
+                className="bg-amber-500/90 text-white border-amber-400 flex items-center gap-1 text-xs"
+              >
+                <Clock className="w-3.5 h-3.5" />
+                <span>In Queue</span>
+              </Badge>
+            )}
+            
             {/* Cancelled badge - Adjusted size to match genre badges */}
             {movie.cancelled && (
               <Badge 
@@ -145,12 +159,19 @@ const MovieCard = ({ movie }: MovieCardProps) => {
           </div>
           
           <div className="flex items-center justify-between">
-            {/* Average personal rating */}
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 fill-lavender-500 text-lavender-500" />
-              <span className="font-medium">{avgPersonalRating}</span>
-              <span className="text-xs text-muted-foreground">Rating</span>
-            </div>
+            {/* For completed movies, show personal rating */}
+            {!queueMode ? (
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4 fill-lavender-500 text-lavender-500" />
+                <span className="font-medium">{avgPersonalRating}</span>
+                <span className="text-xs text-muted-foreground">Rating</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4 text-amber-500" />
+                <span className="text-xs text-muted-foreground">Not watched yet</span>
+              </div>
+            )}
             
             {/* IMDb rating */}
             {movie.rating && (

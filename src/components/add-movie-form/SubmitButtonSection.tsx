@@ -6,10 +6,14 @@ interface SubmitButtonSectionProps {
   isLoading: boolean;
   preview: any;
   contentType: string;
+  inQueue?: boolean;
 }
 
-const SubmitButtonSection = ({ isLoading, preview, contentType }: SubmitButtonSectionProps) => {
+const SubmitButtonSection = ({ isLoading, preview, contentType, inQueue = false }: SubmitButtonSectionProps) => {
   const isSeries = contentType !== 'movie';
+  const buttonText = inQueue 
+    ? `Add to Queue` 
+    : `Add to Collection`;
   
   return (
     <div className="flex justify-end">
@@ -21,10 +25,10 @@ const SubmitButtonSection = ({ isLoading, preview, contentType }: SubmitButtonSe
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Adding {isSeries ? contentType : 'movie'}...
+            Adding {inQueue ? "to Queue" : isSeries ? contentType : 'movie'}...
           </>
         ) : (
-          <>Add to Collection</>
+          <>{buttonText}</>
         )}
       </Button>
     </div>
