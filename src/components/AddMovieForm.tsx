@@ -10,6 +10,7 @@ import MoviePreview from './add-movie-form/MoviePreview';
 import SeasonForm from '@/components/SeasonForm';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
 
 const AddMovieForm = () => {
   const navigate = useNavigate();
@@ -131,7 +132,10 @@ const AddMovieForm = () => {
           
           {preview && (
             <div className="mt-4 mb-4 bg-white/50 rounded-lg p-4 border border-sakura-100">
-              <div className="space-y-3">
+              <h3 className="text-base font-medium mb-2">Collection Settings</h3>
+              <Separator className="mb-3" />
+              
+              <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="waiting"

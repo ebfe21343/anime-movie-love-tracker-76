@@ -36,6 +36,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
   const [seasons, setSeasons] = useState(movie.seasons || []);
   const [cancelled, setCancelled] = useState(movie.cancelled || false);
   const [contentType, setContentType] = useState(movie.content_type || movie.type || 'movie');
+  const [waiting, setWaiting] = useState(movie.waiting || false);
+  const [inQueue, setInQueue] = useState(movie.in_queue || false);
   
   const isSeries = contentType === 'series' || contentType === 'anime';
   
@@ -50,6 +52,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
     setSeasons(movie.seasons || []);
     setCancelled(movie.cancelled || false);
     setContentType(movie.content_type || movie.type || 'movie');
+    setWaiting(movie.waiting || false);
+    setInQueue(movie.in_queue || false);
   }, [movie]);
   
   const handleContentTypeChange = (type: string) => {
@@ -77,6 +81,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
         },
         cancelled: cancelled,
         content_type: contentType,
+        waiting: waiting,
+        in_queue: inQueue,
       };
 
       // Only include seasons if it's a series or anime
@@ -132,16 +138,22 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
               
               <MovieMetadata movie={movie} />
               
-              {editMode ? (
+              {editMode && (
                 <MovieSettings 
                   contentType={contentType}
                   cancelled={cancelled}
                   watchLink={watchLink}
+                  waiting={waiting}
+                  inQueue={inQueue}
                   onContentTypeChange={handleContentTypeChange}
                   onCancelledChange={setCancelled}
                   onWatchLinkChange={setWatchLink}
+                  onWaitingChange={setWaiting}
+                  onInQueueChange={setInQueue}
                 />
-              ) : movie.watch_link ? (
+              )}
+              
+              {!editMode && movie.watch_link && (
                 <div className="pt-2">
                   <Button
                     variant="default"
@@ -154,7 +166,7 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                     </a>
                   </Button>
                 </div>
-              ) : null}
+              )}
             </CardContent>
           </Card>
           
@@ -171,6 +183,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                 lyanWatched={lyanWatched}
                 nastyaWatched={nastyaWatched}
                 editMode={editMode}
+                waiting={waiting}
+                inQueue={inQueue}
                 onLyanRatingChange={setLyanRating}
                 onNastyaRatingChange={setNastyaRating}
                 onLyanWatchedChange={setLyanWatched}
@@ -204,13 +218,15 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
               seasons={seasons}
               contentType={contentType}
               editMode={editMode}
+              waiting={waiting}
+              inQueue={inQueue}
               onSeasonsChange={setSeasons}
               onContentTypeChange={handleContentTypeChange}
               setEditMode={setEditMode}
             />
           )}
           
-          {(editMode || (lyanComment.trim() || nastyaComment.trim())) && (
+          {(editMode || (!waiting && !inQueue && (lyanComment.trim() || nastyaComment.trim()))) && (
             <Card className="border-none glass rounded-2xl overflow-hidden">
               <CardContent className="p-6">
                 <h3 className="text-xl font-medium mb-4">Comments</h3>
@@ -221,6 +237,8 @@ const MovieDetail = ({ movie, onUpdate, onDelete }: MovieDetailProps) => {
                   lyanWatched={lyanWatched}
                   nastyaWatched={nastyaWatched}
                   editMode={editMode}
+                  waiting={waiting}
+                  inQueue={inQueue}
                   onLyanCommentChange={setLyanComment}
                   onNastyaCommentChange={setNastyaComment}
                 />

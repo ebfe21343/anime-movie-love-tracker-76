@@ -76,7 +76,7 @@ const MovieGridSearchBar = ({
               {sortState?.category === 'queue_status' && <Clock className="h-4 w-4" />}
               {sortState?.category === 'waiting_status' && <List className="h-4 w-4" />}
               {getSortLabel ? getSortLabel() : 'Sort By'}
-              {SortIconComponent && <SortIconComponent className="h-4 w-4" />}
+              {SortIconComponent && <SortIconComponent className="h-4 w-4 ml-2" />}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-white border-sakura-200">
