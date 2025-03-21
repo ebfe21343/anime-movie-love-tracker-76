@@ -44,14 +44,16 @@ const MovieGridSearchBar = ({
   const handleSortClick = (category: SortCategory) => {
     setSortState(prev => {
       if (prev.category === category) {
+        // Fix: Explicitly type the direction as SortDirection
+        const newDirection: SortDirection = prev.direction === 'desc' ? 'asc' : 'desc';
         return {
           category,
-          direction: prev.direction === 'desc' ? 'asc' : 'desc'
+          direction: newDirection
         };
       }
       return {
         category,
-        direction: 'desc'
+        direction: 'desc' as SortDirection
       };
     });
   };
