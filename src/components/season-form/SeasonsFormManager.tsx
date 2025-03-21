@@ -8,13 +8,15 @@ interface SeasonsFormManagerProps {
   onSeasonsChange: (seasons: Season[]) => void;
   contentType: string;
   onContentTypeChange: (type: string) => void;
+  waiting?: boolean;
 }
 
 export function SeasonsFormManager({
   seasons,
   onSeasonsChange,
   contentType,
-  onContentTypeChange
+  onContentTypeChange,
+  waiting = false
 }: SeasonsFormManagerProps) {
   const [editMode, setEditMode] = useState(false);
   
@@ -26,6 +28,7 @@ export function SeasonsFormManager({
           onSeasonsChange={onSeasonsChange}
           contentType={contentType}
           onContentTypeChange={onContentTypeChange}
+          waiting={waiting}
         />
       ) : (
         <div>
