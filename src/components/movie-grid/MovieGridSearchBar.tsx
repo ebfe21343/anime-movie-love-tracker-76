@@ -24,7 +24,7 @@ interface MovieGridSearchBarProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   sortState: SortState;
-  setSortState: (state: SortState) => void;
+  setSortState: (state: SortState | ((prev: SortState) => SortState)) => void;
   activeTab: 'collection' | 'queue';
   setActiveTab: (tab: 'collection' | 'queue') => void;
   collectionCount: number;
@@ -42,7 +42,7 @@ const MovieGridSearchBar = ({
   queueCount
 }: MovieGridSearchBarProps) => {
   const handleSortClick = (category: SortCategory) => {
-    setSortState(prev => {
+    setSortState((prev: SortState) => {
       if (prev.category === category) {
         // Fix: Explicitly type the direction as SortDirection
         const newDirection: SortDirection = prev.direction === 'desc' ? 'asc' : 'desc';
