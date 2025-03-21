@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { Movie } from '@/types/movie';
 import MovieCard from './MovieCard';
@@ -9,7 +10,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Search, ChevronDown, ArrowUp, ArrowDown, CalendarDays, Star } from 'lucide-react';
+import { 
+  Search, 
+  ChevronDown, 
+  ArrowUp, 
+  ArrowDown, 
+  CalendarDays, 
+  Star, 
+  ListTodo 
+} from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface MovieGridProps {
   movies: Movie[];
@@ -33,6 +43,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
     direction: 'desc'
   });
   const [visibleMoviesCount, setVisibleMoviesCount] = useState(MOVIES_PER_PAGE);
+  const [activeTab, setActiveTab] = useState<'collection' | 'queue'>('collection');
   const observerTarget = useRef<HTMLDivElement>(null);
   
   const effectiveSortOption = useMemo(() => {
@@ -50,47 +61,53 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
   }, [sortState]);
 
   const filteredAndSortedMovies = useMemo(() => {
+    // First, filter by collection/queue
+    const collectionFiltered = activeTab === 'collection' 
+      ? movies.filter(movie => !movie.in_queue)
+      : movies.filter(movie => movie.in_queue);
+    
+    // Then filter by search query
     const filtered = searchQuery 
-      ? movies.filter(movie => 
+      ? collectionFiltered.filter(movie => 
           movie.primary_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           movie.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          movie.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          movie.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          movie.comments.lyan?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          movie.comments.nastya?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (movie.seasons && movie.seasons.some(season => 
-            season.comments.lyan.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            season.comments.nastya.toLowerCase().includes(searchQuery.toLowerCase())
+            season.comments.lyan?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            season.comments.nastya?.toLowerCase().includes(searchQuery.toLowerCase())
           )) ||
           (movie.in_queue === (searchQuery.toLowerCase() === 'queue'))
         )
-      : movies;
+      : collectionFiltered;
     
     return [...filtered].sort((a, b) => {
       switch (effectiveSortOption) {
         case 'rating_high':
-          return b.rating.aggregate_rating - a.rating.aggregate_rating;
+          return (b.rating?.aggregate_rating || 0) - (a.rating?.aggregate_rating || 0);
         case 'rating_low':
-          return a.rating.aggregate_rating - b.rating.aggregate_rating;
+          return (a.rating?.aggregate_rating || 0) - (b.rating?.aggregate_rating || 0);
         case 'year_new':
-          return b.start_year - a.start_year;
+          return (b.start_year || 0) - (a.start_year || 0);
         case 'year_old':
-          return a.start_year - b.start_year;
+          return (a.start_year || 0) - (b.start_year || 0);
         case 'personal_high':
-          const avgA = (a.personal_ratings.lyan + a.personal_ratings.nastya) / 2;
-          const avgB = (b.personal_ratings.lyan + b.personal_ratings.nastya) / 2;
+          const avgA = ((a.personal_ratings?.lyan || 0) + (a.personal_ratings?.nastya || 0)) / 2;
+          const avgB = ((b.personal_ratings?.lyan || 0) + (b.personal_ratings?.nastya || 0)) / 2;
           return avgB - avgA;
         case 'personal_low':
-          const avgALow = (a.personal_ratings.lyan + a.personal_ratings.nastya) / 2;
-          const avgBLow = (b.personal_ratings.lyan + b.personal_ratings.nastya) / 2;
+          const avgALow = ((a.personal_ratings?.lyan || 0) + (a.personal_ratings?.nastya || 0)) / 2;
+          const avgBLow = ((b.personal_ratings?.lyan || 0) + (b.personal_ratings?.nastya || 0)) / 2;
           return avgALow - avgBLow;
         case 'recently_added':
-          return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
+          return new Date(b.added_at || 0).getTime() - new Date(a.added_at || 0).getTime();
         case 'recently_added_asc':
-          return new Date(a.added_at).getTime() - new Date(b.added_at).getTime();
+          return new Date(a.added_at || 0).getTime() - new Date(b.added_at || 0).getTime();
         default:
-          return new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
+          return new Date(b.added_at || 0).getTime() - new Date(a.added_at || 0).getTime();
       }
     });
-  }, [movies, searchQuery, effectiveSortOption]);
+  }, [movies, searchQuery, effectiveSortOption, activeTab]);
 
   const handleSortClick = (category: SortCategory) => {
     setSortState(prev => {
@@ -128,7 +145,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
 
   useEffect(() => {
     setVisibleMoviesCount(MOVIES_PER_PAGE);
-  }, [searchQuery, sortState]);
+  }, [searchQuery, sortState, activeTab]);
 
   const loadMoreMovies = useCallback(() => {
     if (visibleMoviesCount < filteredAndSortedMovies.length) {
@@ -137,6 +154,7 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
   }, [visibleMoviesCount, filteredAndSortedMovies.length]);
 
   useEffect(() => {
+    // Intersection observer setup for infinite loading
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -161,19 +179,54 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
   const currentMovies = filteredAndSortedMovies.slice(0, visibleMoviesCount);
   const hasMoreMovies = visibleMoviesCount < filteredAndSortedMovies.length;
 
+  // Count for each category
+  const collectionCount = movies.filter(movie => !movie.in_queue).length;
+  const queueCount = movies.filter(movie => movie.in_queue).length;
+
   return (
     <div className="w-full animate-fade-in">
       <div className="flex flex-col md:flex-row gap-4 mb-6">
+        {/* Collection/Queue Tabs moved to the left */}
+        <div>
+          <TabsList className="h-10">
+            <TabsTrigger 
+              value="collection" 
+              className="flex items-center gap-2"
+              onClick={() => setActiveTab('collection')}
+              data-state={activeTab === 'collection' ? 'active' : 'inactive'}
+            >
+              Collection
+              <span className="bg-lavender-100 text-lavender-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                {collectionCount}
+              </span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="queue" 
+              className="flex items-center gap-2"
+              onClick={() => setActiveTab('queue')}
+              data-state={activeTab === 'queue' ? 'active' : 'inactive'}
+            >
+              <ListTodo className="h-4 w-4" />
+              Watch Queue
+              <span className="bg-lavender-100 text-lavender-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                {queueCount}
+              </span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
+        
+        {/* Search Bar (now with flex-1 for responsive sizing) */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by title, genre, or comments (including season comments)..."
+            placeholder="Search by title, genre, or comments..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 bg-white/50 backdrop-blur-sm border-sakura-200 focus-visible:ring-sakura-400"
           />
         </div>
         
+        {/* Sort Dropdown */}
         <div className="flex gap-2 items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -224,7 +277,9 @@ const MovieGrid = ({ movies }: MovieGridProps) => {
           <p className="text-muted-foreground mb-6">
             {searchQuery 
               ? `No movies match "${searchQuery}"`
-              : "Your collection is empty. Add your first movie!"
+              : activeTab === 'queue'
+                ? "Your watch queue is empty. Add movies to your queue when adding new movies."
+                : "Your collection is empty. Add your first movie!"
             }
           </p>
           {searchQuery && (

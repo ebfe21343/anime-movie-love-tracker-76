@@ -114,6 +114,16 @@ const AddMovieForm = () => {
             errors={errors}
           />
           
+          {/* In Queue checkbox has been moved from the bottom to here */}
+          <div className="mt-4 mb-6 flex items-center gap-2">
+            <Checkbox 
+              id="in-queue"
+              checked={inQueue}
+              onCheckedChange={(checked) => setInQueue(!!checked)}
+            />
+            <Label htmlFor="in-queue" className="cursor-pointer">Add to Watch Queue</Label>
+          </div>
+          
           <FormContainer
             register={register}
             handleSubmit={handleSubmit}
@@ -149,15 +159,6 @@ const AddMovieForm = () => {
             </div>
           )}
         </div>
-      </div>
-      
-      <div className="mt-4 flex items-center gap-2">
-        <Label htmlFor="in-queue" className="cursor-pointer">In Queue</Label>
-        <Checkbox 
-          id="in-queue"
-          checked={inQueue}
-          onCheckedChange={(checked) => setInQueue(!!checked)}
-        />
       </div>
     </div>
   );
